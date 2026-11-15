@@ -24,6 +24,9 @@
     <link rel="stylesheet" href="/workspace.css" />
     <link rel="stylesheet" href="/intelligence.css" />
     <link rel="stylesheet" href="/responsive.css" />
+    <!-- Theme overrides and selector -->
+    <link rel="stylesheet" href="/theme.css" />
+    <script src="/theme.js" defer></script>
     <script src="/bootstrap.js" defer=""></script>
   </head>
   <body class="auth-pending">
@@ -118,14 +121,23 @@
           </button>
           <div id="account-menu" class="account-menu" role="menu" hidden>
             <button data-view="profile" role="menuitem">My profile</button
-            ><button data-view="privacy" role="menuitem">Privacy</button
-            ><button data-view="onboarding" role="menuitem">Settings</button
-            ><button data-view="admin" data-admin-only role="menuitem" hidden>
-              System Health &amp; content</button
-            ><button id="account-signout" role="menuitem">Sign out</button>
+              ><button data-view="privacy" role="menuitem">Privacy</button
+              ><button data-view="onboarding" role="menuitem">Settings</button
+              ><button data-view="admin" data-admin-only role="menuitem" hidden>
+                System Health &amp; content</button
+              ><button id="account-signout" role="menuitem">Sign out</button>
+            </div>
           </div>
-        </div>
-        <span class="public-pill">Public discovery</span>
+          <!-- Theme selector added to header -->
+          <div class="theme-switcher" role="group" aria-label="Theme selector">
+            <label for="theme-select">Theme</label>
+            <select id="theme-select" class="theme-select">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="system">System</option>
+            </select>
+          </div>
+          <span class="public-pill">Public discovery</span>
       </header>
       <nav
         id="hub-navigation"

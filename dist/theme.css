@@ -1,0 +1,39 @@
+/*
+ * Dark theme overrides for ProspectoAI.
+ * Uses the token names from dist/styles.css.
+ */
+[data-theme="dark"] {
+  /* Canvas & background colors */
+  --bg-canvas: #0b1018;
+  --bg-surface: #131d2b;
+  --bg-muted: #1b2430;
+  --bg-raised: #1c293b;
+
+  /* Text colors */
+  --text-primary: #eef3fa;
+  --text-secondary: #b2c0d3;
+  --text-muted: #70839d;
+
+  /* Accents */
+  --accent-primary: #8ba8ff;
+  --accent-hover: #5f7bbd;
+  --accent-soft: #283c5c;
+  --text-on-accent: #0b1018;
+
+  /* Borders */
+  --border-subtle: #4a5b6e;
+
+  /* Status colors (preserve semantic meaning) */
+  --status-open: #1e8566;
+  --status-open-bg: #0f4b3a;
+  --status-expected: #905b1d;
+  --status-expected-bg: #37251a;
+  --status-error: #b33a43;
+  --status-error-bg: #5a2c33;
+
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  /* Ensure light theme variables are set for fallback */
+  color-scheme: light;
+}
