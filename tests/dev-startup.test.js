@@ -13,7 +13,6 @@ import { tmpdir } from 'node:os';
 import { resolve, join, basename, dirname } from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { ensureDevBuild } from '../scripts/dev-server.js';
 
 test(
   'fresh local startup builds missing bundles, loads .env.local, and also starts without it',
@@ -119,7 +118,15 @@ test(
       }
       assert.equal((await fetch(base + '/login')).status, 200);
       assert.equal((await fetch(base + '/.env.local')).status, 404);
-      assert.equal(ensureDevBuild(directory), false);
+      // Change source while generated bundles already exist; the next start must rebuild.
+      const source = join(directory, 'src/bootstrap.js');
+      writeFileSync(
+        source,
+        readFileSync(source, 'utf8').replace(
+          'Reload collection',
+          'Reload current collection',
+        ),
+      );
       await stop();
       rmSync(join(directory, '.env.local'));
       base = await start();
@@ -127,6 +134,10 @@ test(
       assert.equal(config.status, 503);
       assert.equal((await config.json()).code, 'auth_not_configured');
       assert.equal((await fetch(base + '/login')).status, 200);
+      assert.match(
+        await (await fetch(base + '/bootstrap.js')).text(),
+        /Reload current collection/,
+      );
     } finally {
       await stop();
       // Only the uniquely created fixture beneath the OS temporary directory is removed.

@@ -17,7 +17,7 @@ A place to explore education and career possibilities, build useful skills and k
 - **Skills for Your Major or Career**: 33 field maps with evidence-based progress, tools, projects and official course links.
 - **Internships and Jobs**: official career sources and individual postings. A source directory is clearly distinguished from a vacancy; missing deadlines are not guessed.
 - A private account workspace with a saved application tracker, profile and private activities. Activities support notes, dates, categories, priority, progress, filtering and sorting.
-- A source-grounded assistant for discovery and development plans. Search and AI planning require a confirmed account.
+- Public catalog search, with a source-grounded assistant and private development plans available after confirmed sign-in.
 
 The initial expanded collection contains 33 programme records, 12 university profiles, 33 field maps, 28 courses, 10 illustrative career pathways and 9 career sources/postings. Some records are directories or closed-cycle preparation watchlists. Each retains its source and review date. Prices, openings, facilities access and programme conditions can change.
 
@@ -33,7 +33,7 @@ npm ci --ignore-scripts
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173`. `npm run dev` automatically loads `.env.local` with Node’s native `--env-file-if-exists` option and builds missing browser bundles before starting. Existing shell variables take precedence over the file. If the file or either required setting is missing, the server still starts and the login page displays a setup diagnostic with sign-in and recovery forms disabled. A configured Supabase project and confirmed login are required to load the collection.
+Open `http://127.0.0.1:4173`. `npm run dev` automatically loads `.env.local` with Node’s native `--env-file-if-exists` option and builds current catalog and browser bundles before starting. Restart development after source edits to rebuild the bundles. Existing shell variables take precedence over the file. Public discovery works without signing in or configuring Supabase. If the file or either required setting is missing, the server still starts and the login page displays a setup diagnostic with sign-in and recovery forms disabled. Personal workspace features require configured Supabase settings and confirmed sign-in.
 
 Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from the same Supabase project. Use a publishable key (or legacy anonymous key), never a secret/service-role key. Restart the server after editing `.env.local`. The file is ignored by Git, is outside the served `dist/` directory, and is never copied into browser bundles. `npm run build` remains available for an explicit rebuild.
 
@@ -61,11 +61,11 @@ Set deployment environment variables in Vercel and local values in `.env.local`.
 | `tests/`                                            | Validation, tracker, calendar, assistant, feeds and renewal checks   |
 | `docs/`                                             | Skills guide, recovery notes and review workflow                     |
 
-`npm run build` validates the catalogs and bundles the login, bootstrap and workspace scripts from pinned packages. Catalog JSON remains outside public output and is served only by the authenticated catalog API. Generated bundles are ignored in Git; the source and lockfile reproduce them.
+`npm run build` validates the catalogs and bundles the login, bootstrap and workspace scripts from pinned packages. Catalog JSON remains outside public output. Anonymous `GET /api/catalog` returns a read-only projection of reviewed repository content, excluding staged review items and private/audit fields. Signed-in catalog requests also retrieve published database revisions. Generated bundles are ignored in Git; the source and lockfile reproduce them.
 
 ## Supabase
 
-Create a project, then apply the migrations in order. Run the idempotent `supabase/seed.sql` after reviewing it. Resources require login, while `profiles`, `trackers` and `activities` are restricted to their owners using `auth.uid()` in every policy. No server secret is used in the browser. A server-only `SUPABASE_SECRET_KEY` is required solely for the optional account-deletion capability.
+Create a project, then apply the migrations in order. Run the idempotent `supabase/seed.sql` after reviewing it. Direct database access to resources requires login; public discovery uses the reviewed repository projection without anonymous owner-table queries. Profiles, trackers and activities are restricted to their owners using `auth.uid()` in every policy. Saving, private folders, documents, custom plans and AI require authentication. No server secret is used in the browser. A server-only `SUPABASE_SECRET_KEY` is required solely for the optional account-deletion capability.
 
 The account client supports email/password registration, login, logout, session persistence and reset-password links. Before opening registration publicly, configure these owner settings:
 
@@ -123,4 +123,4 @@ Created by **Yermukhamed Tuktibay**.
 
 ## Authentication and custom domains
 
-See [auth routing, exact redirects and DNS rollout](docs/auth-routing-and-domains.md). The app now redirects unsigned visitors to `/login` before loading search data. Password recovery has a dedicated `/reset-password` route, and confirmation has `/auth/callback`. A custom domain must be purchased or owned and verified before auth configuration switches to it.
+See [auth routing, exact redirects and DNS rollout](docs/auth-routing-and-domains.md). Unsigned visitors can browse public discovery immediately; personal actions show a sign-in prompt with a return link to the current view. Password recovery has a dedicated `/reset-password` route, and confirmation has `/auth/callback`. A custom domain must be purchased or owned and verified before auth configuration switches to it.

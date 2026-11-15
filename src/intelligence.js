@@ -1,5 +1,8 @@
+import { gateHTML } from './access.js';
+import { HUBS } from './navigation.js';
 import {
   cycleStatus,
+  verificationStatus,
   deadlineInfo,
   explainFit,
   stableSort,
@@ -10,7 +13,7 @@ import {
 } from '../lib/intelligence-core.js';
 const A = window.ProspectoAuth,
   db = A.client,
-  uid = A.user.id,
+  uid = A.user?.id,
   B = window.ProspectoWorkspace;
 const records = window.PROSPECTO_INTELLIGENCE?.records || [],
   majors = window.PROSPECTO_DEVELOPMENT.majors;
@@ -63,6 +66,10 @@ const input = (label, name, value = '', type = 'text', extra = '') =>
   `<label>${E(label)}<input name="${name}" type="${type}" value="${E(value)}" ${extra}></label>`;
 const area = (label, name, value = '', max = 30000) =>
   `<label>${E(label)}<textarea name="${name}" maxlength="${max}" rows="5">${E(value)}</textarea></label>`;
+const statusBadge = (r) => {
+  const status = verificationStatus(r);
+  return `<span class="verification-badge status-${status.tone}" title="${E(status.description)}">${E(status.label)}</span>`;
+};
 const tag = (text, cls = '') =>
   `<span class="work-tag ${cls}">${E(text)}</span>`;
 const link = (url, name) => {
@@ -111,6 +118,20 @@ async function result(q) {
 }
 async function load(force = false) {
   base = await B.getState();
+  if (!uid) {
+    for (const name of [
+      'admissions_folders',
+      'admissions_items',
+      'folder_documents',
+      'saved_resources',
+      'evidence_links',
+      'notification_states',
+    ])
+      state[name] = [];
+    state.admin = false;
+    loaded = true;
+    return;
+  }
   document.body.classList.toggle(
     'reduce-motion',
     base.preferences.basic.reduceMotion !== false,
@@ -143,6 +164,7 @@ async function load(force = false) {
     names.forEach((n, i) => (state[n] = rows[i].data || []));
     const role = await db.rpc('is_content_admin');
     state.admin = !role.error && role.data === true;
+    window.ProspectoNavigation?.setAdmin(state.admin);
     loaded = true;
   })();
   try {
@@ -156,8 +178,11 @@ function message(text) {
   if (e) e.textContent = text;
 }
 function goto(v) {
-  window.ProspectoTracker.setView(v);
-  history.replaceState(null, '', '#' + v);
+  if (window.ProspectoNavigation) window.ProspectoNavigation.navigate(v);
+  else {
+    window.ProspectoTracker.setView(v);
+    history.pushState({ view: v }, '', '#' + v);
+  }
 }
 async function refresh() {
   await load(true);
@@ -298,7 +323,7 @@ function funding() {
           preferences: base.preferences,
           skills: base.user_skills,
         });
-        return `<article class="work-card">${tag(cycleStatus(r))}<h2>${E(r.name)}</h2><p>${E(r.organization)} · ${E(r.country)}</p><p>${E(r.eligibility)}</p><p><strong>Stages:</strong> ${E(r.stages?.join(' · '))}</p><p><strong>Nationality / residence:</strong> ${E(r.nationalities?.join(' · ') || 'Check the official country-specific rules')}</p><dl>${Object.entries(
+        return `<article class="work-card">${statusBadge(r)}<h2>${E(r.name)}</h2><p>${E(r.organization)} · ${E(r.country)}</p><p>${E(r.eligibility)}</p><p><strong>Stages:</strong> ${E(r.stages?.join(' · '))}</p><p><strong>Nationality / residence:</strong> ${E(r.nationalities?.join(' · ') || 'Check the official country-specific rules')}</p><dl>${Object.entries(
           r.funding || {},
         )
           .map(
@@ -325,7 +350,7 @@ function universityView() {
     filters() +
     `<div class="work-actions">${btn('go', 'My admissions folders', 'admissions-folders')}${btn('go', 'Country & city guides', 'locations')}${btn('go', 'Scholarships & funding', 'funding')}</div>` +
     (selectedRecords.length
-      ? `<div class="work-table-wrap"><table><caption>Capability and location comparison · up to four</caption><thead><tr><th>Area</th>${selectedRecords.map((r) => `<th>${E(r.name)} ${btn('uni-compare', 'Remove', r.id, 'text-button')}</th>`).join('')}</tr></thead><tbody>${[
+      ? `<div class="work-table-wrap" role="region" aria-label="University comparison; scroll horizontally for more columns" tabindex="0"><table><caption>Capability and location comparison · up to four</caption><thead><tr><th>Area</th>${selectedRecords.map((r) => `<th>${E(r.name)} ${btn('uni-compare', 'Remove', r.id, 'text-button')}</th>`).join('')}</tr></thead><tbody>${[
           ['Research & laboratories', 'research'],
           ['Student research / capstones', 'experience'],
           ['Industry, exchange & joint degrees', 'partnership'],
@@ -643,6 +668,11 @@ function notices() {
   ).sort((a, b) => a.id.localeCompare(b.id));
 }
 async function updateNoticeBadge() {
+  if (!uid) {
+    const button = document.querySelector('#intel-notices');
+    if (button) button.hidden = true;
+    return;
+  }
   const b = document.querySelector('#intel-notices');
   if (b)
     b.textContent =
@@ -898,6 +928,15 @@ async function render(next) {
   panel.innerHTML =
     '<div class="intel-skeleton" role="status" aria-label="Loading workspace"><span></span><span></span><span></span></div>';
   try {
+    if (
+      !uid &&
+      ['comparison', 'admissions-folders', 'saved-library', 'admin'].includes(
+        next,
+      )
+    ) {
+      panel.innerHTML = gateHTML('your private workspace');
+      return;
+    }
     await load();
     if (view !== next) return;
     let html =
@@ -955,12 +994,33 @@ async function detail(id) {
       ? personCard(r)
       : ['project', 'research'].includes(r.kind)
         ? projectCard(r)
-        : `<p>${E(r.summary || r.eligibility || r.description || r.question || 'Read the official provider information.')}</p>${r.finalDeadline ? `<p>${E(deadlineInfo(r, tz()).text)}</p>` : ''}${sources(r)}${actions(r)}`,
+        : `${['opportunity', 'scholarship'].includes(r.kind) ? statusBadge(r) : ''}<p>${E(r.summary || r.eligibility || r.description || r.question || 'Read the official provider information.')}</p>${r.finalDeadline ? `<p>${E(deadlineInfo(r, tz()).text)}</p>` : ''}${sources(r)}${actions(r)}`,
     '',
     null,
   );
 }
 async function action(name, id) {
+  if (
+    !uid &&
+    ![
+      'go',
+      'retry',
+      'detail',
+      'command',
+      'uni-compare',
+      'download-cv',
+    ].includes(name)
+  ) {
+    A.promptSignIn?.('save and personalize your discoveries');
+    return;
+  }
+  if (
+    /^(admin-|review-candidate|reject-candidate|restore-content|export-report)/.test(
+      name,
+    ) &&
+    !state.admin
+  )
+    throw Error('Administrator access required.');
   if (name === 'go') {
     document.querySelector('#work-dialog')?.close();
     goto(id);
@@ -1359,66 +1419,7 @@ document.addEventListener('change', (e) => {
     render(view);
   }
 });
-const NAV = [
-  [
-    'Explore',
-    [
-      ['dashboard', 'My dashboard'],
-      ['finder', 'Opportunity finder'],
-      ['funding', 'Scholarships & funding'],
-      ['whats-new', 'What’s New'],
-      ['saved-library', 'Saved library'],
-      ['latest', 'Latest source leads'],
-    ],
-  ],
-  [
-    'Build Your Profile',
-    [
-      ['profile', 'My development profile'],
-      ['skills', 'Skills Intelligence'],
-      ['courses', 'Courses & learning'],
-      ['projects', 'Portfolio projects'],
-      ['research', 'Research Idea Studio'],
-      ['cv-library', 'CV and Portfolio Library'],
-      ['documents', 'Private documents'],
-    ],
-  ],
-  [
-    'Professional Pathways',
-    [
-      ['professionals', 'Public profiles & pathways'],
-      ['comparison', 'My evidence comparison'],
-    ],
-  ],
-  [
-    'Admissions and Universities',
-    [
-      ['universities', 'Admissions & University Explorer'],
-      ['admissions-folders', 'My admissions folders'],
-      ['locations', 'Country & city guides'],
-    ],
-  ],
-  [
-    'My Plan',
-    [
-      ['plan', 'My development plan'],
-      ['activities', 'My activities'],
-      ['saved', 'Application tracker'],
-      ['deadlines', 'Deadline view'],
-      ['assistant', 'Ask ProspectoAI'],
-      ['privacy', 'Privacy & account'],
-      ['sources', 'Source review status'],
-      ['admin', 'System Health & content'],
-    ],
-  ],
-];
-const nav = document.querySelector('.main-nav');
-if (nav) {
-  nav.innerHTML = NAV.map(
-    ([group, items]) =>
-      `<div class="intel-nav-group"><div class="intel-nav-label">${E(group)}</div>${items.map(([v, label]) => `<button class="nav-item" data-view="${v}" ${v === 'admin' ? 'hidden' : ''}><span>${E(label)}</span></button>`).join('')}</div>`,
-  ).join('');
-}
+const NAV = HUBS.map((h) => [h.label, h.items]);
 const toolbar =
   document.querySelector('.topbar') || document.querySelector('main');
 if (toolbar) {

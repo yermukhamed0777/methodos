@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { requireUser } from '../lib/auth.js';
+import { publicPreview } from '../lib/public-catalog.js';
+import { intelligence } from '../lib/intelligence-data.js';
 const catalog = JSON.parse(
   readFileSync(new URL('../data/opportunities.json', import.meta.url)),
 );
@@ -12,6 +14,13 @@ const development = JSON.parse(
 export default async function handler(req, res) {
   if (req.method !== 'GET')
     return res.status(405).json({ error: 'Method not allowed' });
+  if (!req.headers?.authorization) {
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
+    res.setHeader('Vary', 'Authorization');
+    return res
+      .status(200)
+      .json(publicPreview({ catalog, resources, development, intelligence }));
+  }
   const auth = await requireUser(req, res);
   if (!auth) return;
   const { data: rows, error } = await auth.db

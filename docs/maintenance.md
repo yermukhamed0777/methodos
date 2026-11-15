@@ -22,6 +22,8 @@ Vercel calls `/api/refresh` daily at 01:00 UTC (09:00 China/Hong Kong time). `CR
 
 Ordinary signed-in visitors cannot publish content. Server and database checks enforce the private administrator role, and each publication uses an expected version plus an audit history. Repository changes still pass CI. Vercel Blob stores the source reports; PostgreSQL cron history is available in the Supabase dashboard.
 
+Anonymous discovery uses the reviewed repository projection from `/api/catalog`; it does not read administrator drafts or owner tables. Database publications are available to authenticated catalog requests. To publish the same correction to the public preview, update the corresponding source under `data/`, rebuild and release it through the repository review flow. Preserve each record's actual review date and distinguish closed cycles from current applications.
+
 ## AI diagnostics
 
 The current reviewed primary model is `openai/gpt-4.1-nano`. A single backup attempt may use `openai/gpt-5-nano` only when the same Gateway credential's model metadata marks it eligible and request availability is explicitly available. Unknown or denied availability is not permission. Authentication, billing, owner-verification, regional and content-policy failures stop rather than retrying through a different credential.

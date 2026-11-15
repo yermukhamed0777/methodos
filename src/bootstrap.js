@@ -1,40 +1,21 @@
 import { authClient } from './auth-client.js';
-import {
-  callbackKind,
-  RECOVERY_PATH,
-  CALLBACK_PATH,
-  safeNext,
-} from './auth-flow.js';
+import { callbackKind, RECOVERY_PATH, CALLBACK_PATH } from './auth-flow.js';
+import { installNavigation } from './navigation.js';
+import { installAccess } from './access.js';
+import { verificationStatus } from '../lib/intelligence-core.js';
 const status = document.querySelector('#boot-status');
 const route = new URL(location.href);
-function login() {
-  location.replace(
-    '/login?next=' + encodeURIComponent(safeNext(route.href, route.origin)),
-  );
-}
 async function loadScript(src) {
   await new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = src;
     script.onload = resolve;
     script.onerror = () =>
-      reject(Error('Workspace could not load. Please reload.'));
+      reject(Error('This view could not load. Please reload.'));
     document.head.append(script);
   });
 }
 async function start() {
-  const routeViews = {
-    '/admissions': 'universities',
-    '/professional-pathways': 'professionals',
-    '/research': 'research',
-    '/funding': 'funding',
-    '/my-plan': 'plan',
-    '/system-health': 'admin',
-  };
-  if (routeViews[route.pathname] && !route.hash)
-    route.hash = '#' + routeViews[route.pathname];
-  if (routeViews[route.pathname] && !location.hash)
-    history.replaceState(null, '', route.pathname + route.search + route.hash);
   const kind = callbackKind(route);
   if (kind) {
     location.replace(
@@ -44,22 +25,34 @@ async function start() {
     );
     return;
   }
-  const { client, config } = await authClient();
-  const { data, error } = await client.auth.getUser();
-  if (
-    error ||
-    !data.user ||
-    !data.user.email_confirmed_at ||
-    data.user.is_anonymous
-  )
-    return login();
+  const navigation = installNavigation();
+  const access = installAccess();
+  const preview = fetch('/api/catalog', { cache: 'no-store' }).catch(
+    () => null,
+  );
+  let client = null,
+    config = {},
+    user = null,
+    setupError = null;
+  try {
+    ({ client, config } = await authClient());
+    const { data, error } = await client.auth.getUser();
+    if (!error && data.user?.email_confirmed_at && !data.user.is_anonymous)
+      user = data.user;
+  } catch (error) {
+    setupError = error.message;
+  }
   async function authorizedFetch(url, options = {}) {
+    if (!window.ProspectoAuth.user || !client) {
+      access.promptSignIn('use your private workspace');
+      throw Error('Sign in to continue.');
+    }
     const {
       data: { session },
     } = await client.auth.getSession();
     if (!session) {
-      login();
-      throw Error('Sign in again.');
+      access.promptSignIn('continue with your account');
+      throw Error('Your session expired. Sign in again.');
     }
     const response = await fetch(url, {
       ...options,
@@ -79,45 +72,75 @@ async function start() {
             .catch(() => ({}))
         ).code === 'email_not_confirmed')
     ) {
-      login();
-      throw Error('Sign in again.');
+      location.replace('/?signin=expired#finder');
+      throw Error('Sign in again to continue.');
     }
     return response;
   }
-  const response = await authorizedFetch('/api/catalog');
-  if (!response.ok)
-    throw Error('The collection could not load. Please reload.');
-  const { catalog, resources, development, intelligence } =
-    await response.json();
-  window.EXPLORER_CATALOG = catalog;
-  window.OPPORTUNITIES = catalog.opportunities;
-  window.CHECKED_ON = catalog.updatedAt.slice(0, 10);
-  window.PROSPECTO_RESOURCES = resources;
-  window.PROSPECTO_DEVELOPMENT = development;
-  window.PROSPECTO_INTELLIGENCE = intelligence;
   window.ProspectoAuth = {
     client,
     config,
-    user: data.user,
+    user,
+    preview: !user,
+    setupError,
+    ...access,
     fetch: authorizedFetch,
+    requireAccount(purpose) {
+      return !!this.user || access.promptSignIn(purpose);
+    },
   };
-  client.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') {
-      document.body.classList.add('auth-pending');
-      login();
-    }
+  const response = user ? await authorizedFetch('/api/catalog') : await preview;
+  if (user) await preview.catch(() => {});
+  if (!response?.ok)
+    throw Error('The public collection could not load. Please reload.');
+  const { catalog, resources, development, intelligence } =
+    await response.json();
+  Object.assign(window, {
+    EXPLORER_CATALOG: catalog,
+    OPPORTUNITIES: catalog.opportunities,
+    CHECKED_ON: catalog.updatedAt.slice(0, 10),
+    PROSPECTO_RESOURCES: resources,
+    PROSPECTO_DEVELOPMENT: development,
+    PROSPECTO_INTELLIGENCE: intelligence,
+    ProspectoVerification: verificationStatus,
   });
-  await loadScript('/app.js');
-  await loadScript('/workspace.js');
-  await loadScript('/intelligence.js');
-  await loadScript('/platform.js');
+  document.body.classList.toggle('public-preview', !user);
+  const previewBanner = document.querySelector('#preview-banner');
+  if (previewBanner) previewBanner.hidden = !!user;
+  const pill = document.querySelector('.public-pill');
+  if (pill)
+    pill.textContent = user ? 'Your private account' : 'Public discovery';
+  client?.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') location.replace('/#finder');
+  });
+  for (const src of [
+    '/app.js',
+    '/workspace.js',
+    '/intelligence.js',
+    '/platform.js',
+  ])
+    await loadScript(src);
   document.body.classList.remove('auth-pending');
   status.hidden = true;
+  if (!user) {
+    const notices = document.querySelector('#intel-notices');
+    if (notices) notices.hidden = true;
+  }
+  navigation.start();
+  if (user)
+    client
+      .rpc('is_content_admin')
+      .then((role) => navigation.setAdmin(!role.error && role.data === true))
+      .catch(() => navigation.setAdmin(false));
+  if (route.searchParams.get('signin') === 'expired')
+    access.promptSignIn('continue with your account');
 }
 start().catch((error) => {
+  status.className = 'error-banner';
+  status.setAttribute('role', 'alert');
   status.textContent = error.message;
-  const retry = document.createElement('a');
-  retry.href = '/login';
-  retry.textContent = 'Go to sign in';
+  const retry = document.createElement('button');
+  retry.textContent = 'Reload collection';
+  retry.onclick = () => location.reload();
   status.append(document.createElement('br'), retry);
 });

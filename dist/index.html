@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#173f34" />
+    <meta name="theme-color" content="#f5f7fb" />
     <title>ProspectoAI — Your Development Workspace</title>
     <meta
       name="description"
@@ -23,10 +23,11 @@
     <link rel="stylesheet" href="/platform.css" />
     <link rel="stylesheet" href="/workspace.css" />
     <link rel="stylesheet" href="/intelligence.css" />
+    <link rel="stylesheet" href="/responsive.css" />
     <script src="/bootstrap.js" defer=""></script>
   </head>
   <body class="auth-pending">
-    <p id="boot-status" role="status">Checking your session…</p>
+    <p id="boot-status" role="status">Loading public discovery…</p>
     <noscript
       ><p>
         JavaScript is needed. <a href="/login">Sign in to ProspectoAI</a>.
@@ -43,72 +44,30 @@
       <button id="nav-close" class="nav-close" aria-label="Close navigation">
         ×
       </button>
-      <a href="#" class="brand" aria-label="ProspectoAI home"
+      <a
+        href="#finder"
+        data-view="finder"
+        class="brand"
+        aria-label="ProspectoAI home"
         ><img
-          src="/assets/logo-dark.svg"
+          src="/assets/logo-light.svg"
           width="206"
           height="42"
           alt="ProspectoAI"
       /></a>
       <div class="workspace-label">FIND YOUR NEXT STEP</div>
-      <nav class="main-nav" aria-label="Workspace">
-        <button data-view="dashboard" class="nav-item">
-          <i data-icon="compass"></i><span>My dashboard</span>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <button data-view="finder" data-hub="explore" class="nav-item active">
+          <i data-icon="compass"></i><span>Explore</span>
         </button>
-        <button data-view="profile" class="nav-item">
-          <i data-icon="people"></i><span>My development profile</span>
+        <button data-view="courses" data-hub="learn" class="nav-item">
+          <i data-icon="spark"></i><span>Courses &amp; Skills</span>
         </button>
-        <button data-view="plan" class="nav-item">
-          <i data-icon="calendar"></i><span>My development plan</span>
+        <button data-view="professionals" data-hub="career" class="nav-item">
+          <i data-icon="people"></i><span>Career Pathways</span>
         </button>
-        <button data-view="finder" class="nav-item">
-          <i data-icon="globe"></i><span>Opportunity finder</span>
-        </button>
-        <button data-view="courses" class="nav-item">
-          <i data-icon="check"></i><span>Courses & learning</span>
-        </button>
-        <button data-view="pathways" class="nav-item">
-          <i data-icon="compass"></i><span>Career pathways</span>
-        </button>
-        <button data-view="documents" class="nav-item">
-          <i data-icon="bookmark"></i><span>Private documents</span>
-        </button>
-        <button data-view="privacy" class="nav-item">
-          <i data-icon="info"></i><span>Privacy & account</span>
-        </button>
-
-        <button data-view="explore" class="nav-item active">
-          <i data-icon="compass"></i><span>Explore &amp; compare</span
-          ><span id="nav-total" class="nav-count">23</span>
-        </button>
-        <button data-view="latest" class="nav-item">
-          <i data-icon="spark"></i><span>Latest updates</span
-          ><span id="feed-count" class="nav-count">…</span>
-        </button>
-        <button data-view="saved" class="nav-item">
-          <i data-icon="bookmark"></i><span>Application tracker</span
-          ><span id="saved-count" class="nav-count">0</span>
-        </button>
-        <button data-view="deadlines" class="nav-item">
-          <i data-icon="calendar"></i><span>Deadline view</span>
-        </button>
-        <button data-view="universities" class="nav-item">
-          <i data-icon="globe"></i><span>Search for universities</span>
-        </button>
-        <button data-view="skills" class="nav-item">
-          <i data-icon="spark"></i><span>Skills for my major</span>
-        </button>
-        <button data-view="careers" class="nav-item">
-          <i data-icon="compass"></i><span>Internships &amp; jobs</span>
-        </button>
-        <button data-view="activities" class="nav-item">
-          <i data-icon="check"></i><span>My activities</span>
-        </button>
-        <button data-view="assistant" class="nav-item">
-          <i data-icon="spark"></i><span>Ask ProspectoAI</span>
-        </button>
-        <button data-view="sources" class="nav-item">
-          <i data-icon="globe"></i><span>Sources &amp; review status</span>
+        <button data-view="dashboard" data-hub="workspace" class="nav-item">
+          <i data-icon="bookmark"></i><span>My Workspace</span>
         </button>
       </nav>
       <div class="sidebar-note">
@@ -126,8 +85,8 @@
         <div class="local-note">
           <i data-icon="bookmark"></i
           ><span
-            >Your shortlist stays private<small
-              >Checking your account…</small
+            >Explore freely. Save privately.<small
+              >Your next step starts here.</small
             ></span
           >
         </div>
@@ -147,13 +106,45 @@
           ProspectoAI <span>/</span
           ><strong id="breadcrumb-title">Explore</strong>
         </div>
-        <button id="account-button" class="account-button">
-          Sign in / create account</button
-        ><span class="public-pill"
-          ><span class="online-dot"></span>Private workspace</span
-        >
+        <div class="account-wrap">
+          <button
+            id="account-button"
+            class="account-button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="account-menu"
+          >
+            Sign in
+          </button>
+          <div id="account-menu" class="account-menu" role="menu" hidden>
+            <button data-view="profile" role="menuitem">My profile</button
+            ><button data-view="privacy" role="menuitem">Privacy</button
+            ><button data-view="onboarding" role="menuitem">Settings</button
+            ><button data-view="admin" data-admin-only role="menuitem" hidden>
+              System Health &amp; content</button
+            ><button id="account-signout" role="menuitem">Sign out</button>
+          </div>
+        </div>
+        <span class="public-pill">Public discovery</span>
       </header>
-      <main>
+      <nav
+        id="hub-navigation"
+        class="hub-navigation"
+        aria-label="Explore sections"
+      ></nav>
+      <main tabindex="-1">
+        <section id="preview-banner" class="discovery-banner">
+          <div>
+            <strong>A little curiosity goes a long way.</strong>
+            <p>
+              Browse opportunities, learning and career pathways freely. Sign in
+              when you want to save your next step.
+            </p>
+          </div>
+          <button class="primary" data-signin>
+            Create your workspace <span aria-hidden="true">↗</span>
+          </button>
+        </section>
         <section class="hero">
           <div>
             <div class="eyebrow">A LITTLE CURIOSITY GOES A LONG WAY</div>
@@ -522,5 +513,29 @@
       <div id="account-content"></div>
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
+    <dialog
+      id="signin-dialog"
+      class="signin-dialog"
+      aria-labelledby="signin-title"
+    >
+      <button
+        type="button"
+        class="dialog-close"
+        data-close-signin
+        aria-label="Close sign-in prompt"
+      >
+        ×</button
+      ><span class="eyebrow">MAKE IT YOURS</span>
+      <h2 id="signin-title">Keep your next step.</h2>
+      <p data-signin-purpose>Sign in to save your work privately.</p>
+      <ul>
+        <li>Save opportunities and courses</li>
+        <li>Build a personal plan</li>
+        <li>Keep documents and admissions notes private</li>
+      </ul>
+      <a class="primary" data-login-link href="/login"
+        >Sign in or create an account</a
+      ><button class="text-button" data-close-signin>Continue browsing</button>
+    </dialog>
   </body>
 </html>

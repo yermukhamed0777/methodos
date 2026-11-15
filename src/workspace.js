@@ -1,3 +1,5 @@
+import { verificationStatus } from '../lib/intelligence-core.js';
+import { gateHTML } from './access.js';
 import {
   monday,
   checkBudget,
@@ -11,7 +13,7 @@ const D = window.PROSPECTO_DEVELOPMENT,
   R = window.PROSPECTO_RESOURCES,
   A = window.ProspectoAuth,
   db = A.client,
-  uid = A.user.id;
+  uid = A.user?.id;
 const TABLES = [
   'preferences',
   'documents',
@@ -84,10 +86,14 @@ const link = (url, label) => {
 const button = (action, label, id = '', cls = 'secondary') =>
   `<button class="${cls}" data-work="${action}" data-id="${E(id)}">${E(label)}</button>`;
 const go = (page, label) => button('go', label, page);
+const statusBadge = (r) => {
+  const status = verificationStatus(r);
+  return `<span class="verification-badge status-${status.tone}" title="${E(status.description)}">${E(status.label)}</span>`;
+};
 const tag = (text, cls = '') =>
   `<span class="work-tag ${cls}">${E(text)}</span>`;
 const heading = (title, description) =>
-  `<header class="platform-heading"><span class="eyebrow">YOUR DEVELOPMENT WORKSPACE</span><h1>${E(title)}</h1><p>${E(description)}</p></header>`;
+  `<header class="platform-heading"><span class="eyebrow">EXPLORE. LEARN. MAKE YOUR NEXT MOVE.</span><h1>${E(title)}</h1><p>${E(description)}</p></header>`;
 const empty = (text, action = '') =>
   `<div class="work-empty"><img src="/assets/white-lion.svg" alt="" width="88" height="70"><p>${E(text)}</p>${action}</div>`;
 const input = (label, name, value = '', type = 'text', attrs = '') =>
@@ -117,6 +123,18 @@ async function unwrap(query) {
   return data;
 }
 async function load(force = false) {
+  if (!uid) {
+    for (const name of TABLES) state[name] = [];
+    state.preferences = {
+      basic: {},
+      field_ids: [],
+      goals: [],
+      allow_profile_ai: false,
+      in_app_reminders: false,
+    };
+    ready = true;
+    return;
+  }
   if (ready && !force) return;
   if (loading) return loading;
   loading = (async () => {
@@ -828,7 +846,7 @@ function reviewPlanDraft(goal, hours, result) {
       selectedPlan = plans[0].id;
       view = 'plan';
       window.ProspectoTracker.setView('plan');
-      history.replaceState(null, '', '#plan');
+      window.ProspectoNavigation?.navigate('plan');
     },
   );
 }
@@ -846,6 +864,7 @@ function opportunities() {
         ? 'Published provider deadline'
         : 'Next deadline not confirmed',
     closed: o.archived,
+    recordId: 'opportunity-' + o.id,
     url: o.sources[0][1],
     note: o.caution,
     educationLevels: [],
@@ -871,6 +890,7 @@ function opportunities() {
       .map((r) => ({
         ...r,
         org: r.organization,
+        recordId: r.id,
         educationLevels: r.stages || [],
         type:
           r.type || (r.kind === 'scholarship' ? 'Scholarship' : 'Programme'),
@@ -879,7 +899,7 @@ function opportunities() {
         closed: ['Closed', 'Previous cycle', 'Archived'].includes(r.status),
         verification: r.status,
       })),
-    ...D.opportunities,
+    ...D.opportunities.map((o) => ({ ...o, recordId: 'programme-' + o.id })),
     ...legacy,
     ...R.careers.map((o) => ({
       ...o,
@@ -937,10 +957,10 @@ function finder() {
   });
   return (
     heading(
-      'Opportunity finder.',
+      'Find your next opportunity.',
       'Explore programmes and official directories internationally. Check every source for eligibility, time commitment, funding and current availability.',
     ) +
-    `<details class="work-card" open><summary>Search & filters</summary><form id="work-search" class="work-form"><div class="work-form-grid">${input('Search role, skill, duration or keyword', 'q', search.q, 'search', 'maxlength="150"')}${choose(
+    `<details class="work-card discovery-filters"><summary>Search & filters</summary><form id="work-search" class="work-form"><div class="work-form-grid">${input('Search role, skill, duration or keyword', 'q', search.q, 'search', 'maxlength="150"')}${choose(
       'Field',
       'field',
       D.majors.map((x) => [x.id, x.name]),
@@ -950,7 +970,7 @@ function finder() {
       items
         .map((o) => {
           const fit = fitReasons(o, state.preferences);
-          return `<article class="work-card">${tag(o.type)} ${tag(availability(o), availability(o).startsWith('Closed') ? 'warning' : '')}<h2>${E(o.name)}</h2><p>${E(o.org)} · ${E(o.region)} · ${E(o.country)}</p><p>${E(o.fields?.join(' · '))}</p><h3>Who should check</h3><p>${E(o.eligibility)}</p><p><strong>Funding / pay:</strong> ${E(o.funding || 'Not verified')}</p><p><strong>Deadline:</strong> ${o.finalDeadline ? tag(o.finalDeadline, 'deadline') : E(o.deadline || 'Not confirmed')} ${o.startDate ? ' · Start ' + E(o.startDate) : ''}</p><p><strong>Duration:</strong> ${E(o.duration || o.effort || 'Check provider')} · ${E(o.format || 'Check provider')}</p><p><strong>Required skills:</strong> ${E(o.requiredSkills?.join(', ') || 'Not independently verified; inspect the individual provider notice')}</p><p><strong>Why explore:</strong> ${E(fit.reasons.join('; '))}</p><p class="resource-note">${E(o.note || o.caution || 'Verify individual eligibility and availability.')} Checked ${E(o.checkedOn)}.</p><div class="resource-links"><a href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">Official provider source ↗</a></div>${button('quick-plan', 'Add preparation task', o.name)}</article>`;
+          return `<article class="work-card discovery-card"><div class="card-classification">${statusBadge(o)}${tag(o.type)}</div><h2><button class="title-button" data-work="opportunity-detail" data-id="${E(o.id)}">${E(o.name)}</button></h2><p class="discovery-provider">${E(o.org)} · ${E(o.country || o.region)}</p><a class="discovery-source" href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">Official source ↗</a><p class="discovery-summary">${E(o.eligibility)}</p><dl class="discovery-facts"><div><dt>Funding / cost</dt><dd>${E(o.funding || 'Not verified')}</dd></div><div><dt>Application deadline</dt><dd>${E(o.finalDeadline || o.deadline || 'Not confirmed')}</dd></div></dl><p class="resource-note">Reviewed ${E(o.checkedOn)} · ${E(verificationStatus(o).description)}</p><div class="work-actions">${button('opportunity-detail', 'View details', o.id)}${o.recordId ? `<button class="text-button" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}${button('quick-plan', 'Add to plan', o.name, 'text-button')}</div></article>`;
         })
         .join('') || empty('No matches. Broaden a filter or reset the search.')
     }</div>`
@@ -965,7 +985,7 @@ function universities() {
     ) +
     `<label>Search university, research or region<input id="work-university-search" type="search" maxlength="120" placeholder="e.g. materials, makerspace, Hong Kong"></label><p>Compare up to four universities. Programmes and partnerships can change; use the official sources linked on each profile.</p><div id="work-uni-compare">${
       chosen.length
-        ? `<div class="work-table-wrap"><table><caption>University capabilities comparison</caption><thead><tr><th>Capability</th>${chosen.map((x) => `<th>${E(x.name)} ${button('compare-uni', 'Remove', x.id, 'text-button')}</th>`).join('')}</tr></thead><tbody>${[
+        ? `<div class="work-table-wrap" role="region" aria-label="University comparison; scroll horizontally for more columns" tabindex="0"><table><caption>University capabilities comparison</caption><thead><tr><th>Capability</th>${chosen.map((x) => `<th>${E(x.name)} ${button('compare-uni', 'Remove', x.id, 'text-button')}</th>`).join('')}</tr></thead><tbody>${[
             ['Research & laboratories', 'research'],
             ['Student experience', 'experience'],
             ['Degree partnerships', 'partnership'],
@@ -1012,7 +1032,19 @@ function privacy() {
 async function render(next) {
   view = next;
   const panel = document.querySelector('#platform-panel');
-  panel.innerHTML = '<p role="status">Loading your private workspace…</p>';
+  if (
+    !uid &&
+    !['finder', 'courses', 'skills', 'pathways', 'universities'].includes(next)
+  ) {
+    panel.innerHTML = gateHTML(
+      next === 'documents'
+        ? 'private documents and uploads'
+        : 'your personal plans and saved work',
+    );
+    return;
+  }
+  panel.innerHTML =
+    '<div class="loading-skeleton" role="status" aria-label="Loading view"><span></span><span></span><span></span></div>';
   try {
     await load();
     if (view !== next) return;
@@ -1054,13 +1086,40 @@ window.ProspectoWorkspace = {
     return state;
   },
   modal,
-  openTask: (title) => itemForm('', title),
+  openTask: (title) =>
+    uid ? itemForm('', title) : A.promptSignIn?.('create a personal plan'),
 };
 async function action(name, id, element) {
-  if (name === 'go') {
-    window.ProspectoTracker.setView(id);
-    history.replaceState(null, '', '#' + id);
+  if (
+    !uid &&
+    ![
+      'go',
+      'retry',
+      'compare-uni',
+      'reset-search',
+      'opportunity-detail',
+    ].includes(name)
+  ) {
+    A.promptSignIn?.('save and personalize your learning');
     return;
+  }
+  if (name === 'go') {
+    if (window.ProspectoNavigation) window.ProspectoNavigation.navigate(id);
+    else {
+      window.ProspectoTracker.setView(id);
+      history.pushState({ view: id }, '', '#' + id);
+    }
+    return;
+  }
+  if (name === 'opportunity-detail') {
+    const o = opportunities().find((r) => r.id === id);
+    if (!o) throw Error('This record is unavailable.');
+    return modal(
+      o.name,
+      `${statusBadge(o)}<p>${E(o.org)} · ${E(o.country || o.region)}</p><h3>Who should check</h3><p>${E(o.eligibility)}</p><h3>Funding / costs</h3><p>${E(o.funding || 'Not verified')}</p><h3>Dates, format & commitment</h3><p>${E(o.finalDeadline || o.deadline || 'Current deadline not confirmed')} · ${E(o.duration || o.effort || 'Check the provider')} · ${E(o.format || 'Check the provider')}</p><h3>Before you apply</h3><p>${E(o.note || o.caution || 'Check the current official eligibility and application notice.')}</p><p>${E(fitReasons(o, state.preferences).reasons.join('; '))}</p><p class="resource-note">Reviewed ${E(o.checkedOn)}. ${E(verificationStatus(o).description)}</p><div class="resource-links">${link(o.url, 'Official provider source')}</div><div class="work-actions">${button('quick-plan', 'Add preparation task', o.name)}${o.recordId ? `<button class="secondary" data-intel="save" data-id="${E(o.recordId)}">Save to my library</button>` : ''}</div>`,
+      '',
+      null,
+    );
   }
   if (name === 'retry') {
     ready = false;
@@ -1079,8 +1138,9 @@ async function action(name, id, element) {
       onboarding_complete: true,
     });
     await load(true);
-    window.ProspectoTracker.setView('dashboard');
-    history.replaceState(null, '', '#dashboard');
+    if (window.ProspectoNavigation)
+      window.ProspectoNavigation.navigate('dashboard');
+    else window.ProspectoTracker.setView('dashboard');
     return;
   }
   if (name === 'record') return recordForm(id);
@@ -1367,7 +1427,7 @@ function download(text, name, type) {
 }
 document.addEventListener('click', async (e) => {
   const source = e.target.closest('[data-view-source]');
-  if (source && ready) {
+  if (source && uid && ready) {
     const o = opportunities().find((x) => x.id === source.dataset.viewSource);
     if (o)
       save('recent_views', {
@@ -1397,6 +1457,10 @@ document.addEventListener('submit', async (e) => {
   if (!['work-onboarding', 'work-privacy', 'work-search'].includes(f.id))
     return;
   e.preventDefault();
+  if (!uid && f.id !== 'work-search') {
+    A.promptSignIn?.('change your private settings');
+    return;
+  }
   const b = f.querySelector('[type=submit],button.primary');
   b.disabled = true;
   try {
@@ -1438,7 +1502,7 @@ document.addEventListener('submit', async (e) => {
     await load(true);
     if (step === 3) {
       window.ProspectoTracker.setView('dashboard');
-      history.replaceState(null, '', '#dashboard');
+      window.ProspectoNavigation?.navigate('dashboard');
     } else render(view);
   } catch (err) {
     notify(err.message);

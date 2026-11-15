@@ -1,5 +1,4 @@
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { dirname, extname, resolve, sep } from 'node:path';
@@ -16,22 +15,8 @@ import developmentHandler from '../api/development.js';
 import accountHandler from '../api/account.js';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(projectRoot, 'dist');
-const bundles = [
-  'bootstrap',
-  'auth-page',
-  'platform',
-  'workspace',
-  'intelligence',
-];
-
 export function ensureDevBuild(directory = projectRoot) {
-  if (
-    bundles.every((name) =>
-      existsSync(resolve(directory, 'dist', name + '.js')),
-    )
-  )
-    return false;
-  console.log('Building missing ProspectoAI bundles…');
+  console.log('Building current ProspectoAI sources…');
   for (const script of ['build-catalog.cjs', 'build-platform.js'])
     execFileSync(process.execPath, [resolve(directory, 'scripts', script)], {
       cwd: directory,
