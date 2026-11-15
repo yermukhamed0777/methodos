@@ -374,6 +374,14 @@
       view,
     };
   }
+  function verificationBadge(o) {
+    const status = window.ProspectoVerification?.(o) || {
+      label: 'Awaiting Review',
+      tone: 'review',
+      description: 'Current application availability is not verified.',
+    };
+    return `<span class="verification-badge status-${status.tone}" title="${esc(status.description)}">${esc(status.label)}</span>`;
+  }
   function status(o) {
     return (
       (Core.isClosed(o, today)
@@ -389,10 +397,10 @@
     return `<div class="fact"><div class="fact-label">${icon(i)}${label}</div><div class="fact-value">${esc(value)}</div>${note ? `<p class="fact-note">${esc(note)}</p>` : ''}</div>`;
   }
   function card(o) {
-    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" target="_blank" rel="noopener noreferrer">Provider source ↗</a><button class="details-btn" data-detail="${o.id}">Full details & sources →</button></div></div></article>`;
+    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" target="_blank" rel="noopener noreferrer">Provider source ↗</a><button class="details-btn" data-detail="${o.id}">Full details & sources →</button></div></div></article>`;
   }
   function deadlineItem(o) {
-    return `<article class="deadline-item"><div class="deadline-date">${esc(o.deadline)}</div><div><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="status-row">${status(o)}</div><p>${esc(o.deadlineDetail)}</p></div><button class="details-btn" data-detail="${o.id}">Details →</button></article>`;
+    return `<article class="deadline-item"><div class="deadline-date">${esc(o.deadline)}</div><div><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="status-row">${verificationBadge(o)}${status(o)}</div><p>${esc(o.deadlineDetail)}</p></div><button class="details-btn" data-detail="${o.id}">Details →</button></article>`;
   }
   function newsCard(item) {
     return `<article class="news-card"><div class="news-meta"><span>${esc(item.sourceName)}</span><time datetime="${esc(item.publishedAt)}">${esc(dateLabel(item.publishedAt))}</time></div><h2><a href="${esc(safeLink(item.url))}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a></h2><div class="status-row"><span class="status unverified">Source announcement · not verified</span><span class="topic-pill">${esc(item.type)}</span>${(item.degreeTags || []).map((t) => `<span class="topic-pill">Mentions ${esc(t)}</span>`).join('')}</div>${item.excerpt ? `<p class="news-excerpt">${esc(item.excerpt)}…</p>` : ''}<p class="news-disclaimer">Eligibility, award value and application dates need checking with the provider. This may be a program announcement or a scholarship roundup.</p><div class="news-links"><a class="primary-link" href="${esc(safeLink(item.url))}" target="_blank" rel="noopener noreferrer">Read original announcement ↗</a>${(
@@ -470,6 +478,26 @@
       : '';
   }
   function render() {
+    if (
+      window.ProspectoAuth?.preview &&
+      ['saved', 'deadlines', 'latest', 'sources'].includes(view)
+    ) {
+      document.body.dataset.currentView = view;
+      for (const selector of [
+        '.hero',
+        '.collection-bar',
+        '.search-row',
+        '.type-tabs',
+        '.explore-layout',
+      ])
+        $(selector).hidden = true;
+      $('#platform-panel').hidden = false;
+      $('#platform-panel').innerHTML = window.ProspectoAuth.gateHTML(
+        'your saved work and account updates',
+      );
+      $('#compare-tray').hidden = true;
+      return;
+    }
     const platform = [
       'skills',
       'careers',
@@ -763,7 +791,7 @@
     const o = byId(id);
     if (!o) return;
     $('#detail-content').innerHTML =
-      `<div class="dialog-eyebrow">${esc(o.type)} · ${esc(o.cycle)}</div><h2 id="detail-title">${esc(o.name)}</h2><p class="detail-org">${esc(o.org)}</p><p>${esc(o.description)}</p><div class="status-row">${status(o)}</div><div class="detail-grid"><div><h3>Who can apply</h3><p>${esc(o.eligibility)}</p><p><strong>Entry route:</strong> ${esc(o.access)}</p></div><div><h3>Next deadline</h3><p><strong>${esc(o.deadline)}</strong></p><p>${esc(o.deadlineDetail)}</p></div><div><h3>Funding & costs</h3><p><strong>${esc(o.cost)}</strong></p><p>${esc(o.costNote)}</p></div><div><h3>Where, when & how</h3><p>${esc(o.location)} · ${esc(o.formats.join(' / '))}</p><p>${esc(o.schedule)}</p><p>${esc(o.effort)} · ${esc(o.team)}</p></div></div><div class="attention"><strong>Before you commit</strong><p>${esc(o.caution)}</p></div><h3>What you could take away</h3><p>${esc(o.output)}</p><p class="editorial-label">Editorial assessment; admission, publication or an award is not guaranteed.</p><h3>A useful next step</h3><p>${esc(o.next)}</p><h3>Read the original sources</h3>${sourceList(o)}<div class="detail-actions"><button class="primary" data-save="${o.id}">${saved.has(o.id) ? 'Remove from shortlist' : 'Save to tracker'}</button>${o.deadlineConfirmed && o.deadlineStart === o.deadlineEnd ? `<button class="secondary" data-calendar="${o.id}">Export deadline reminder (.ics)</button>` : ''}<button class="secondary" data-share="${o.id}">Copy opportunity link</button></div><p class="calendar-note">Calendar exports are date reminders, not exact cut-offs. Check the deadline and timezone above. Notifications depend on your calendar settings.</p>`;
+      `<div class="dialog-eyebrow">${esc(o.type)} · ${esc(o.cycle)}</div><h2 id="detail-title">${esc(o.name)}</h2><p class="detail-org">${esc(o.org)}</p><p>${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div><div class="detail-grid"><div><h3>Who can apply</h3><p>${esc(o.eligibility)}</p><p><strong>Entry route:</strong> ${esc(o.access)}</p></div><div><h3>Next deadline</h3><p><strong>${esc(o.deadline)}</strong></p><p>${esc(o.deadlineDetail)}</p></div><div><h3>Funding & costs</h3><p><strong>${esc(o.cost)}</strong></p><p>${esc(o.costNote)}</p></div><div><h3>Where, when & how</h3><p>${esc(o.location)} · ${esc(o.formats.join(' / '))}</p><p>${esc(o.schedule)}</p><p>${esc(o.effort)} · ${esc(o.team)}</p></div></div><div class="attention"><strong>Before you commit</strong><p>${esc(o.caution)}</p></div><h3>What you could take away</h3><p>${esc(o.output)}</p><p class="editorial-label">Editorial assessment; admission, publication or an award is not guaranteed.</p><h3>A useful next step</h3><p>${esc(o.next)}</p><h3>Read the original sources</h3>${sourceList(o)}<div class="detail-actions"><button class="primary" data-save="${o.id}">${saved.has(o.id) ? 'Remove from shortlist' : 'Save to tracker'}</button>${o.deadlineConfirmed && o.deadlineStart === o.deadlineEnd ? `<button class="secondary" data-calendar="${o.id}">Export deadline reminder (.ics)</button>` : ''}<button class="secondary" data-share="${o.id}">Copy opportunity link</button></div><p class="calendar-note">Calendar exports are date reminders, not exact cut-offs. Check the deadline and timezone above. Notifications depend on your calendar settings.</p>`;
     if (show) $('#detail-dialog').showModal();
   }
   function openComparison() {
@@ -807,6 +835,7 @@
     $('#compare-dialog').showModal();
   }
   async function loadFeed() {
+    if (window.ProspectoAuth?.preview) return;
     try {
       const response = await window.ProspectoAuth.fetch('/api/discover', {
         headers: { Accept: 'application/json' },

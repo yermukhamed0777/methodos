@@ -1,3 +1,5 @@
+import { gateHTML } from './access.js';
+import { verificationStatus } from '../lib/intelligence-core.js';
 import { authMessage, RECOVERY_PATH } from './auth-flow.js';
 const R = window.PROSPECTO_RESOURCES;
 const $ = (s) => document.querySelector(s);
@@ -93,7 +95,8 @@ function skillCard(o) {
     )}</div><h3>Make something you can show</h3><p>${E(o.project)}</p><details><summary>A practical learning sequence</summary><ol>${o.learningPath.map((x) => `<li><strong>${E(x.level)}</strong>: ${E(x.task)}</li>`).join('')}</ol></details><h3>Projects that demonstrate progress</h3><ul>${o.skillProjects.map((x) => `<li><strong>${E(x.skill)}</strong>: ${E(x.project)}</li>`).join('')}</ul><p class="resource-note">${E(o.credentials)}</p><p class="resource-note">${E(o.assessment)}</p>${saveTaskButton('Build skills: ' + o.name, 'skill:' + o.id)}</article>`;
 }
 function careerCard(o) {
-  return `<article class="resource-card"><div class="resource-meta">${E(o.kind)} · ${E(o.region)}</div><h2>${E(o.name)}</h2><span class="source-label">${E(o.status)}</span><p>${E(o.summary)}</p><p><strong>Work arrangement:</strong> ${E(o.arrangement)}<br><strong>Experience:</strong> ${E(o.experience)}<br><strong>Type:</strong> ${E(o.employmentType)}</p><h3>Who should check it</h3><p>${E(o.eligibility)}</p><h3>Deadlines & availability</h3><p>${E(o.deadlineNote)}</p><p class="resource-note">A source page is not a guarantee of a current vacancy, eligibility or work authorization. Reviewed ${o.checkedOn}.</p><div class="resource-links">${link(o.url, 'Open employer / programme source')}</div><button class="text-button" data-open-skills="${E(o.skills[0])}">Explore related skill paths →</button>${saveTaskButton('Check opportunities at ' + o.org, 'career:' + o.id)}</article>`;
+  const status = verificationStatus(o);
+  return `<article class="resource-card"><span class="verification-badge status-${E(status.tone)}" title="${E(status.description)}">${E(status.label)}</span><div class="resource-meta">${E(o.kind)} · ${E(o.region)}</div><h2>${E(o.name)}</h2><span class="source-label">${E(o.status)}</span><p>${E(o.summary)}</p><p><strong>Work arrangement:</strong> ${E(o.arrangement)}<br><strong>Experience:</strong> ${E(o.experience)}<br><strong>Type:</strong> ${E(o.employmentType)}</p><h3>Who should check it</h3><p>${E(o.eligibility)}</p><h3>Deadlines & availability</h3><p>${E(o.deadlineNote)}</p><p class="resource-note">A source page is not a guarantee of a current vacancy, eligibility or work authorization. Reviewed ${o.checkedOn}.</p><div class="resource-links">${link(o.url, 'Open employer / programme source')}</div><button class="text-button" data-open-skills="${E(o.skills[0])}">Explore related skill paths →</button>${saveTaskButton('Check opportunities at ' + o.org, 'career:' + o.id)}</article>`;
 }
 function resourceList(view) {
   const key =
@@ -132,6 +135,15 @@ function resourceList(view) {
 }
 function render(view) {
   resourcesView = view;
+  if (
+    !window.ProspectoAuth.user &&
+    ['assistant', 'activities'].includes(view)
+  ) {
+    $('#platform-panel').innerHTML = gateHTML(
+      view === 'assistant' ? 'the AI assistant' : 'personal activities',
+    );
+    return;
+  }
   if (window.ProspectoWorkspace?.views.includes(view)) {
     window.ProspectoWorkspace.render(view);
     return;
@@ -175,8 +187,11 @@ function setView(v) {
   activeField = '';
   activeRegion = '';
   activeKind = '';
-  window.ProspectoTracker.setView(v);
-  history.replaceState(null, '', '#' + v);
+  if (window.ProspectoNavigation) window.ProspectoNavigation.navigate(v);
+  else {
+    window.ProspectoTracker.setView(v);
+    history.pushState({ view: v }, '', '#' + v);
+  }
 }
 function accountUi(message = '') {
   const panel = $('#account-content');
@@ -185,9 +200,19 @@ function accountUi(message = '') {
     : '<p>Redirecting to sign in…</p>';
 }
 $('#account-button').addEventListener('click', () => {
-  if (!user) return location.assign('/login');
-  accountUi();
-  $('#account-dialog').showModal();
+  if (!user) {
+    window.ProspectoAuth.promptSignIn?.('save your next step');
+    return;
+  }
+  const menu = $('#account-menu');
+  if (menu) {
+    menu.hidden = !menu.hidden;
+    $('#account-button').setAttribute('aria-expanded', String(!menu.hidden));
+    if (!menu.hidden) menu.querySelector('button')?.focus();
+  } else {
+    accountUi();
+    $('#account-dialog').showModal();
+  }
 });
 $('#account-dialog .account-close').addEventListener('click', () =>
   $('#account-dialog').close(),
@@ -197,10 +222,11 @@ async function initialize() {
   db = window.ProspectoAuth.client;
   db.auth.onAuthStateChange((event, session) => {
     if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') return;
-    if (!session) return location.replace('/login');
+    if (!session) return location.replace('/#finder');
     setTimeout(() => loadAccount(session.user), 0);
   });
   await loadAccount(window.ProspectoAuth.user);
+  if (window.ProspectoNavigation) return;
   const hash = location.hash.slice(1);
   if (
     [
@@ -219,7 +245,7 @@ async function initialize() {
   )
     setView(hash);
   else if (!new URL(location.href).searchParams.has('opportunity'))
-    setView('dashboard');
+    setView(user ? 'dashboard' : 'finder');
 }
 let loadedUserId;
 let accountReady = false;
@@ -234,11 +260,9 @@ async function loadAccount(nextUser) {
   profile = {};
   pendingTracker = null;
   clearTimeout(syncTimer);
-  $('#account-button').textContent = user
-    ? 'My account'
-    : 'Sign in / create account';
+  $('#account-button').textContent = user ? 'Account' : 'Sign in';
   if (!user) {
-    window.ProspectoTracker.setCloud(null);
+    window.ProspectoTracker.setCloud({ saved: [], progress: {} });
     if (['activities', 'assistant'].includes(resourcesView))
       render(resourcesView);
     return;
@@ -354,7 +378,11 @@ async function addActivity(
   kind = 'Task',
   priority = 'Medium',
 ) {
-  if (!user || !accountReady) {
+  if (!user) {
+    window.ProspectoAuth.promptSignIn?.('save a personal activity');
+    return false;
+  }
+  if (!accountReady) {
     accountUi(
       user
         ? 'Your account is still loading. Reload if it does not finish.'
@@ -522,7 +550,12 @@ document.addEventListener('click', async (e) => {
       setView(nav.dataset.view);
     else {
       resourcesView = '';
-      history.replaceState(null, '', location.pathname + location.search);
+      if (!window.ProspectoNavigation)
+        history.pushState(
+          { view: nav.dataset.view },
+          '',
+          '#' + nav.dataset.view,
+        );
     }
   }
   const task = e.target.closest('[data-add-task]');
@@ -705,6 +738,10 @@ document.addEventListener('submit', async (e) => {
     const input = $('#chat-input');
     const message = input.value.trim();
     if (!message) return;
+    if (!user) {
+      window.ProspectoAuth.promptSignIn?.('use the AI assistant');
+      return;
+    }
     input.value = '';
     messages.push({ role: 'user', text: message });
     renderMessages();
@@ -861,3 +898,30 @@ window.addEventListener('resize', () => {
     navigation.inert = true;
 });
 closeNavigation();
+
+$('#account-signout')?.addEventListener('click', async () => {
+  const result = await db.auth.signOut();
+  if (result.error) {
+    notice('Sign-out could not finish. Please retry.');
+    return;
+  }
+  location.replace('/#finder');
+});
+document.addEventListener('keydown', (event) => {
+  if (
+    event.key === 'Escape' &&
+    $('#account-menu') &&
+    !$('#account-menu').hidden
+  ) {
+    $('#account-menu').hidden = true;
+    $('#account-button').setAttribute('aria-expanded', 'false');
+    $('#account-button').focus();
+  }
+});
+document.addEventListener('click', (event) => {
+  const menu = $('#account-menu');
+  if (menu && !event.target.closest('.account-wrap')) {
+    menu.hidden = true;
+    $('#account-button').setAttribute('aria-expanded', 'false');
+  }
+});

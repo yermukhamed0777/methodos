@@ -17,7 +17,7 @@ Legacy recovery and previously allowed preview URLs are retained for links alrea
 
 **Authentication → Sign In / Providers → Email:** enable email sign-in and account confirmation. Keep new-user signup enabled when accepting registrations. **Authentication → Emails → SMTP Settings:** configure an owner-controlled SMTP provider and verified sender. The default Supabase sender is restricted and rate limited; it is not evidence that public email delivery works. Do not disable confirmation to conceal delivery failures.
 
-The password reset request uses the request origin plus `/reset-password`; confirmation uses `/auth/callback`. Dedicated routes manually consume implicit tokens or exchange a PKCE code before clearing URL credentials. The app is vanilla JavaScript with Node functions, not Next.js: Next.js middleware/SSR helpers would not apply. Bootstrap validates the user before downloading catalog data; every private API separately validates the bearer session. Supabase RLS protects direct client queries and Storage.
+The password reset request uses the request origin plus `/reset-password`; confirmation uses `/auth/callback`. Dedicated routes manually consume implicit tokens or exchange a PKCE code before clearing URL credentials. The app is vanilla JavaScript with Node functions, not Next.js: Next.js middleware/SSR helpers would not apply. Bootstrap permits a reviewed public catalog preview without sign-in and validates the user before loading private workspace data or published database revisions. Personal actions show a sign-in prompt with a safe return path. Every private API separately validates the bearer session. Supabase RLS protects direct client queries and Storage.
 
 ## Preferred custom domain: www.prospectoai.com
 

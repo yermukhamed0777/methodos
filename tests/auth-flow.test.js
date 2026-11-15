@@ -160,7 +160,7 @@ test('public configuration refuses mismatched projects and privileged keys', () 
     publicAuthConfig({ SUPABASE_PUBLISHABLE_KEY: serviceKey }),
   );
 });
-test('auth routes load directly; private catalogs and APIs cannot be fetched without login', async () => {
+test('auth routes and the public preview load directly; private APIs remain protected', async () => {
   const server = createPreviewServer();
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
@@ -179,7 +179,7 @@ test('auth routes load directly; private catalogs and APIs cannot be fetched wit
       '/resource-data.js',
     ])
       assert.equal((await fetch(base + path)).status, 404);
-    for (const path of ['/api/catalog', '/api/discover', '/api/renewal']) {
+    for (const path of ['/api/discover', '/api/renewal']) {
       const r = await fetch(base + path);
       assert.equal(r.status, 401);
       assert.equal(r.headers.get('cache-control'), 'private, no-store');
