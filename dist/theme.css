@@ -23,12 +23,12 @@
   /* Borders */
   --border-subtle: #4a5b6e;
 
-  /* Status colors (preserve semantic meaning) */
-  --status-open: #1e8566;
+  /* Status colors (improved contrast for small text) */
+  --status-open: #1dc69b;          /* bright teal */
   --status-open-bg: #0f4b3a;
-  --status-expected: #905b1d;
-  --status-expected-bg: #37251a;
-  --status-error: #b33a43;
+  --status-expected: #e6b700;           /* gold */
+  --status-expected-bg: #38281c;
+  --status-error: #f5625e;            /* fresh red */
   --status-error-bg: #5a2c33;
 
   color-scheme: dark;

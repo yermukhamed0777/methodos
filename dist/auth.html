@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/platform.css" />
     <link rel="stylesheet" href="/responsive.css" />
     <script src="/auth-page.js" defer></script>
+    <script src="/theme.js" defer></script>
   </head>
   <body class="auth-page">
     <main class="auth-shell">
@@ -39,6 +40,15 @@
         </p>
       </section>
       <section class="auth-card" aria-labelledby="auth-title">
+        <!-- Theme selector added to auth page -->
+        <div class="theme-switcher" role="group" aria-label="Theme selector">
+          <label for="theme-select">Theme</label>
+          <select id="theme-select" class="theme-select">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="system">System</option>
+          </select>
+        </div>
         <span class="eyebrow" id="auth-kicker">WELCOME TO PROSPECTOAI</span>
         <h2 id="auth-title">Sign in to explore.</h2>
         <p id="auth-intro">Use your ProspectoAI email and password.</p>

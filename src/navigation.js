@@ -5,7 +5,7 @@ export const HUBS = [
     view: 'finder',
     items: [
       ['finder', 'Opportunities'],
-      ['universities', 'Admissions'],
+      ['universities', 'Universities & Admissions'],
       ['funding', 'Funding'],
       ['locations', 'Location guides'],
       ['whats-new', 'Recently reviewed'],
