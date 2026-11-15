@@ -438,6 +438,7 @@
     top: 0;
     z-index: 25;
     padding: 12px 20px;
+    height: auto;
     gap: 12px;
     min-height: 70px;
   }
@@ -1083,18 +1084,37 @@
     padding: 24px 16px 40px;
   }
   .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    height: auto;
     padding: 10px 16px;
     gap: 8px;
+  }
+  .topbar .nav-toggle {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .topbar .account-wrap {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: 0;
   }
   .breadcrumb {
     display: none;
   }
   .topbar .intel-global-tools {
-    margin-left: auto;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    margin-left: 0;
+    flex-wrap: nowrap;
   }
   .intel-global-tools .secondary {
     padding: 8px 10px;
     font-size: 0.72rem;
+    flex: 1 1 0;
+    min-width: 0;
   }
   .hub-navigation {
     padding: 8px 12px;
