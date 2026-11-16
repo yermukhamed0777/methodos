@@ -26,60 +26,21 @@
     <link rel="stylesheet" href="/responsive.css" />
     <!-- Theme overrides and selector -->
     <link rel="stylesheet" href="/theme.css" />
-    <style>
-      /* Loader styling – responsive to system theme without JS */
-      #boot-status {
-        text-align: center;
-        padding: 2rem 1rem;
-      }
-      #boot-status img {
-        width: 120px;
-        height: 120px;
-        display: block;
-        margin: 0 auto;
-      }
-      #boot-status .loader-text {
-        font-size: 1.2rem;
-        margin-top: 1rem;
-        color: inherit;
-      }
-      /* Simple spinner */
-      #boot-status .spinner {
-        margin: 1rem auto 0;
-        width: 24px;
-        height: 24px;
-        border: 3px solid #c0c0c0;
-        border-top: 3px solid #8ba8ff;
-        border-radius: 50%;
-        animation: spin 0.75s linear infinite;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      /* System theme colors – fallback for text */
-      @media (prefers-color-scheme: dark) {
-        #boot-status {
-          background: #0b1018;
-          color: #eef3fa;
-        }
-      }
-      @media (prefers-color-scheme: light) {
-        #boot-status {
-          background: #ffffff;
-          color: #000000;
-        }
-      }
-    </style>
-    <script src="/theme.js" defer></script>
+    <link rel="stylesheet" href="/loading.css" />
+    <script src="/theme.js"></script>
     <script src="/bootstrap.js" defer=""></script>
   </head>
   <body class="auth-pending">
-    <div id="boot-status" role="status">
+    <div
+      id="boot-status"
+      class="app-loader"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <img src="/assets/white-lion.svg" alt="" width="120" height="120" />
       <div class="loader-text">Hi, I’m BARYS. Let’s find your next step.</div>
-      <div class="spinner"></div>
+      <div class="spinner" aria-hidden="true"></div>
     </div>
     <noscript
       ><p>
