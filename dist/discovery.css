@@ -2,6 +2,34 @@
   max-width: 1240px;
   margin: 0 auto;
 }
+.barys-context {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 18px;
+}
+.barys-context h3 {
+  font-size: 1rem;
+  margin: 0 0 10px;
+}
+.barys-context p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.barys-faq {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 16px;
+  margin-top: 20px;
+}
+.barys-faq > button {
+  display: block;
+  text-align: left;
+  min-height: 44px;
+  white-space: normal;
+}
+.barys-launcher[hidden] {
+  display: none;
+}
 .barys-launcher {
   position: fixed;
   right: 24px;

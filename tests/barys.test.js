@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Window } from 'happy-dom';
-import { installBarys } from '../src/barys.js';
+import { installBarys, guideFor } from '../src/barys.js';
 test('BARYS opens on demand, restores focus and uses existing navigation for private actions', async () => {
   const w = new Window({ url: 'https://app.example/' });
   try {
@@ -33,6 +33,33 @@ test('BARYS opens on demand, restores focus and uses existing navigation for pri
     assert.match(dialog.textContent, /without AI/);
     barys.destroy();
     assert.equal(w.document.querySelector('#barys-dialog'), null);
+  } finally {
+    await w.happyDOM.close();
+  }
+});
+test('BARYS explains the current page and hiding it keeps the sidebar reopen path', async () => {
+  const w = new Window({ url: 'https://app.example/' });
+  try {
+    w.document.write('<button id="guide-btn">How this works</button>');
+    w.document.body.dataset.currentView = 'campus';
+    const barys = installBarys(w);
+    barys.open();
+    assert.match(
+      w.document.querySelector('.barys-context').textContent,
+      /more than classes/,
+    );
+    w.document.querySelector('[data-barys-question=status]').click();
+    assert.match(
+      w.document.querySelector('#barys-answer').textContent,
+      /30 days/,
+    );
+    w.document.querySelector('[data-hide-barys]').click();
+    assert(w.document.querySelector('.barys-launcher').hidden);
+    assert.equal(w.sessionStorage.getItem('prospecto-barys-hidden'), '1');
+    w.document.querySelector('#guide-btn').click();
+    assert(!w.document.querySelector('.barys-launcher').hidden);
+    assert(w.document.querySelector('#barys-dialog').open);
+    assert.match(guideFor('courses')[1], /syllabus/);
   } finally {
     await w.happyDOM.close();
   }
