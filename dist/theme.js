@@ -14,12 +14,21 @@ let systemListener = null;
 function setTheme(theme) {
   const root = document.documentElement;
   if (theme === 'system') {
-    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    // Use a test stub in Node when available; otherwise fall back to real API
+    const mql = globalThis.__mockMatchMedia
+      ? globalThis.__mockMatchMedia('(prefers-color-scheme: dark)')
+      : window.matchMedia('(prefers-color-scheme: dark)');
     if (!systemMediaQuery) {
       systemMediaQuery = mql;
+      // expose via a theme API for test harnesses
+      window.__themeAPI = window.__themeAPI || {};
+      window.__themeAPI.getSystemMql = () => systemMediaQuery;
     }
     const handler = (e) => {
-      root.setAttribute(THEME_ATTR, e.matches ? 'dark' : 'light');
+      root.setAttribute(
+        THEME_ATTR,
+        systemMediaQuery.matches ? 'dark' : 'light',
+      );
     };
     // Ensure only one listener
     if (!systemListener) {
@@ -45,7 +54,10 @@ function init() {
   } catch (_) {
     stored = null;
   }
-  const theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+  const theme =
+    stored === 'light' || stored === 'dark' || stored === 'system'
+      ? stored
+      : 'system';
   setTheme(theme);
   const select = document.getElementById('theme-select');
   if (select) {
@@ -62,4 +74,6 @@ function init() {
   }
 }
 
+// Register init on both document and window to accommodate test harness
 document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('DOMContentLoaded', init);
