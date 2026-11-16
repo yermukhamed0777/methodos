@@ -3,7 +3,8 @@ import { callbackKind, RECOVERY_PATH, CALLBACK_PATH } from './auth-flow.js';
 import { installNavigation } from './navigation.js';
 import { installAccess } from './access.js';
 import { verificationStatus } from '../lib/intelligence-core.js';
-const status = document.querySelector('#boot-status');
+import { createBootStatus } from './boot-status.js';
+const bootStatus = createBootStatus(document, () => location.reload());
 const route = new URL(location.href);
 async function loadScript(src) {
   await new Promise((resolve, reject) => {
@@ -121,7 +122,7 @@ async function start() {
   ])
     await loadScript(src);
   document.body.classList.remove('auth-pending');
-  status.hidden = true;
+  bootStatus.complete();
   if (!user) {
     const notices = document.querySelector('#intel-notices');
     if (notices) notices.hidden = true;
@@ -135,12 +136,4 @@ async function start() {
   if (route.searchParams.get('signin') === 'expired')
     access.promptSignIn('continue with your account');
 }
-start().catch((error) => {
-  status.className = 'error-banner';
-  status.setAttribute('role', 'alert');
-  status.textContent = error.message;
-  const retry = document.createElement('button');
-  retry.textContent = 'Reload collection';
-  retry.onclick = () => location.reload();
-  status.append(document.createElement('br'), retry);
-});
+start().catch((error) => bootStatus.fail(error));
