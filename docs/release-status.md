@@ -2,6 +2,23 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit. No rollback to Opportunity Explorer is part of this release.
 
+## Phase 3 Home, campus and BARYS · 16 November 2026
+
+The theme foundation is merged in [PR #13](https://github.com/yermukhamed0777/opportunity-explorer/pull/13), at `32b68bf0ade825086243b96000a66618056b3e37`.
+The next release on `codex/phase-3-home-campus-barys` adds a separate Home,
+personalized real-task continuation, prominent university cards and location
+filters, an enrolled-student campus resource explorer with exact-ID share links,
+the on-demand BARYS guide, course filters and pagination, and a verified-deadline
+radar. See [implementation evidence and boundaries](phase-3-home-campus-themes.md).
+
+Local validation passed build, lint, scoped type checking and **107 tests**; the
+dependency audit reported zero vulnerabilities. Desktop and 375px/430px public
+flows were checked in the browser. Private-action gates remain intact. This
+release adds no database migration or paid service. BARYS provides built-in
+guidance; it does not establish successful AI generation. Final CI, PR, merged
+commit and live deployment identifiers are recorded in the release handoff after
+verification, not inferred from local tests.
+
 ## Phase 1 technical fixes · 13 November 2026
 
 Implementation base: merged main commit `8410c2ab936eee0be7ad062b76fdd3eb910cb647` (PRs #4–#9). Phase 1 implementation commit `c5f2fe02ab91e958c47865d43f020ab0ee4b519a` is saved in [PR #10](https://github.com/yermukhamed0777/opportunity-explorer/pull/10), on `codex/phase-1-critical-fixes`. [GitHub CI run 50](https://github.com/yermukhamed0777/opportunity-explorer/actions/runs/43357117038) passed for that implementation. Its release is merged only after passing CI; the exact final merge commit and deployment are recorded in the PR/release handoff and Vercel metadata rather than a self-referential commit hash here.
@@ -18,7 +35,7 @@ Anonymous catalog requests return reviewed repository content with private field
 
 The four primary hubs are Explore, Courses & Skills, Career Pathways and My Workspace. Profile, Privacy and Settings are in the Account menu; administrator tools require a verified role. Shared navigation uses history entries and restores views through Back and Forward. The stylesheets share semantic color, type, spacing and radius tokens; responsive rules are consolidated in `dist/responsive.css`. Opportunity cards and detail dialogs distinguish Verified Open, Expected Cycle, Directory / Evergreen and Awaiting Review, with closed or archived cycles labeled explicitly.
 
-The current suite contains **82 tests**, including six public-discovery regressions for privacy projection, guest views without owner-data access, sign-in prompts, role-gated navigation, browser history and verification labels. Passing automated checks does not establish desktop/mobile visual quality or successful AI generation. Release validation must also verify signed-out and signed-in views, compare production asset hashes, and confirm the deployed commit matches the merged commit. Final PR, CI and deployment identifiers belong in the release handoff. At this documentation review the Phase 2 changes are local and uncommitted; publication and final live verification remain pending.
+The Phase 2 suite contained **82 tests**, including six public-discovery regressions for privacy projection, guest views without owner-data access, sign-in prompts, role-gated navigation, browser history and verification labels. Phase 2 and its mobile account correction were merged through PRs #11 and #12; production was verified at `a595b8310e940cf25a434227db91d59f76442df3` before the Phase 3 work. Passing automated checks alone does not establish visual quality or successful AI generation.
 
 ## Earlier production continuation · 13 November 2026
 

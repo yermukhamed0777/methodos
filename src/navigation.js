@@ -6,6 +6,7 @@ export const HUBS = [
     items: [
       ['finder', 'Opportunities'],
       ['universities', 'Universities & Admissions'],
+      ['campus', 'At my university'],
       ['funding', 'Funding'],
       ['locations', 'Location guides'],
       ['whats-new', 'Recently reviewed'],
@@ -69,9 +70,11 @@ export const PRIVATE_VIEWS = new Set([
   'sources',
 ]);
 export function hubFor(view) {
+  if (view === 'home') return HUBS[0];
   return HUBS.find((h) => h.items.some(([v]) => v === view)) || HUBS[3];
 }
 const paths = {
+  '/home': 'home',
   '/admissions': 'universities',
   '/professional-pathways': 'professionals',
   '/research': 'research',
@@ -94,22 +97,31 @@ export function installNavigation(w = window) {
     'admin',
     'sources',
     'explore',
+    'home',
   ]);
   const current = () =>
     aliases[w.location.hash.slice(1)] ||
     (valid.has(w.location.hash.slice(1))
       ? w.location.hash.slice(1)
-      : paths[w.location.pathname] || 'finder');
+      : paths[w.location.pathname] ||
+        (new URL(w.location.href).searchParams.has('opportunity')
+          ? 'finder'
+          : 'home'));
   function paint(view) {
     const hub = hubFor(view);
     d.body.dataset.currentView = view;
     d.body.dataset.hub = hub.id;
+    d.querySelector('[data-home-link]')?.setAttribute(
+      'aria-current',
+      view === 'home' ? 'page' : 'false',
+    );
     d.querySelectorAll('.main-nav [data-hub]').forEach((el) => {
-      const active = el.dataset.hub === hub.id;
+      const active = view !== 'home' && el.dataset.hub === hub.id;
       el.classList.toggle('active', active);
       el.setAttribute('aria-current', active ? 'page' : 'false');
     });
     const tabs = d.querySelector('#hub-navigation');
+    if (tabs) tabs.hidden = view === 'home';
     if (tabs)
       tabs.innerHTML = hub.items
         .map(
@@ -124,6 +136,9 @@ export function installNavigation(w = window) {
       if (el.dataset.view === 'admin') el.hidden = !admin;
     });
     const menu = d.querySelector('#account-menu');
+    tabs
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     if (menu) menu.hidden = true;
     d.querySelector('#account-button')?.setAttribute('aria-expanded', 'false');
   }
@@ -133,6 +148,10 @@ export function installNavigation(w = window) {
       const url = new URL(w.location.href);
       url.hash = view;
       url.searchParams.delete('opportunity');
+      if (view !== 'campus') {
+        url.searchParams.delete('university');
+        url.searchParams.delete('campus-category');
+      }
       w.history.pushState({ view }, '', url.pathname + url.search + url.hash);
     }
     w.ProspectoTracker?.setView(view);
@@ -158,6 +177,8 @@ export function installNavigation(w = window) {
       const shell = d.querySelector('.main-shell');
       if (shell) shell.inert = false;
       const sidebar = d.querySelector('#workspace-navigation');
+      sidebar?.removeAttribute('role');
+      sidebar?.removeAttribute('aria-modal');
       if (sidebar && w.innerWidth <= 900) sidebar.inert = true;
     },
     true,

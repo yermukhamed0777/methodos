@@ -1,7 +1,10 @@
 # Phase 3: verified theme and loading-screen scope
 
-Verification date: 16 November 2026. Work is on `codex/phase-3-themes`;
-this record describes the local feature branch, not a production release.
+Verification date: 16 November 2026. The theme foundation was merged in
+[PR #13](https://github.com/yermukhamed0777/opportunity-explorer/pull/13) at
+`32b68bf0ade825086243b96000a66618056b3e37`. The subsequent discovery release is on
+`codex/phase-3-home-campus-barys`; publication and deployment evidence belong in
+its PR and release handoff.
 
 ## Implemented
 
@@ -31,7 +34,7 @@ maintained files in this repository. Other browser bundles are built from `src/`
 The theme runtime is explicitly included in lint coverage. Formatting exclusions
 cover generated bundles and dependency files; `src/*.js` is not excluded.
 
-## Evidence
+## Initial theme evidence
 
 - `npm run check`: build, lint, scoped type checking and **93 tests passed**.
 - `npm run format:check`: passed.
@@ -47,13 +50,57 @@ cover generated bundles and dependency files; `src/*.js` is not excluded.
 - Local account pages show the setup diagnostic because this workspace has no
   `.env.local`. An authenticated production session was not tested in this review.
 
-## Remaining work
+## Discovery release
 
-The illustration and loading status do **not** implement a conversational BARYS
-assistant. A separate starting screen, personalized greeting, campus opportunity
-research, stronger university card hierarchy, and a full assistant remain future
-work. No Supabase schema, user records, authentication checks, AI billing or
-production configuration were changed for this theme review.
+- A separate Home route opens at `/`, `/home` and `#home`. Existing opportunity
+  links retain their finder behavior. The brand and Start here control return
+  Home; four primary hubs remain intact.
+- Guided discovery cards explain opportunities, admissions, courses, careers and
+  the campus explorer. Counts are derived from the returned catalog.
+- Confirmed signed-in users see a local-time greeting with their actual profile
+  name and up to three real active plan tasks. Empty and failed-sync states do not
+  invent progress. Tests cover escaping and late responses after navigation.
+- University names lead redesigned cards. Details expand to expose the original
+  research, admissions and campus sources. Location, field and query filters,
+  alphabetical/location sorting, result counts and clear-filter recovery work
+  with existing records. Comparison and private folders retain existing guards.
+- At my university offers researched institutional resources and category filters.
+  Individual openings require an exact institution ID and Verified Open status;
+  missing coverage is stated explicitly. Capability profiles are not vacancies.
+- Campus selections can be shared through exact-ID URLs. Browser storage is opt-in
+  and stores only the university ID; clear selection removes it. It does not alter
+  the account profile. Back restores URL-backed campus filters.
+- BARYS is an on-demand white-lion guide with contextual help, practical answers,
+  navigation, session hide/reopen, native dialog keyboard behavior and focus
+  restoration. It uses no model calls. Open-ended AI stays in the existing gated
+  assistant and depends on the existing provider/account configuration.
+- Courses have platform and format filters, honest unknown-format labeling,
+  12-item pages, complete catalog coverage and clear recovery from no matches.
+- Home shows only reviewed open deadlines within 30 days, with a badge legend.
+  Directories, stale reviews and previous cycles are excluded from that radar.
+
+## Discovery validation
+
+`npm run check` passed build, lint, scoped type checking and **107 tests**.
+Formatting passed before final release documentation; the dependency audit found
+zero vulnerabilities. The final formatting check and GitHub CI are release gates.
+
+Local browser review exercised Home, university location filtering, institution
+links to campus, campus category Back navigation, BARYS navigation to a gated
+private plan, course provider filtering, page changes, empty-state reset, and both
+themes. Desktop, 375px and 430px views were inspected; the narrow views had no
+document-wide horizontal overflow. The missing-account local startup error found
+in that review was fixed and covered by a regression test. Old console entries
+remain in the browser log, but no new occurrence followed the corrected reload.
+
+## Boundaries
+
+No Supabase migration, user-data write, authentication-policy change, AI billing
+change or new service dependency is part of this release. BARYS is a deterministic
+guide, not a general-purpose chatbot. Campus resources are limited to the existing
+reviewed university profiles; this release does not claim a fresh university-wide
+vacancy crawl. Authenticated production verification is reported separately from
+the isolated signed-in tests.
 
 Push/PR, CI outcome and any later deployment must be recorded using their actual
 URLs and commit IDs. Local checks alone do not prove that production changed.

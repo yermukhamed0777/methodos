@@ -18,6 +18,10 @@
   ],
   "rewrites": [
     {
+      "source": "/home",
+      "destination": "/index.html"
+    },
+    {
       "source": "/login",
       "destination": "/auth.html"
     },
