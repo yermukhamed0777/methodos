@@ -3,6 +3,41 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
 
+test('public platform initialization remains usable when account configuration is missing', async () => {
+  const w = new Window({ url: 'https://app.example/' });
+  try {
+    w.document.write(
+      readFileSync('dist/index.html', 'utf8').replace(
+        /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+        '',
+      ),
+    );
+    w.PROSPECTO_RESOURCES = JSON.parse(readFileSync('data/resources.json'));
+    w.ProspectoAuth = { client: null, config: {}, user: null };
+    w.ProspectoNavigation = { navigate() {} };
+    let cleared = 0;
+    w.ProspectoTracker = {
+      setCloud() {
+        cleared++;
+      },
+    };
+    w.eval(readFileSync('dist/platform.js', 'utf8'));
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(cleared, 1);
+    assert.equal(
+      w.document.querySelector('#account-button').textContent,
+      'Sign in',
+    );
+    w.ProspectoPlatform.render('skills');
+    assert.match(
+      w.document.querySelector('#platform-panel').textContent,
+      /Skills for your next step/,
+    );
+  } finally {
+    await w.happyDOM.close();
+  }
+});
+
 test('tracker account restoration and delayed feeds survive replacement workspace navigation', async () => {
   const w = new Window({ url: 'https://app.example/#dashboard' });
   try {

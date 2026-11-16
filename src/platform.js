@@ -220,7 +220,7 @@ $('#account-dialog .account-close').addEventListener('click', () =>
 async function initialize() {
   config = window.ProspectoAuth.config;
   db = window.ProspectoAuth.client;
-  db.auth.onAuthStateChange((event, session) => {
+  db?.auth.onAuthStateChange((event, session) => {
     if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') return;
     if (!session) return location.replace('/#finder');
     setTimeout(() => loadAccount(session.user), 0);
