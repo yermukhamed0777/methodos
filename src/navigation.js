@@ -1,8 +1,4 @@
-import {
-  HUBS,
-  PATH_VIEWS,
-  SAFE_HASH_VIEWS,
-} from './view-registry.js';
+import { HUBS, PATH_VIEWS, SAFE_HASH_VIEWS } from './view-registry.js';
 
 export { HUBS, PRIVATE_VIEWS } from './view-registry.js';
 export function hubFor(view) {

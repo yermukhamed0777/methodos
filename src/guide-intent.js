@@ -16,7 +16,10 @@ const VIEWS = [
   ['activities', /\bactivities\b|\btasks?\b|to-do|what I planned/i],
   ['saved', /tracker|saved|shortlist|bookmark|favourite|favorite/i],
   ['assistant', /\bAI\b|assistant|chat with prospecto|ask a question/i],
-  ['plan', /personal plan|planner|my plan|roadmap|weekly plan|study plan|next step/i],
+  [
+    'plan',
+    /personal plan|planner|my plan|roadmap|weekly plan|study plan|next step/i,
+  ],
   ['profile', /profile|settings|preferences|my details/i],
   ['privacy', /privacy|delete my account|my data/i],
   ['dashboard', /overview|my workspace|workspace home/i],
@@ -28,11 +31,17 @@ const VIEWS = [
   ['careers', /career director/i],
   ['professionals', /career|jobs?|internships?|professional|public profile/i],
   ['funding', /scholarship|funding|grants?|financial aid|tuition/i],
-  ['locations', /location|country guide|where to study|city guide|region guide/i],
+  [
+    'locations',
+    /location|country guide|where to study|city guide|region guide/i,
+  ],
   ['whats-new', /recently reviewed|what.s new|source updates/i],
   ['latest', /latest|source leads|fresh leads|new leads/i],
   ['home', /\bhome\b|start page/i],
-  ['finder', /opportunit|hackathon|olympiad|competition|programme|program|find|explore/i],
+  [
+    'finder',
+    /opportunit|hackathon|olympiad|competition|programme|program|find|explore/i,
+  ],
 ];
 
 const AUTH = [
@@ -130,9 +139,10 @@ export function guidePlan(text, { signedIn = false } = {}) {
       view,
       label: VIEW_LABELS[view] || view,
       requiresAuth,
-      title: requiresAuth && !signedIn
-        ? `${VIEW_LABELS[view] || view} needs an account.`
-        : `Opening ${VIEW_LABELS[view] || view}.`,
+      title:
+        requiresAuth && !signedIn
+          ? `${VIEW_LABELS[view] || view} needs an account.`
+          : `Opening ${VIEW_LABELS[view] || view}.`,
       steps,
     };
   }

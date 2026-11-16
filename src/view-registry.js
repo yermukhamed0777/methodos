@@ -100,36 +100,12 @@ export const SAFE_HASH_VIEWS = new Set([
 
 export const VIEW_LABELS = Object.fromEntries([
   ...HUBS.flatMap((hub) => hub.items),
-  [
-    'home',
-    'Home',
-  ],
-  [
-    'profile',
-    'Profile & settings',
-  ],
-  [
-    'privacy',
-    'Privacy',
-  ],
-  [
-    'onboarding',
-    'Getting started',
-  ],
-  [
-    'comparison',
-    'University comparison',
-  ],
-  [
-    'admin',
-    'System health',
-  ],
-  [
-    'sources',
-    'Source review',
-  ],
-  [
-    'explore',
-    'Opportunities',
-  ],
+  ['home', 'Home'],
+  ['profile', 'Profile & settings'],
+  ['privacy', 'Privacy'],
+  ['onboarding', 'Getting started'],
+  ['comparison', 'University comparison'],
+  ['admin', 'System health'],
+  ['sources', 'Source review'],
+  ['explore', 'Opportunities'],
 ]);

@@ -87,7 +87,8 @@ test(
         /AI generation is unavailable/,
       );
       assert.equal(
-        w.document.querySelector('.chat-routes [data-view=courses]').textContent,
+        w.document.querySelector('.chat-routes [data-view=courses]')
+          .textContent,
         'Courses',
       );
       payload = { error: 'The source collection is temporarily unavailable.' };

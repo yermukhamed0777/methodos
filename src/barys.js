@@ -77,7 +77,8 @@ export function installBarys(w = window) {
   } catch {
     /* Session memory is optional. */
   }
-  let returnFocus, lastQuestion = '';
+  let returnFocus,
+    lastQuestion = '';
   const planBox = dialog.querySelector('#barys-plan');
   function showPlan(plan, question) {
     planBox.replaceChildren();
@@ -106,7 +107,10 @@ export function installBarys(w = window) {
           ? 'Open the reset page →'
           : 'Open the sign-in page →';
       actions.append(link);
-    } else if (plan.kind === 'view' && (!plan.requiresAuth || w.ProspectoAuth?.user)) {
+    } else if (
+      plan.kind === 'view' &&
+      (!plan.requiresAuth || w.ProspectoAuth?.user)
+    ) {
       const button = d.createElement('button');
       button.className = 'secondary';
       button.type = 'button';
@@ -147,7 +151,10 @@ export function installBarys(w = window) {
     if (!question) return;
     lastQuestion = question;
     input.value = '';
-    showPlan(guidePlan(question, { signedIn: !!w.ProspectoAuth?.user }), question);
+    showPlan(
+      guidePlan(question, { signedIn: !!w.ProspectoAuth?.user }),
+      question,
+    );
   });
   function open() {
     returnFocus = d.activeElement;

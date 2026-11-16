@@ -187,10 +187,7 @@ test('chat responses expose validated navigation routes for retrieved records', 
     env: {},
     authenticate: async () => ({ db, user: { id: 'verified-user' } }),
     getContext: async () => ({ profileConsent: false }),
-  })(
-    { method: 'POST', body: { message: 'materials' } },
-    res,
-  );
+  })({ method: 'POST', body: { message: 'materials' } }, res);
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.mode, 'catalog');
   assert.equal(res.body.routes.length, 3);
@@ -200,7 +197,14 @@ test('chat responses expose validated navigation routes for retrieved records', 
   ]);
   assert(
     res.body.routes.every((route) =>
-      ['finder', 'courses', 'universities', 'skills', 'professionals', 'pathways'].includes(route.view),
+      [
+        'finder',
+        'courses',
+        'universities',
+        'skills',
+        'professionals',
+        'pathways',
+      ].includes(route.view),
     ),
   );
 });

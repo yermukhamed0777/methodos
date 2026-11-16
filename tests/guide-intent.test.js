@@ -8,8 +8,14 @@ import { installBarys } from '../src/barys.js';
 test('the local guide routes account, private and public requests to known views', () => {
   assert.equal(guidePlan('I forgot my password').action, 'reset');
   assert.equal(guidePlan('I need to reset my password').action, 'reset');
-  assert.equal(guidePlan('My confirmation email never arrived').action, 'confirm');
-  assert.equal(guidePlan('How do I authorize access to my account?').action, 'signin');
+  assert.equal(
+    guidePlan('My confirmation email never arrived').action,
+    'confirm',
+  );
+  assert.equal(
+    guidePlan('How do I authorize access to my account?').action,
+    'signin',
+  );
   const saved = guidePlan('Show my saved tracker');
   assert.equal(saved.view, 'saved');
   assert.equal(saved.requiresAuth, true);
@@ -18,15 +24,18 @@ test('the local guide routes account, private and public requests to known views
   assert.equal(finder.requiresAuth, false);
   assert.equal(guidePlan('Explore my current university').view, 'campus');
   assert.equal(guidePlan('singing in the rain').kind, 'unknown');
-  assert.deepEqual(navigationFor([
-    { kind: 'course' },
-    { kind: 'course' },
-    { kind: 'university' },
-    { kind: 'unknown' },
-  ]), [
-    { view: 'courses', label: 'Courses' },
-    { view: 'universities', label: 'Universities' },
-  ]);
+  assert.deepEqual(
+    navigationFor([
+      { kind: 'course' },
+      { kind: 'course' },
+      { kind: 'university' },
+      { kind: 'unknown' },
+    ]),
+    [
+      { view: 'courses', label: 'Courses' },
+      { view: 'universities', label: 'Universities' },
+    ],
+  );
 });
 
 test('BARYS turns a question into a working account or navigation action', async () => {
@@ -35,7 +44,8 @@ test('BARYS turns a question into a working account or navigation action', async
     w.document.write(
       '<main tabindex="-1"></main><button id="guide-btn">Guide</button>',
     );
-    const visited = [], prompted = [];
+    const visited = [],
+      prompted = [];
     w.ProspectoNavigation = {
       navigate: (view) => {
         visited.push(view);
@@ -83,7 +93,10 @@ test('BARYS turns a question into a working account or navigation action', async
     barys.open();
     ask('help me plan what to learn next');
     w.document.querySelector('[data-barys-ai]').click();
-    assert.equal(w.sessionStorage.getItem('prospecto-ai-prefill'), 'help me plan what to learn next');
+    assert.equal(
+      w.sessionStorage.getItem('prospecto-ai-prefill'),
+      'help me plan what to learn next',
+    );
     assert.deepEqual(visited, ['saved', 'finder', 'assistant']);
     barys.destroy();
   } finally {
