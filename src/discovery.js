@@ -1,5 +1,6 @@
 import { greeting, nextSteps } from './discovery-model.js';
 import { installCampus } from './campus.js';
+import { installBarys } from './barys.js';
 const escape = (value) =>
   String(value ?? '').replace(
     /[&<>"']/g,
@@ -15,6 +16,7 @@ export function installDiscovery(w = window) {
   const previous = w.ProspectoPlatform.render;
   let homeEpoch = 0;
   const campus = installCampus(w);
+  installBarys(w);
   w.ProspectoWorkspace.views.push('home', 'campus');
   function directions() {
     const courses = w.PROSPECTO_RESOURCES?.courses || [];
