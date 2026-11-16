@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added contextual sign-in and recovery help without reading credentials.
+- Added a grounded application writing coach with unsaved drafts and an honest skeleton fallback.
+- Added an optional OpenAI-compatible provider so generation does not depend on one deployment gateway.
+- Added a shared view registry and fixed auth return links for campus and home views.
+
 ## 5.0.0 · 12 November 2026
 
 - Connected five workspaces with public professional facts, illustrative pathways, CV formats, safe project/research ideas and private admissions folders.
