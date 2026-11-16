@@ -1,6 +1,10 @@
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { gateHTML } from './access.js';
 import {
+  filterCourses,
+  courseProvider as providerName,
+} from './course-discovery.js';
+import {
   monday,
   checkBudget,
   validateDocument,
@@ -55,6 +59,8 @@ let state = {},
     availability: '',
   },
   courseSearch = '',
+  selectedProvider = '',
+  selectedFormat = '',
   selectedPlan = '',
   planFilter = 'All',
   orderUndo = null;
@@ -456,17 +462,17 @@ function skillForm(id) {
   );
 }
 function courses() {
-  const items = R.courses.filter(
-    (c) =>
-      !courseSearch ||
-      JSON.stringify(c).toLowerCase().includes(courseSearch.toLowerCase()),
-  );
+  const items = filterCourses(R.courses, {
+    query: courseSearch,
+    provider: selectedProvider,
+    format: selectedFormat,
+  });
   return (
     heading(
       'Courses with a purpose.',
       'Official courses and open learning resources. Link learning to evidence and a plan.',
     ) +
-    `<div class="work-notice">Pricing, regional access, auditing and certificates can change. Check university access for LinkedIn Learning. Unknown duration or level is shown explicitly.</div><label>Search course, field, or provider<input id="work-course-search" value="${E(courseSearch)}" type="search" maxlength="150"></label><p>${items.length} courses</p><div class="resource-grid">${items
+    `<div class="work-notice">Pricing, regional access, auditing and certificates can change. Check university access for LinkedIn Learning. Unknown duration or level is shown explicitly.</div><div class="course-filterbar"><label>Search course, field, or provider<input id="work-course-search" value="${E(courseSearch)}" type="search" maxlength="150" placeholder="Try Python, materials or leadership"></label><label>Learning provider<select id="work-course-provider">${select([...new Set(R.courses.map(providerName).filter(Boolean))].sort(), selectedProvider, 'All providers')}</select></label><label>Format<select id="work-course-format">${select([...new Set(R.courses.map((c) => c.format).filter(Boolean))].map((x) => [x, x]).concat([['unknown', 'Format not yet reviewed']]), selectedFormat, 'All formats')}</select></label>${button('reset-courses', 'Clear filters')}</div><p role="status">${items.length} courses${courseSearch || selectedProvider || selectedFormat ? ' match your filters' : ' in the collection'}</p>${!items.length ? '<div class="work-empty"><h2>No courses match yet.</h2><p>Try another provider or a broader skill.</p>' + button('reset-courses', 'Show all courses') + '</div>' : ''}<div class="resource-grid">${items
       .map((c) => {
         const p = state.course_progress.find((x) => x.course_id === c.id);
         return `<article class="work-card">${tag(p?.state || 'Not saved')}<h2>${E(c.name)}</h2><p>${E(c.provider)}${c.institution ? ' · ' + E(c.institution) : ''}</p><p>${E((c.skills || []).join(' · '))}</p><dl><dt>Level</dt><dd>${E(c.level || 'Not verified')}</dd><dt>Duration</dt><dd>${E(c.duration || 'Not verified')}</dd><dt>Format</dt><dd>${E(c.format || 'Provider online course')}</dd><dt>Access and cost</dt><dd>${E(c.auditing || c.costType)}</dd><dt>Certificate</dt><dd>${E(c.certificate || 'Confirm provider conditions and price')}</dd></dl><p class="resource-note">Checked ${c.checkedOn}. Completion does not guarantee professional qualification.</p><div class="resource-links">${link(c.url, 'Official course page')}</div><div class="work-actions">${button('course', 'Save / update learning', c.id)}${button('quick-plan', 'Add to plan', c.name)}</div>${p?.notes ? `<p>Your notes: ${E(p.notes)}</p>` : ''}</article>`;
@@ -1097,11 +1103,18 @@ async function action(name, id, element) {
       'retry',
       'compare-uni',
       'reset-search',
+      'reset-courses',
       'opportunity-detail',
     ].includes(name)
   ) {
     A.promptSignIn?.('save and personalize your learning');
     return;
+  }
+  if (name === 'reset-courses') {
+    courseSearch = '';
+    selectedProvider = '';
+    selectedFormat = '';
+    return render('courses');
   }
   if (name === 'go') {
     if (window.ProspectoNavigation) window.ProspectoNavigation.navigate(id);
@@ -1511,6 +1524,12 @@ document.addEventListener('submit', async (e) => {
   }
 });
 document.addEventListener('change', (e) => {
+  if (['work-course-provider', 'work-course-format'].includes(e.target.id)) {
+    const id = e.target.id;
+    if (id === 'work-course-provider') selectedProvider = e.target.value;
+    else selectedFormat = e.target.value;
+    render('courses').then(() => document.getElementById(id)?.focus());
+  }
   if (e.target.id === 'work-field') {
     field = e.target.value || D.majors[0].id;
     render(view);
