@@ -5,6 +5,33 @@
 .home-directions {
   margin-top: 40px;
 }
+.home-continuation {
+  margin-top: 24px;
+  padding: 28px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--bg-surface);
+}
+.home-continuation p {
+  color: var(--text-secondary);
+}
+.next-step-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+.next-step-list li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.next-step-list span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
 .section-heading {
   display: flex;
   align-items: end;
