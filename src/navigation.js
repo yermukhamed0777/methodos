@@ -69,9 +69,11 @@ export const PRIVATE_VIEWS = new Set([
   'sources',
 ]);
 export function hubFor(view) {
+  if (view === 'home') return HUBS[0];
   return HUBS.find((h) => h.items.some(([v]) => v === view)) || HUBS[3];
 }
 const paths = {
+  '/home': 'home',
   '/admissions': 'universities',
   '/professional-pathways': 'professionals',
   '/research': 'research',
@@ -94,22 +96,31 @@ export function installNavigation(w = window) {
     'admin',
     'sources',
     'explore',
+    'home',
   ]);
   const current = () =>
     aliases[w.location.hash.slice(1)] ||
     (valid.has(w.location.hash.slice(1))
       ? w.location.hash.slice(1)
-      : paths[w.location.pathname] || 'finder');
+      : paths[w.location.pathname] ||
+        (new URL(w.location.href).searchParams.has('opportunity')
+          ? 'finder'
+          : 'home'));
   function paint(view) {
     const hub = hubFor(view);
     d.body.dataset.currentView = view;
     d.body.dataset.hub = hub.id;
+    d.querySelector('[data-home-link]')?.setAttribute(
+      'aria-current',
+      view === 'home' ? 'page' : 'false',
+    );
     d.querySelectorAll('.main-nav [data-hub]').forEach((el) => {
-      const active = el.dataset.hub === hub.id;
+      const active = view !== 'home' && el.dataset.hub === hub.id;
       el.classList.toggle('active', active);
       el.setAttribute('aria-current', active ? 'page' : 'false');
     });
     const tabs = d.querySelector('#hub-navigation');
+    if (tabs) tabs.hidden = view === 'home';
     if (tabs)
       tabs.innerHTML = hub.items
         .map(

@@ -1,0 +1,69 @@
+.discovery-home {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+.welcome-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  align-items: center;
+  gap: 40px;
+  padding: clamp(24px, 5vw, 64px);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+}
+.welcome-hero h1 {
+  font-size: clamp(2rem, 4.4vw, 3.9rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  margin: 18px 0;
+  max-width: 18ch;
+}
+.welcome-hero p {
+  color: var(--text-secondary);
+  max-width: 58ch;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+.welcome-mascot {
+  margin: 0;
+  text-align: center;
+  padding: 24px;
+  background: var(--bg-canvas);
+  border-radius: 24px;
+}
+.welcome-mascot img {
+  max-width: 100%;
+}
+.welcome-mascot figcaption {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+body[data-current-view='home'] #preview-banner {
+  display: none;
+}
+.sidebar [data-home-link] {
+  margin-bottom: 16px;
+}
+.sidebar [data-home-link][aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+@media (max-width: 600px) {
+  .welcome-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .welcome-mascot {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    text-align: left;
+  }
+  .welcome-mascot img {
+    width: 80px;
+    height: 80px;
+  }
+}

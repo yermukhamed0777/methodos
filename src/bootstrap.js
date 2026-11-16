@@ -4,6 +4,7 @@ import { installNavigation } from './navigation.js';
 import { installAccess } from './access.js';
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { createBootStatus } from './boot-status.js';
+import { installDiscovery } from './discovery.js';
 const bootStatus = createBootStatus(document, () => location.reload());
 const route = new URL(location.href);
 async function loadScript(src) {
@@ -122,6 +123,7 @@ async function start() {
   ])
     await loadScript(src);
   document.body.classList.remove('auth-pending');
+  installDiscovery();
   bootStatus.complete();
   if (!user) {
     const notices = document.querySelector('#intel-notices');
