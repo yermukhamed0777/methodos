@@ -57,6 +57,19 @@
 .glass-layout > * {
   min-width: 0;
 }
+.coach-layout .glass-chip {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.glass-stat strong {
+  display: block;
+  font-size: 1.6rem;
+  line-height: 1.25;
+}
+.glass-stat p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
 .glass-rule {
   height: 1px;
   border: 0;
@@ -78,7 +91,7 @@
       transform 160ms ease,
       border-color 160ms ease;
   }
-  .glass-card:hover {
+  .glass-card:has(a, button):hover {
     transform: translateY(-2px);
     border-color: var(--accent-primary);
   }
