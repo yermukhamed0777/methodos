@@ -2,6 +2,107 @@
   max-width: 1240px;
   margin: 0 auto;
 }
+.university-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+.university-grid .university-card {
+  margin: 0;
+  min-width: 0;
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+.university-card > header {
+  display: flex;
+  gap: 18px;
+  align-items: start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.university-card header h2 {
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+  margin: 8px 0 10px;
+  overflow-wrap: anywhere;
+}
+.university-monogram {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-primary);
+  background: var(--accent-soft);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  font-weight: 800;
+}
+.university-card header p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.university-card .resource-tags {
+  margin: 18px 0;
+}
+.university-summary {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.university-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+}
+.university-actions button {
+  min-height: 44px;
+}
+.university-details summary {
+  cursor: pointer;
+  font-weight: 650;
+  padding: 16px 0;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--accent-primary);
+}
+.university-details section {
+  padding-top: 8px;
+}
+.university-details h3 {
+  font-size: 1rem;
+  margin-top: 20px;
+}
+.hub-tab[aria-current='page'] {
+  box-shadow: inset 0 -3px 0 var(--accent-primary);
+  font-weight: 750;
+}
+@media (max-width: 1050px) {
+  .university-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 430px) {
+  .university-grid .university-card {
+    padding: 20px;
+  }
+  .university-card > header {
+    gap: 12px;
+  }
+  .university-monogram {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: 0.8rem;
+  }
+}
 .home-directions {
   margin-top: 40px;
 }

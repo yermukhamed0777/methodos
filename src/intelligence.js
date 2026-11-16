@@ -1,5 +1,6 @@
 import { gateHTML } from './access.js';
 import { HUBS } from './navigation.js';
+import { universityCard } from './university-cards.js';
 import {
   cycleStatus,
   verificationStatus,
@@ -364,18 +365,20 @@ function universityView() {
           )
           .join('')}</tbody></table></div>`
       : '') +
+    '<div class="university-grid">' +
     items
-      .map(
-        (r) =>
-          `<article class="intel-university"><header><span class="eyebrow">${E([r.country, r.city, r.region].filter(Boolean).join(' · '))}</span><h2>${E(r.name)}</h2><p>${E(r.institutionType || 'See institution profile')} · ${E(r.campus || r.city || 'Campus details in official links')}</p></header><div class="intel-two"><section><h3>Research & laboratories</h3><p>${E(r.research)}</p><h3>Student opportunities</h3><p>${E(r.experience)}</p><h3>Partnerships & flexibility</h3><p>${E(r.partnership)}</p><p>${E(r.interdisciplinary || 'Check faculty rules for cross-disciplinary study.')}</p></section><section><h3>Admissions routes · official sources</h3><p>Requirements vary by programme and applicant background. No admission chance or eligibility guarantee is assigned.</p>${Object.entries(
-            r.admissions || {},
-          )
-            .map(([k, u]) => `<p>${link(u, k)}</p>`)
-            .join(
-              '',
-            )}<h3>Campus & support</h3><p>${E(r.locationSummary || 'Explore the linked location guide and official student support.')}</p><p>${E(r.careerServices || 'Consult the official careers service.')}</p>${r.locationId ? btn('detail', 'Country / city guide', r.locationId) : ''}</section></div><p class="resource-note">${E(r.note || r.limitations)}</p>${sources(r)}<div class="work-actions">${btn('uni-compare', compareIds.includes(r.id) ? 'Remove comparison' : 'Compare capabilities', r.id)}${btn('folder', 'Create / open my private folder', r.id)}${btn('task', 'Add exploration task', r.id)}</div></article>`,
+      .map((r) =>
+        universityCard(
+          r,
+          btn(
+            'uni-compare',
+            compareIds.includes(r.id) ? 'Remove comparison' : 'Compare',
+            r.id,
+          ) + btn('folder', 'My admissions folder', r.id),
+        ),
       )
-      .join('')
+      .join('') +
+    '</div>'
   );
 }
 function locations() {
