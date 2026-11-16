@@ -1,4 +1,5 @@
 import { greeting, nextSteps } from './discovery-model.js';
+import { installCampus } from './campus.js';
 const escape = (value) =>
   String(value ?? '').replace(
     /[&<>"']/g,
@@ -13,7 +14,8 @@ export function installDiscovery(w = window) {
   const panel = d.querySelector('#platform-panel');
   const previous = w.ProspectoPlatform.render;
   let homeEpoch = 0;
-  w.ProspectoWorkspace.views.push('home');
+  const campus = installCampus(w);
+  w.ProspectoWorkspace.views.push('home', 'campus');
   function directions() {
     const courses = w.PROSPECTO_RESOURCES?.courses || [];
     const universities = (w.PROSPECTO_INTELLIGENCE?.records || []).filter(
@@ -47,6 +49,13 @@ export function installDiscovery(w = window) {
         'Explore public career stories and possible routes from learning to work.',
         'professionals',
         'Career Pathways',
+      ],
+      [
+        '05',
+        'Already at university?',
+        'Discover research, exchanges and careers resources inside your own university.',
+        'campus',
+        'Explore my campus',
       ],
     ];
     return `<section class="home-directions" aria-labelledby="directions-title"><div class="section-heading"><div><span class="eyebrow">CHOOSE YOUR DIRECTION</span><h2 id="directions-title">What brings you here today?</h2></div><p>No perfect plan needed. Start with one question.</p></div><div class="direction-grid">${cards.map(([n, title, text, view, label]) => `<article class="direction-card"><span class="direction-number" aria-hidden="true">${n}</span><h3>${title}</h3><p>${text}</p><button class="secondary" data-view="${view}">${label} →</button></article>`).join('')}</div></section><section class="home-proof" aria-label="About the collection"><p><strong>${escape(universities.length)}</strong> university profiles</p><p><strong>${escape(courses.length)}</strong> courses & learning resources</p><p><strong>Official sources</strong> with review dates</p><p><strong>Your workspace</strong> stays private</p></section>`;
@@ -88,6 +97,7 @@ export function installDiscovery(w = window) {
   }
   w.ProspectoPlatform.render = (view) => {
     if (view === 'home') home();
+    else if (view === 'campus') campus.render();
     else previous(view);
   };
   return { escape, home };
