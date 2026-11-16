@@ -1,150 +1,136 @@
-import { test, beforeEach, afterEach } from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
-import * as fs from 'node:fs';
-
-// happy-dom provides a DOM implementation for the test harness
+import { readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
-
-// Utility to set up a fresh Window for each test
-function createWindow() {
-  const dom = new Window();
-  const win = dom.window;
-  // expose globals required by the module under test
-  globalThis.window = win;
-  globalThis.document = win.document;
-  // minimal DOM containing the theme selector used by the module
-  win.document.body.innerHTML = `<select id="theme-select" class="theme-select"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select>`;
-  // Simple matchMedia stub that allows mutable .matches and event handlers
-  win.matchMedia = (query) => {
-    const mql = {
-      matches: false,
-      media: query,
-      listeners: [],
-      addEventListener(type, fn) {
-        if (type === 'change') this.listeners.push(fn);
-      },
-      removeEventListener(type, fn) {
-        if (type === 'change')
-          this.listeners = this.listeners.filter((h) => h !== fn);
-      },
-      dispatchEvent(ev) {
-        if (ev.type === 'change') this.listeners.forEach((fn) => fn(ev));
-      },
-    };
-    return mql;
+const code = readFileSync(new URL('../dist/theme.js', import.meta.url), 'utf8');
+async function fixture(
+  run,
+  { stored, readFails = false, writeFails = false, dark = false } = {},
+) {
+  const w = new Window({ url: 'https://app.example/' });
+  const listeners = new Set();
+  let writes = 0;
+  const media = {
+    matches: dark,
+    addEventListener(type, fn) {
+      if (type === 'change') listeners.add(fn);
+    },
+    removeEventListener(type, fn) {
+      if (type === 'change') listeners.delete(fn);
+    },
   };
-  // expose mock for Node test harness
-  globalThis.__mockMatchMedia = win.matchMedia;
-  return { dom, win };
-}
-
-// Load the theme module into the isolated window
-async function loadTheme(win) {
-  const code = fs.readFileSync('dist/theme.js', 'utf8');
-  win.eval(code);
-}
-
-test('theme implementation', async (t) => {
-  let windowHolder;
-  beforeEach(() => {
-    // Setup a clean window before each test
-    windowHolder = createWindow();
+  w.matchMedia = () => media;
+  const storage = {
+    getItem() {
+      if (readFails) throw Error('Storage denied');
+      return stored;
+    },
+    setItem() {
+      writes++;
+      if (writeFails) throw Error('Storage denied');
+    },
+  };
+  Object.defineProperty(w, 'localStorage', {
+    configurable: true,
+    value: storage,
   });
-  afterEach(() => {
-    if (windowHolder) {
-      // happy-dom instances do not expose a dispose method; allow GC
-      windowHolder = undefined;
-    }
-  });
-
-  t.test('stored preference restored', async () => {
-    const { win } = windowHolder;
-    win.localStorage.setItem('prefers-theme', 'dark');
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    assert.strictEqual(
-      win.document.documentElement.getAttribute('data-theme'),
-      'dark',
+  w.document.write(
+    '<meta name="theme-color"><select id="theme-select"><option value="light">Light</option><option value="dark">Dark</option><option value="system">System</option></select>',
+  );
+  const choose = (value) => {
+    const select = w.document.getElementById('theme-select');
+    select.value = value;
+    select.dispatchEvent(new w.Event('change'));
+  };
+  const emit = (matches) => {
+    media.matches = matches;
+    for (const listener of [...listeners]) listener({ matches });
+  };
+  try {
+    w.eval(code);
+    w.document.dispatchEvent(
+      new w.Event('DOMContentLoaded', { bubbles: true }),
     );
-  });
-
-  t.test('manual dark remains dark after OS light change', async () => {
-    const { win } = windowHolder;
-    win.localStorage.setItem('prefers-theme', 'dark');
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    const mql = globalThis.__mockMatchMedia('(prefers-color-scheme: dark)');
-    mql.matches = false;
-    mql.dispatchEvent(new win.Event('change'));
-    assert.strictEqual(
-      win.document.documentElement.getAttribute('data-theme'),
-      'dark',
-    );
-  });
-
-  t.test('manual light remains light after OS dark change', async () => {
-    const { win } = windowHolder;
-    win.localStorage.setItem('prefers-theme', 'light');
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    const mql = globalThis.__mockMatchMedia('(prefers-color-scheme: dark)');
-    mql.matches = true;
-    mql.dispatchEvent(new win.Event('change'));
-    assert.strictEqual(
-      win.document.documentElement.getAttribute('data-theme'),
-      'light',
-    );
-  });
-
-  t.test('system mode follows OS changes', async () => {
-    const { win } = windowHolder;
-    win.localStorage.setItem('prefers-theme', 'system');
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    const mql = win.__themeAPI.getSystemMql();
-    mql.matches = true;
-    mql.dispatchEvent(new win.Event('change'));
-    assert.strictEqual(
-      win.document.documentElement.getAttribute('data-theme'),
-      'dark',
-    );
-  });
-
-  t.test('listener cleanup on manual switch', async () => {
-    const { win } = windowHolder;
-    win.localStorage.setItem('prefers-theme', 'system');
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    const select = win.document.getElementById('theme-select');
-    select.value = 'light';
-    select.dispatchEvent(new win.Event('change', { bubbles: true }));
-    const mql = globalThis.__mockMatchMedia('(prefers-color-scheme: dark)');
-    mql.matches = true;
-    mql.dispatchEvent(new win.Event('change'));
-    assert.strictEqual(
-      win.document.documentElement.getAttribute('data-theme'),
-      'light',
-    );
-  });
-
-  t.test('storage read/write failures are non-fatal', async () => {
-    const { win } = windowHolder;
-    const originalGet = win.localStorage.getItem;
-    const originalSet = win.localStorage.setItem;
-    win.localStorage.getItem = () => {
-      throw new Error('get fail');
-    };
-    win.localStorage.setItem = () => {
-      throw new Error('set fail');
-    };
-    await loadTheme(win);
-    win.document.dispatchEvent(new win.Event('DOMContentLoaded'));
-    assert.doesNotThrow(() => {
-      const sel = win.document.getElementById('theme-select');
-      sel.value = 'dark';
-      sel.dispatchEvent(new win.Event('change', { bubbles: true }));
+    await run({
+      w,
+      listeners,
+      choose,
+      emit,
+      writes: () => writes,
+      resolved: () => w.document.documentElement.dataset.theme,
     });
-    win.localStorage.getItem = originalGet;
-    win.localStorage.setItem = originalSet;
-  });
-});
+  } finally {
+    w.ProspectoTheme?.destroy();
+    await w.happyDOM.close();
+  }
+}
+test('theme applies a stored preference immediately, before controls are ready', () =>
+  fixture(
+    ({ w, resolved }) => {
+      assert.equal(resolved(), 'dark');
+      assert.equal(w.document.querySelector('meta').content, '#0b1018');
+    },
+    { stored: 'dark' },
+  ));
+test('System follows both directions of the same browser media query', () =>
+  fixture(({ emit, resolved, listeners }) => {
+    assert.equal(listeners.size, 1);
+    emit(true);
+    assert.equal(resolved(), 'dark');
+    emit(false);
+    assert.equal(resolved(), 'light');
+  }));
+for (const [mode, opposite] of [
+  ['dark', false],
+  ['light', true],
+]) {
+  test('System to manual ' + mode + ' removes the actual OS listener', () =>
+    fixture(({ choose, emit, listeners, resolved }) => {
+      choose(mode);
+      assert.equal(listeners.size, 0);
+      emit(opposite);
+      assert.equal(resolved(), mode);
+    }),
+  );
+}
+test('repeated installation and DOM-ready events never duplicate handlers', () =>
+  fixture(({ w, choose, writes, listeners }) => {
+    w.eval(code);
+    w.document.dispatchEvent(
+      new w.Event('DOMContentLoaded', { bubbles: true }),
+    );
+    w.dispatchEvent(new w.Event('DOMContentLoaded'));
+    choose('dark');
+    assert.equal(writes(), 1);
+    assert.equal(listeners.size, 0);
+    choose('system');
+    choose('system');
+    assert.equal(listeners.size, 1);
+  }));
+test('storage read failure retains a usable controller and selector', () =>
+  fixture(
+    ({ choose, resolved }) => {
+      choose('dark');
+      assert.equal(resolved(), 'dark');
+    },
+    { readFails: true },
+  ));
+test('storage write failure preserves the selected manual theme', () =>
+  fixture(
+    ({ choose, resolved, writes }) => {
+      choose('dark');
+      assert.equal(resolved(), 'dark');
+      assert.equal(writes(), 1);
+    },
+    { writeFails: true },
+  ));
+test('invalid stored values use the OS theme and destruction releases listeners', () =>
+  fixture(
+    ({ w, resolved, listeners }) => {
+      assert.equal(resolved(), 'dark');
+      assert.equal(w.ProspectoTheme.getMode(), 'system');
+      w.ProspectoTheme.destroy();
+      assert.equal(listeners.size, 0);
+    },
+    { stored: 'invalid', dark: true },
+  ));

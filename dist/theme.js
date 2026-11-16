@@ -1,79 +1,82 @@
-/*
- * Theme toggling for ProspectoAI.
- * Supports Light, Dark, System preferences.
- * Persistence via localStorage key 'prefers-theme'.
- * Applies data-theme attribute on document.documentElement.
- */
-const PREF_KEY = 'prefers-theme';
-const THEME_ATTR = 'data-theme';
-
-// Controller state – stored in module scope.
-let systemMediaQuery = null;
-let systemListener = null;
-
-function setTheme(theme) {
-  const root = document.documentElement;
-  if (theme === 'system') {
-    // Use a test stub in Node when available; otherwise fall back to real API
-    const mql = globalThis.__mockMatchMedia
-      ? globalThis.__mockMatchMedia('(prefers-color-scheme: dark)')
-      : window.matchMedia('(prefers-color-scheme: dark)');
-    if (!systemMediaQuery) {
-      systemMediaQuery = mql;
-      // expose via a theme API for test harnesses
-      window.__themeAPI = window.__themeAPI || {};
-      window.__themeAPI.getSystemMql = () => systemMediaQuery;
-    }
-    const handler = (e) => {
-      root.setAttribute(
-        THEME_ATTR,
-        systemMediaQuery.matches ? 'dark' : 'light',
-      );
-    };
-    // Ensure only one listener
-    if (!systemListener) {
-      systemListener = handler;
-      systemMediaQuery.addEventListener('change', systemListener);
-    }
-    root.setAttribute(THEME_ATTR, mql.matches ? 'dark' : 'light');
-  } else {
-    // Remove old OS listener if present
-    if (systemListener && systemMediaQuery) {
-      systemMediaQuery.removeEventListener('change', systemListener);
-      systemListener = null;
-      systemMediaQuery = null;
-    }
-    root.setAttribute(THEME_ATTR, theme);
+/* Browser theme controller: apply before paint; bind controls once the DOM exists. */
+(function installTheme(w) {
+  if (w.ProspectoTheme) return;
+  const d = w.document,
+    key = 'prefers-theme';
+  const valid = (value) =>
+    ['light', 'dark', 'system'].includes(value) ? value : 'system';
+  let mode,
+    media,
+    listening = false,
+    select = null;
+  try {
+    media = w.matchMedia('(prefers-color-scheme: dark)');
+  } catch {
+    media = null;
   }
-}
-
-function init() {
+  function render() {
+    const resolved =
+      mode === 'system' ? (media?.matches ? 'dark' : 'light') : mode;
+    d.documentElement.setAttribute('data-theme', resolved);
+    const meta = d.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = resolved === 'dark' ? '#0b1018' : '#f5f7fb';
+    if (select) select.value = mode;
+  }
+  function osChanged() {
+    if (mode === 'system') render();
+  }
+  function unsubscribe() {
+    if (!listening) return;
+    if (media?.removeEventListener)
+      media.removeEventListener('change', osChanged);
+    else media?.removeListener?.(osChanged);
+    listening = false;
+  }
+  function setMode(value, persist = true) {
+    mode = valid(value);
+    if (mode === 'system' && !listening && media) {
+      if (media.addEventListener) media.addEventListener('change', osChanged);
+      else media.addListener?.(osChanged);
+      listening = true;
+    } else if (mode !== 'system') unsubscribe();
+    render();
+    if (persist) {
+      try {
+        w.localStorage.setItem(key, mode);
+      } catch {
+        /* Device storage is optional. */
+      }
+    }
+  }
+  function changed(event) {
+    setMode(event.target.value);
+  }
+  function bind() {
+    const next = d.getElementById('theme-select');
+    if (next === select) return;
+    select?.removeEventListener('change', changed);
+    select = next;
+    select?.addEventListener('change', changed);
+    render();
+  }
+  w.ProspectoTheme = {
+    setMode,
+    getMode: () => mode,
+    destroy() {
+      unsubscribe();
+      select?.removeEventListener('change', changed);
+      d.removeEventListener('DOMContentLoaded', bind);
+      delete w.ProspectoTheme;
+    },
+  };
   let stored;
   try {
-    stored = localStorage.getItem(PREF_KEY);
-  } catch (_) {
-    stored = null;
+    stored = w.localStorage.getItem(key);
+  } catch {
+    /* Keep the system default. */
   }
-  const theme =
-    stored === 'light' || stored === 'dark' || stored === 'system'
-      ? stored
-      : 'system';
-  setTheme(theme);
-  const select = document.getElementById('theme-select');
-  if (select) {
-    select.value = theme;
-    select.addEventListener('change', (e) => {
-      const v = e.target.value;
-      setTheme(v === 'system' ? 'system' : v);
-      try {
-        localStorage.setItem(PREF_KEY, v);
-      } catch (_) {
-        // ignore persistence errors
-      }
-    });
-  }
-}
-
-// Register init on both document and window to accommodate test harness
-document.addEventListener('DOMContentLoaded', init);
-window.addEventListener('DOMContentLoaded', init);
+  setMode(stored, false);
+  if (d.readyState === 'loading')
+    d.addEventListener('DOMContentLoaded', bind, { once: true });
+  else bind();
+})(window);
