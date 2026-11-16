@@ -41,3 +41,30 @@
 [data-theme='dark'] img[src='/assets/logo-light.svg'] {
   content: url('/assets/logo-dark.svg');
 }
+
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  order: 2;
+}
+.theme-switcher label {
+  font-size: 0.8rem;
+}
+.theme-select {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+}
+.theme-select:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+.auth-card .theme-switcher {
+  margin-bottom: 20px;
+}
