@@ -1,4 +1,5 @@
-import { greeting, nextSteps } from './discovery-model.js';
+import { greeting, nextSteps, deadlineRadar } from './discovery-model.js';
+import { officialLink } from './university-cards.js';
 import { installCampus } from './campus.js';
 import { installBarys } from './barys.js';
 const escape = (value) =>
@@ -69,6 +70,17 @@ export function installDiscovery(w = window) {
     panel
       .querySelector('.discovery-home')
       .insertAdjacentHTML('beforeend', directions());
+    const upcoming = deadlineRadar([
+      ...(w.PROSPECTO_INTELLIGENCE?.records || []),
+      ...(w.PROSPECTO_DEVELOPMENT?.opportunities || []),
+      ...(w.OPPORTUNITIES || []),
+    ]);
+    panel
+      .querySelector('.discovery-home')
+      .insertAdjacentHTML(
+        'beforeend',
+        `<section class="home-deadlines"><div class="section-heading"><div><span class="eyebrow">CHECKED CYCLES, CLEARER DECISIONS</span><h2>Closing in the next 30 days</h2></div><button class="text-button" data-view="finder">All opportunities →</button></div>${upcoming.length ? `<div class="direction-grid">${upcoming.map((r) => `<article class="direction-card"><span class="verification-badge status-open">Verified Open</span><h3>${escape(r.name)}</h3><p>Recorded deadline: <strong>${escape(r.finalDeadline)}</strong>. Check the provider’s timezone and current eligibility.</p>${officialLink(r.applicationUrl, 'Read the application requirements')}</article>`).join('')}</div>` : '<p class="resource-note">No verified open deadlines fall in this window in the current collection. Expected cycles and directories are kept out of this list. You can still research and prepare.</p>'}<details class="status-explainer"><summary>What do the verification badges mean?</summary><dl><dt>Verified Open</dt><dd>A recently checked application cycle; confirm its current conditions.</dd><dt>Expected Cycle</dt><dd>Prepare ahead. Applications are not verified open.</dd><dt>Directory / Evergreen</dt><dd>A resource or directory, not an individual vacancy.</dd><dt>Awaiting Review</dt><dd>Current availability needs a fresh check.</dd></dl><button class="text-button" data-open-barys>Ask BARYS how to check a source →</button></details></section>`,
+      );
     if (w.ProspectoAuth?.user) {
       const slot = d.createElement('section');
       slot.className = 'home-continuation';

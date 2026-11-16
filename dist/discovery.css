@@ -2,6 +2,55 @@
   max-width: 1240px;
   margin: 0 auto;
 }
+.hub-navigation[hidden] {
+  display: none;
+}
+.home-deadlines {
+  margin-top: 36px;
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+}
+.status-explainer {
+  margin-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 18px;
+}
+.status-explainer summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+.status-explainer dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 14px;
+  font-size: 0.9rem;
+  margin: 20px 0;
+}
+.status-explainer dt {
+  font-weight: 700;
+}
+.status-explainer dd {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.direction-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+@media (max-width: 600px) {
+  .status-explainer dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .status-explainer dd {
+    margin-bottom: 12px;
+  }
+  .home-deadlines {
+    padding: 20px;
+  }
+}
 .course-pagination {
   display: flex;
   flex-wrap: wrap;
