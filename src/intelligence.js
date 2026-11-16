@@ -1,6 +1,6 @@
 import { gateHTML } from './access.js';
 import { HUBS } from './navigation.js';
-import { universityCard } from './university-cards.js';
+import { universityCard, filterUniversities } from './university-cards.js';
 import {
   cycleStatus,
   verificationStatus,
@@ -42,6 +42,8 @@ let state = {},
   level = '',
   selected = '',
   compareIds = [],
+  universityCountry = '',
+  universitySort = 'name',
   undo = null;
 const E = (x) =>
   String(x ?? '').replace(
@@ -339,16 +341,43 @@ function funding() {
   );
 }
 function universityView() {
-  const items = list('university'),
+  const items = filterUniversities(records, {
+      query: search,
+      country: universityCountry,
+      field,
+      sort: universitySort,
+    }),
     selectedRecords = compareIds
       .map((id) => records.find((r) => r.id === id))
       .filter(Boolean);
   return (
     title(
-      'Admissions and University Explorer',
+      'Universities & Admissions',
       'Explore what you could study, build and investigate, then keep your own application research in a private folder.',
     ) +
-    filters() +
+    `<div class="intel-filterbar university-filters"><label>Search universities<input id="intel-search" type="search" maxlength="120" placeholder="University, city or research interest" value="${E(search)}"></label><label>Country / region<select id="university-country">${options(
+      [
+        ...new Set(
+          records
+            .filter((r) => r.kind === 'university')
+            .map((r) => r.country)
+            .filter(Boolean),
+        ),
+      ].sort(),
+      universityCountry,
+      'All locations',
+    )}</select></label><label>Field<select id="intel-field">${options(
+      majors.map((x) => [x.id, x.name]),
+      field,
+      'All fields',
+    )}</select></label><label>Sort<select id="university-sort">${options(
+      [
+        ['name', 'Name A–Z'],
+        ['country', 'Country / region'],
+      ],
+      universitySort,
+      'Choose order',
+    )}</select></label>${btn('reset-universities', 'Clear filters')}</div><p class="resource-count" role="status">${items.length} university ${items.length === 1 ? 'profile' : 'profiles'}${search || field || universityCountry ? ' match your filters' : ' in the collection'}</p>` +
     `<div class="work-actions">${btn('go', 'My admissions folders', 'admissions-folders')}${btn('go', 'Country & city guides', 'locations')}${btn('go', 'Scholarships & funding', 'funding')}</div>` +
     (selectedRecords.length
       ? `<div class="work-table-wrap" role="region" aria-label="University comparison; scroll horizontally for more columns" tabindex="0"><table><caption>Capability and location comparison · up to four</caption><thead><tr><th>Area</th>${selectedRecords.map((r) => `<th>${E(r.name)} ${btn('uni-compare', 'Remove', r.id, 'text-button')}</th>`).join('')}</tr></thead><tbody>${[
@@ -365,6 +394,11 @@ function universityView() {
           )
           .join('')}</tbody></table></div>`
       : '') +
+    (items.length
+      ? ''
+      : '<div class="work-empty"><h2>No universities match yet.</h2><p>Try a broader location or field. A missing profile does not mean a university lacks these opportunities.</p>' +
+        btn('reset-universities', 'Show all universities') +
+        '</div>') +
     '<div class="university-grid">' +
     items
       .map((r) =>
@@ -1011,11 +1045,19 @@ async function action(name, id) {
       'detail',
       'command',
       'uni-compare',
+      'reset-universities',
       'download-cv',
     ].includes(name)
   ) {
     A.promptSignIn?.('save and personalize your discoveries');
     return;
+  }
+  if (name === 'reset-universities') {
+    search = '';
+    field = '';
+    universityCountry = '';
+    universitySort = 'name';
+    return render('universities');
   }
   if (
     /^(admin-|review-candidate|reject-candidate|restore-content|export-report)/.test(
@@ -1413,6 +1455,17 @@ document.addEventListener('input', (e) => {
   }, 180);
 });
 document.addEventListener('change', (e) => {
+  if (
+    e.target.id === 'university-country' ||
+    e.target.id === 'university-sort'
+  ) {
+    if (e.target.id === 'university-country')
+      universityCountry = e.target.value;
+    else universitySort = e.target.value;
+    render('universities').then(() =>
+      document.getElementById(e.target.id)?.focus(),
+    );
+  }
   if (e.target.id === 'intel-field') {
     field = e.target.value;
     render(view);

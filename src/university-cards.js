@@ -15,6 +15,38 @@ export function officialLink(url, label) {
     return '';
   }
 }
+export function filterUniversities(
+  records,
+  { query = '', country = '', field = '', sort = 'name' } = {},
+) {
+  const q = query.trim().toLocaleLowerCase();
+  return records
+    .filter(
+      (r) =>
+        r.kind === 'university' &&
+        r.status !== 'Archived' &&
+        (!country || r.country === country) &&
+        (!field || r.fieldIds?.includes(field)) &&
+        (!q ||
+          [
+            r.name,
+            r.country,
+            r.city,
+            r.research,
+            r.experience,
+            ...(r.fields || []),
+          ]
+            .join(' ')
+            .toLocaleLowerCase()
+            .includes(q)),
+    )
+    .sort(
+      (a, b) =>
+        (sort === 'country'
+          ? (a.country || '').localeCompare(b.country || '')
+          : 0) || a.name.localeCompare(b.name),
+    );
+}
 export function universityCard(record, actions = '') {
   const r = record;
   const initials = r.name
