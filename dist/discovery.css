@@ -2,6 +2,23 @@
   max-width: 1240px;
   margin: 0 auto;
 }
+.course-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 18px 0;
+  margin-bottom: 16px;
+  border-block: 1px solid var(--border-subtle);
+}
+.course-pagination span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.course-pagination button {
+  min-height: 44px;
+}
 .course-filterbar {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
