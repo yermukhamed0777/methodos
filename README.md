@@ -86,12 +86,19 @@ Do not disable email confirmation as a workaround for delivery failures. The UI 
 | `SUPABASE_SECRET_KEY`      | Server secret        | Enables deletion of the signed-in account only                |
 | `AI_GATEWAY_MODEL`         | Server configuration | Exact `provider/model` ID from the gateway catalog            |
 | `AI_GATEWAY_API_KEY`       | Server secret        | Gateway authentication when deployment OIDC is not configured |
+| `AI_DIRECT_MODEL`          | Server configuration | Model ID for an OpenAI-compatible provider                    |
+| `AI_DIRECT_API_KEY`        | Server secret        | Enables generation without the Vercel gateway                 |
+| `AI_DIRECT_BASE_URL`       | Server configuration | Optional HTTPS-compatible API origin                          |
 
 The public config endpoint returns only the project URL, publishable key and capability flag. It never returns AI, cron, storage or service-role secrets.
 
 ## AI interface and limits
 
 `POST /api/chat` validates input, retrieves matching researched records and returns attributed references with review dates. It uses the provider-independent Vercel AI SDK and the configured gateway model. Set `AI_GATEWAY_API_KEY` securely, or use deployment OIDC only after the project owner approves that authentication setup. A ChatGPT subscription is not used by the website.
+
+The sign-in page includes contextual recovery help derived only from the visible status message. Signed-in students can also open the **Application coach**, which drafts one short section from their own notes and the reviewed catalog. It never submits or saves an application; without generation it returns a clearly labelled writing skeleton.
+
+Set `AI_DIRECT_MODEL` and `AI_DIRECT_API_KEY` to use an OpenAI-compatible provider instead of the Vercel gateway. `AI_DIRECT_BASE_URL` is optional and must be HTTPS. The key stays server-only and the public configuration endpoint exposes only a capability flag.
 
 AI calls require a verified Supabase session. The database enforces 10 requests per user per day and 200 requests site-wide per day. Inputs, history and output length are bounded. A failed provider, missing configuration or exhausted allowance returns clearly labelled catalog search. A personalized plan asks for missing stage, field, time and goals first.
 
