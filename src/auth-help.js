@@ -22,22 +22,22 @@ const HELP = [
     ['Back to sign in', '/login'],
   ],
   [
-    /password|reset|update/i,
-    'Password help',
-    [
-      'Use the email address of your ProspectoAI account.',
-      'Open only the newest reset message.',
-      'Choose at least 10 characters and sign in again.',
-    ],
-    ['Open password reset', '/reset-password'],
-  ],
-  [
     /incorrect|credentials|invalid_credentials/i,
     'Check your account details',
     [
       'Confirm the email address and password are correct.',
       'If you just registered, confirm your email before signing in.',
       'Use password reset if you cannot remember the password.',
+    ],
+    ['Open password reset', '/reset-password'],
+  ],
+  [
+    /password|reset|update/i,
+    'Password help',
+    [
+      'Use the email address of your ProspectoAI account.',
+      'Open only the newest reset message.',
+      'Choose at least 10 characters and sign in again.',
     ],
     ['Open password reset', '/reset-password'],
   ],
