@@ -1,5 +1,6 @@
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { triageDeadlines } from '../lib/deadline-triage.js';
+import { sharedPathId, shareLinkHTML } from './path-card.js';
 import { gateHTML } from './access.js';
 import {
   filterCourses,
@@ -1036,12 +1037,18 @@ function universities() {
   );
 }
 function pathways() {
+  const shared = sharedPathId(window.location.href);
+  const highlighted = shared ? D.pathways.find((p) => p.id === shared) : null;
+  const banner = highlighted
+    ? `<section class="work-card shared-path"><span class="work-tag">Shared path</span><h2>${E(highlighted.name)}</h2><p>${E(highlighted.education)}</p><p class="resource-note">Shared from the public catalog. No personal data was included; verify the source before acting.</p></section>`
+    : '';
   return (
     heading(
       'Career pathways to explore.',
       'Illustrative routes assembled from occupational sources. These are not biographies, employer endorsements or guaranteed careers.',
     ) +
-    `<div class="resource-grid">${D.pathways.map((p) => `<article class="work-card"><span class="work-tag">Illustrative learning archetype</span><h2>${E(p.name)}</h2><h3>Education & foundations</h3><p>${E(p.education)}</p><p>${E(p.foundations.join(' · '))}</p><h3>Tools & projects</h3><p>${E(p.tools.join(' · '))}</p><p>${E(p.projects.join(' '))}</p><details><summary>Experience, progression & sample plan</summary><h3>Internships</h3><p>${E(p.internships)}</p><h3>Research & teamwork</h3><p>${E(p.research)} ${E(p.teamwork)}</p><h3>Early roles</h3><p>${E(p.earlyRoles)}</p><h3>Progression & alternatives</h3><p>${E(p.progression)} ${E(p.alternatives)}</p><ol>${p.samplePlan.map((x) => `<li><strong>${E(x.phase)}</strong>: ${E(x.task)}</li>`).join('')}</ol></details><p class="resource-note">${E(p.note)} Checked ${p.checkedOn}.</p><div class="resource-links">${p.sources.map(([l, u]) => link(u, l)).join('')}</div>${button('quick-plan', 'Start a preparation task', p.name)}</article>`).join('')}</div>`
+    banner +
+    `<div class="resource-grid">${D.pathways.map((p) => `<article class="work-card${p.id === shared ? ' is-shared' : ''}"><span class="work-tag">Illustrative learning archetype</span><h2>${E(p.name)}</h2><h3>Education & foundations</h3><p>${E(p.education)}</p><p>${E(p.foundations.join(' · '))}</p><h3>Tools & projects</h3><p>${E(p.tools.join(' · '))}</p><p>${E(p.projects.join(' '))}</p><details><summary>Experience, progression & sample plan</summary><h3>Internships</h3><p>${E(p.internships)}</p><h3>Research & teamwork</h3><p>${E(p.research)} ${E(p.teamwork)}</p><h3>Early roles</h3><p>${E(p.earlyRoles)}</p><h3>Progression & alternatives</h3><p>${E(p.progression)} ${E(p.alternatives)}</p><ol>${p.samplePlan.map((x) => `<li><strong>${E(x.phase)}</strong>: ${E(x.task)}</li>`).join('')}</ol></details><p class="resource-note">${E(p.note)} Checked ${p.checkedOn}.</p><div class="resource-links">${p.sources.map(([l, u]) => link(u, l)).join('')}</div><div class="work-actions">${button('quick-plan', 'Start a preparation task', p.name)}${shareLinkHTML(window.location.origin, p.id)}</div></article>`).join('')}</div>`
   );
 }
 function privacy() {

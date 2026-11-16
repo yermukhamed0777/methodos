@@ -32,6 +32,15 @@
   font-size: 13px;
 }
 
+.shared-path,
+.work-card.is-shared {
+  border-color: var(--accent-primary);
+}
+
+.shared-path .work-tag {
+  margin-bottom: 10px;
+}
+
 .work-card p {
   line-height: 1.65;
 }
