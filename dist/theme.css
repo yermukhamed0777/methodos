@@ -12,7 +12,7 @@
   /* Text colors */
   --text-primary: #eef3fa;
   --text-secondary: #b2c0d3;
-  --text-muted: #70839d;
+  --text-muted: #9cacbf;
 
   /* Accents */
   --accent-primary: #8ba8ff;
@@ -28,7 +28,7 @@
   --status-open-bg: #0f4b3a;
   --status-expected: #e6b700; /* gold */
   --status-expected-bg: #38281c;
-  --status-error: #f5625e; /* fresh red */
+  --status-error: #ff9691;
   --status-error-bg: #5a2c33;
 
   color-scheme: dark;
@@ -36,4 +36,8 @@
 [data-theme='light'] {
   /* Ensure light theme variables are set for fallback */
   color-scheme: light;
+}
+
+[data-theme='dark'] img[src='/assets/logo-light.svg'] {
+  content: url('/assets/logo-dark.svg');
 }
