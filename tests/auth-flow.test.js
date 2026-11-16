@@ -33,6 +33,8 @@ test('return paths cannot redirect to external sites, auth pages or token fragme
   ])
     assert.equal(safeNext(value, origin), '/');
   assert.equal(safeNext('/#universities', origin), '/#universities');
+  assert.equal(safeNext('/#campus', origin), '/#campus');
+  assert.equal(safeNext('/#home', origin), '/#home');
   assert.equal(
     safeNext('/?opportunity=research-science-institute#explore', origin),
     '/?opportunity=research-science-institute#explore',

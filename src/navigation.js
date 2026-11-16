@@ -1,109 +1,24 @@
-export const HUBS = [
-  {
-    id: 'explore',
-    label: 'Explore',
-    view: 'finder',
-    items: [
-      ['finder', 'Opportunities'],
-      ['universities', 'Universities & Admissions'],
-      ['campus', 'At my university'],
-      ['funding', 'Funding'],
-      ['locations', 'Location guides'],
-      ['whats-new', 'Recently reviewed'],
-      ['latest', 'Source leads'],
-    ],
-  },
-  {
-    id: 'learn',
-    label: 'Courses & Skills',
-    view: 'courses',
-    items: [
-      ['courses', 'Courses'],
-      ['skills', 'Skills'],
-      ['projects', 'Portfolio projects'],
-      ['research', 'Research ideas'],
-    ],
-  },
-  {
-    id: 'career',
-    label: 'Career Pathways',
-    view: 'professionals',
-    items: [
-      ['professionals', 'Public profiles & pathways'],
-      ['pathways', 'Learning routes'],
-      ['careers', 'Career directories'],
-      ['cv-library', 'CV examples'],
-    ],
-  },
-  {
-    id: 'workspace',
-    label: 'My Workspace',
-    view: 'dashboard',
-    items: [
-      ['dashboard', 'Overview'],
-      ['plan', 'Planner'],
-      ['saved', 'Tracker'],
-      ['deadlines', 'Deadlines'],
-      ['documents', 'Documents'],
-      ['admissions-folders', 'Admissions folders'],
-      ['saved-library', 'Saved library'],
-      ['activities', 'Activities'],
-      ['assistant', 'AI assistant'],
-    ],
-  },
-];
-export const PRIVATE_VIEWS = new Set([
-  'dashboard',
-  'plan',
-  'saved',
-  'deadlines',
-  'documents',
-  'admissions-folders',
-  'saved-library',
-  'activities',
-  'assistant',
-  'profile',
-  'privacy',
-  'onboarding',
-  'comparison',
-  'admin',
-  'sources',
-]);
+import {
+  HUBS,
+  PATH_VIEWS,
+  SAFE_HASH_VIEWS,
+} from './view-registry.js';
+
+export { HUBS, PRIVATE_VIEWS } from './view-registry.js';
 export function hubFor(view) {
   if (view === 'home') return HUBS[0];
   return HUBS.find((h) => h.items.some(([v]) => v === view)) || HUBS[3];
 }
-const paths = {
-  '/home': 'home',
-  '/admissions': 'universities',
-  '/professional-pathways': 'professionals',
-  '/research': 'research',
-  '/funding': 'funding',
-  '/my-plan': 'plan',
-  '/system-health': 'admin',
-  '/dashboard': 'dashboard',
-  '/search': 'finder',
-};
 const aliases = { explore: 'finder' };
 export function installNavigation(w = window) {
   const d = w.document;
   let admin = false;
-  const valid = new Set([
-    ...HUBS.flatMap((h) => h.items.map(([v]) => v)),
-    'profile',
-    'privacy',
-    'onboarding',
-    'comparison',
-    'admin',
-    'sources',
-    'explore',
-    'home',
-  ]);
+  const valid = SAFE_HASH_VIEWS;
   const current = () =>
     aliases[w.location.hash.slice(1)] ||
     (valid.has(w.location.hash.slice(1))
       ? w.location.hash.slice(1)
-      : paths[w.location.pathname] ||
+      : PATH_VIEWS[w.location.pathname] ||
         (new URL(w.location.href).searchParams.has('opportunity')
           ? 'finder'
           : 'home'));

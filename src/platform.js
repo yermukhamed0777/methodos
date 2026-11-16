@@ -433,6 +433,16 @@ function renderAssistant() {
       '',
       'Any field',
     )}</select></label><label>Existing skills<input id="assistant-skills" maxlength="300" value="${''}"></label><label>Hours per week<input id="assistant-hours" type="number" min="1" max="80" value="${''}"></label><label>Budget<input id="assistant-budget" maxlength="120" value="${''}"></label><label>Preferred location<input id="assistant-location" maxlength="120" value="${''}"></label><label>Preference<select id="assistant-arrangement">${options(['Remote', 'Hybrid', 'On-site', 'Flexible'], '', 'Any arrangement')}</select></label><label>Your goal<input id="assistant-goal" maxlength="500" value="${''}"></label><p>Optional filters narrow the catalog. Your message and chosen filters are sent for AI generation after you sign in.</p><p>10 AI requests per account per day, subject to the site’s daily allowance. If generation is unavailable, clearly labelled catalog search remains available.</p><button class="text-button" id="clear-chat">Clear this conversation</button></aside><div class="assistant-chat"><div id="chat-messages" class="chat-messages" aria-live="polite"></div><div class="prompt-suggestions"><button data-prompt="Find research opportunities for a high-school student interested in physics">High-school research</button><button data-prompt="Help me plan skills and internships in materials and semiconductors">Materials & semiconductors</button><button data-prompt="Find universities with laboratory and research opportunities">University research</button></div><form id="chat-form"><label for="chat-input">What would you like to explore?</label><textarea id="chat-input" maxlength="1500" required rows="3" placeholder="I’m a first-year engineering student. What could I prepare for next summer?"></textarea><button class="primary" id="chat-send">Find options & make a plan →</button></form><p class="resource-note">Answers can be wrong. Verify sources before acting. Chats are kept in this tab only and are not submitted as applications. ${user ? 'AI planning is available after account verification.' : 'AI planning uses the researched collection. Verify every provider source.'}</p></div></div>`;
+  try {
+    const prefill = window.sessionStorage.getItem('prospecto-ai-prefill');
+    if (prefill) {
+      const input = $('#chat-input');
+      if (input) input.value = prefill.slice(0, 1500);
+      window.sessionStorage.removeItem('prospecto-ai-prefill');
+    }
+  } catch {
+    /* Optional handoff from the local guide. */
+  }
   renderMessages();
 }
 function renderMessages() {
@@ -474,6 +484,22 @@ function renderMessages() {
         sources.append(a);
       }
       div.append(sources);
+    }
+    if (m.routes?.length) {
+      const routes = document.createElement('div');
+      routes.className = 'chat-routes';
+      const label = document.createElement('span');
+      label.textContent = 'Open in ProspectoAI:';
+      routes.append(label);
+      for (const route of m.routes) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'secondary';
+        button.dataset.view = route.view;
+        button.textContent = route.label;
+        routes.append(button);
+      }
+      div.append(routes);
     }
     if (m.role !== 'user') {
       const b = document.createElement('button');

@@ -3,7 +3,11 @@ import { isGatewayConfigured } from '../lib/ai-config.js';
 import { generateWithFallback, gatewayDiagnostic } from '../lib/ai-gateway.js';
 import { developmentContext } from '../lib/development-context.js';
 import { requireUser } from '../lib/auth.js';
-import { searchResources, fallbackAnswer } from '../lib/assistant.js';
+import {
+  searchResources,
+  fallbackAnswer,
+  navigationFor,
+} from '../lib/assistant.js';
 export function createChatHandler({
   authenticate = requireUser,
   getContext = developmentContext,
@@ -116,6 +120,7 @@ export function createChatHandler({
               .join(', ') +
             '. Your current skills, budget, location and format preference will also help. You can fill these in under Your direction.',
           references: [],
+          routes: navigationFor(results),
           notice:
             'A personal plan needs context. You can still browse the collection without a profile.',
         });
@@ -131,6 +136,7 @@ export function createChatHandler({
           mode: 'catalog',
           text: fallbackAnswer(results),
           references,
+          routes: navigationFor(results),
           notice,
           requestId,
         });
@@ -166,6 +172,7 @@ export function createChatHandler({
           mode: 'ai',
           text,
           references,
+          routes: navigationFor(results),
           requestId,
           model: aiModel,
           usedFallback,

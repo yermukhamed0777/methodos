@@ -229,6 +229,50 @@
   min-height: 48px;
   white-space: normal;
 }
+.barys-ask {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0 8px;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--bg-canvas);
+}
+.barys-ask label {
+  font-weight: 700;
+}
+.barys-ask input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.barys-plan {
+  margin: 10px 0 18px;
+  padding: 16px;
+  border-left: 3px solid var(--accent-primary);
+  background: var(--bg-canvas);
+  border-radius: 0 12px 12px 0;
+}
+.barys-plan strong {
+  display: block;
+  margin-bottom: 8px;
+}
+.barys-plan ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.barys-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
 body:has(.barys-launcher) main {
   padding-bottom: 110px;
 }

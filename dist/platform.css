@@ -638,6 +638,16 @@ select {
   margin-bottom: 20px;
 }
 
+.chat-routes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
 .chat-welcome {
   padding: 20px 4px;
   color: var(--text-primary);
