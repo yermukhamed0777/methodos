@@ -648,6 +648,62 @@ select {
   color: var(--text-secondary);
 }
 
+.coach-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.coach-form,
+.coach-result {
+  padding: 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.coach-form label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.coach-form textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.coach-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: var(--bg-canvas);
+  color: var(--accent-primary);
+  font-size: 12px;
+}
+
+.coach-result pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  line-height: 1.7;
+}
+
+.coach-sources {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .coach-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .chat-welcome {
   padding: 20px 4px;
   color: var(--text-primary);
