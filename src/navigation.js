@@ -145,6 +145,10 @@ export function installNavigation(w = window) {
       const url = new URL(w.location.href);
       url.hash = view;
       url.searchParams.delete('opportunity');
+      if (view !== 'campus') {
+        url.searchParams.delete('university');
+        url.searchParams.delete('campus-category');
+      }
       w.history.pushState({ view }, '', url.pathname + url.search + url.hash);
     }
     w.ProspectoTracker?.setView(view);

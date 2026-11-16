@@ -408,7 +408,9 @@ function universityView() {
             'uni-compare',
             compareIds.includes(r.id) ? 'Remove comparison' : 'Compare',
             r.id,
-          ) + btn('folder', 'My admissions folder', r.id),
+          ) +
+            btn('folder', 'My admissions folder', r.id) +
+            `<button class="secondary" data-campus-university="${E(r.id)}">Campus resources →</button>`,
         ),
       )
       .join('') +
