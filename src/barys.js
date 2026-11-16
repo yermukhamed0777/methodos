@@ -136,6 +136,7 @@ export function installBarys(w = window) {
     }
     const action = event.target.closest('[data-barys-view]');
     if (action) {
+      returnFocus = null;
       dialog.close();
       w.ProspectoNavigation.navigate(action.dataset.barysView);
     }

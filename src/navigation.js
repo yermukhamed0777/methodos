@@ -136,6 +136,9 @@ export function installNavigation(w = window) {
       if (el.dataset.view === 'admin') el.hidden = !admin;
     });
     const menu = d.querySelector('#account-menu');
+    tabs
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     if (menu) menu.hidden = true;
     d.querySelector('#account-button')?.setAttribute('aria-expanded', 'false');
   }
@@ -174,6 +177,8 @@ export function installNavigation(w = window) {
       const shell = d.querySelector('.main-shell');
       if (shell) shell.inert = false;
       const sidebar = d.querySelector('#workspace-navigation');
+      sidebar?.removeAttribute('role');
+      sidebar?.removeAttribute('aria-modal');
       if (sidebar && w.innerWidth <= 900) sidebar.inert = true;
     },
     true,

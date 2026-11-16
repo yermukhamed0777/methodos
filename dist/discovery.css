@@ -2,6 +2,32 @@
   max-width: 1240px;
   margin: 0 auto;
 }
+@media (max-width: 600px) {
+  #preview-banner {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+  #preview-banner strong {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+  #preview-banner p {
+    display: none;
+  }
+  #preview-banner button {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    min-width: 0;
+    max-width: 140px;
+    flex: 0 0 auto;
+  }
+  #preview-banner button span {
+    display: none;
+  }
+}
 .hub-navigation[hidden] {
   display: none;
 }
@@ -123,6 +149,9 @@
 }
 .barys-launcher[hidden] {
   display: none;
+}
+.navigation-open .barys-launcher {
+  visibility: hidden;
 }
 .barys-launcher {
   position: fixed;

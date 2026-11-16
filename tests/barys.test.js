@@ -5,11 +5,14 @@ import { installBarys, guideFor } from '../src/barys.js';
 test('BARYS opens on demand, restores focus and uses existing navigation for private actions', async () => {
   const w = new Window({ url: 'https://app.example/' });
   try {
-    w.document.write('<button id="guide-btn">How this works</button>');
+    w.document.write(
+      '<main tabindex="-1"></main><button id="guide-btn">How this works</button>',
+    );
     let view;
     w.ProspectoNavigation = {
       navigate: (v) => {
         view = v;
+        w.document.querySelector('main')?.focus();
       },
     };
     const barys = installBarys(w),
@@ -30,6 +33,7 @@ test('BARYS opens on demand, restores focus and uses existing navigation for pri
     w.document.querySelector('[data-barys-view=plan]').click();
     assert.equal(view, 'plan');
     assert(!dialog.open);
+    assert.equal(w.document.activeElement.tagName, 'MAIN');
     assert.match(dialog.textContent, /without AI/);
     barys.destroy();
     assert.equal(w.document.querySelector('#barys-dialog'), null);
