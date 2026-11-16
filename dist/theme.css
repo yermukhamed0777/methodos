@@ -1,0 +1,70 @@
+/*
+ * Dark theme overrides for ProspectoAI.
+ * Uses the token names from dist/styles.css.
+ */
+[data-theme='dark'] {
+  /* Canvas & background colors */
+  --bg-canvas: #0b1018;
+  --bg-surface: #131d2b;
+  --bg-muted: #1b2430;
+  --bg-raised: #1c293b;
+
+  /* Text colors */
+  --text-primary: #eef3fa;
+  --text-secondary: #b2c0d3;
+  --text-muted: #9cacbf;
+
+  /* Accents */
+  --accent-primary: #8ba8ff;
+  --accent-hover: #5f7bbd;
+  --accent-soft: #283c5c;
+  --text-on-accent: #0b1018;
+
+  /* Borders */
+  --border-subtle: #4a5b6e;
+
+  /* Status colors (improved contrast for small text) */
+  --status-open: #1dc69b; /* bright teal */
+  --status-open-bg: #0f4b3a;
+  --status-expected: #e6b700; /* gold */
+  --status-expected-bg: #38281c;
+  --status-error: #ff9691;
+  --status-error-bg: #5a2c33;
+
+  color-scheme: dark;
+}
+[data-theme='light'] {
+  /* Ensure light theme variables are set for fallback */
+  color-scheme: light;
+}
+
+[data-theme='dark'] img[src='/assets/logo-light.svg'] {
+  content: url('/assets/logo-dark.svg');
+}
+
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  order: 2;
+}
+.theme-switcher label {
+  font-size: 0.8rem;
+}
+.theme-select {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+}
+.theme-select:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+.auth-card .theme-switcher {
+  margin-bottom: 20px;
+}

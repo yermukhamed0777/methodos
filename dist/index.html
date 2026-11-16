@@ -24,10 +24,24 @@
     <link rel="stylesheet" href="/workspace.css" />
     <link rel="stylesheet" href="/intelligence.css" />
     <link rel="stylesheet" href="/responsive.css" />
+    <!-- Theme overrides and selector -->
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/loading.css" />
+    <script src="/theme.js"></script>
     <script src="/bootstrap.js" defer=""></script>
   </head>
   <body class="auth-pending">
-    <p id="boot-status" role="status">Loading public discovery…</p>
+    <div
+      id="boot-status"
+      class="app-loader"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <img src="/assets/white-lion.svg" alt="" width="120" height="120" />
+      <div class="loader-text">Hi, I’m BARYS. Let’s find your next step.</div>
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
     <noscript
       ><p>
         JavaScript is needed. <a href="/login">Sign in to ProspectoAI</a>.
@@ -124,6 +138,15 @@
               System Health &amp; content</button
             ><button id="account-signout" role="menuitem">Sign out</button>
           </div>
+        </div>
+        <!-- Theme selector added to header -->
+        <div class="theme-switcher" role="group" aria-label="Theme selector">
+          <label for="theme-select">Theme</label>
+          <select id="theme-select" class="theme-select">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="system">System</option>
+          </select>
         </div>
         <span class="public-pill">Public discovery</span>
       </header>

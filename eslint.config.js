@@ -1,6 +1,6 @@
 import globals from 'globals';
 export default [
-  { ignores: ['node_modules/**', 'dist/**'] },
+  { ignores: ['node_modules/**', 'dist/**/*', '!dist/theme.js'] },
   {
     files: [
       'api/**/*.js',
@@ -8,6 +8,7 @@ export default [
       'src/**/*.js',
       'scripts/**/*.{js,cjs,mjs}',
       'tests/**/*.{js,cjs}',
+      'dist/theme.js',
     ],
     languageOptions: {
       ecmaVersion: 'latest',
