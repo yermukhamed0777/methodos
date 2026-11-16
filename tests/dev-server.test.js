@@ -10,6 +10,9 @@ test('local preview serves public assets and rejects unsafe requests', async () 
     const home = await fetch(url);
     assert.equal(home.status, 200);
     assert((await home.text()).includes('ProspectoAI'));
+    const welcome = await fetch(url + '/home');
+    assert.equal(welcome.status, 200);
+    assert((await welcome.text()).includes('main-content'));
     const head = await fetch(url + '/app.js', { method: 'HEAD' });
     assert.equal(head.status, 200);
     assert.equal(await head.text(), '');

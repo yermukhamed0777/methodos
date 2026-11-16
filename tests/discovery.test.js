@@ -45,3 +45,48 @@ test('root opens a separate Home while opportunity links retain the finder', asy
     }
   }
 });
+test('signed-in Home escapes profile content and never paints tasks into a departed view', async () => {
+  const w = new Window({ url: 'https://app.example/#home' });
+  try {
+    w.document.write(
+      '<main><section id="platform-panel"></section></main><strong id="breadcrumb-title"></strong>',
+    );
+    let resolve;
+    w.ProspectoAuth = { user: { id: 'owner', user_metadata: {} } };
+    w.ProspectoWorkspace = {
+      views: [],
+      getState: () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    };
+    w.ProspectoPlatform = {
+      render: () => {
+        w.document.querySelector('#platform-panel').textContent = 'Other view';
+      },
+    };
+    installDiscovery(w);
+    w.ProspectoPlatform.render('home');
+    resolve({
+      preferences: { basic: { name: '<script>alert(1)</script>' } },
+      plan_items: [{ title: '<img src=x>', state: 'Planned' }],
+    });
+    await new Promise((done) => setImmediate(done));
+    assert.equal(w.document.querySelector('.home-continuation script'), null);
+    assert.equal(w.document.querySelector('.next-step-list img'), null);
+    assert.match(
+      w.document.querySelector('.next-step-list').textContent,
+      /<img src=x>/,
+    );
+    w.ProspectoPlatform.render('home');
+    w.ProspectoPlatform.render('finder');
+    resolve({ preferences: { basic: { name: 'Old' } }, plan_items: [] });
+    await new Promise((done) => setImmediate(done));
+    assert.equal(
+      w.document.querySelector('#platform-panel').textContent,
+      'Other view',
+    );
+  } finally {
+    await w.happyDOM.close();
+  }
+});

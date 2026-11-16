@@ -105,6 +105,7 @@ export function createPreviewServer() {
             ? '/auth.html'
             : [
                   '/',
+                  '/home',
                   '/dashboard',
                   '/search',
                   '/admissions',
