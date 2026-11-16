@@ -119,7 +119,8 @@ test(
       assert.equal((await fetch(base + '/login')).status, 200);
       assert.equal((await fetch(base + '/.env.local')).status, 404);
       // Change source while generated bundles already exist; the next start must rebuild.
-      const source = join(directory, 'src/bootstrap.js');
+      const source = join(directory, 'src/boot-status.js');
+      assert.match(readFileSync(source, 'utf8'), /Reload collection/);
       writeFileSync(
         source,
         readFileSync(source, 'utf8').replace(
