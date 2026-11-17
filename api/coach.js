@@ -43,7 +43,12 @@ export function createCoachHandler({
         id: r.id,
         kind: r.kind,
       }));
-      const results = searchResources(target, { extra: published }).slice(0, 6);
+      // The coach writes towards an application target, so skill maps and
+      // career pathways are never cited as the thing being applied to.
+      const results = searchResources(target, {
+        extra: published,
+        kinds: ['opportunity', 'course', 'university'],
+      }).slice(0, 6);
       const exact = recordId ? published.find((r) => r.id === recordId) : null;
       const references = (exact ? [exact, ...results] : results)
         .filter((r, i, all) => r && all.findIndex((x) => x.id === r.id) === i)
