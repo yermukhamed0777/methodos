@@ -403,7 +403,37 @@ body:has(.barys-launcher) main {
   letter-spacing: -0.035em;
   color: var(--text-primary);
   margin: 8px 0 10px;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.university-card .university-heading {
+  min-width: 0;
+}
+.university-place {
+  font-size: 0.9rem !important;
+  color: var(--text-primary) !important;
+}
+.university-place span {
+  color: var(--accent-primary);
+  font-weight: 700;
+  margin-right: 4px;
+}
+.university-review {
+  margin-top: 3px !important;
+}
+.university-context {
+  margin: 16px 0 4px;
+}
+.university-context .resource-note {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+}
+.research-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
 }
 .university-monogram {
   width: 48px;
@@ -651,5 +681,35 @@ body[data-current-view='home'] #preview-banner {
   .welcome-mascot img {
     width: 80px;
     height: 80px;
+  }
+}
+
+.home-access {
+  margin-top: 40px;
+}
+.access-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+.access-grid .glass-card h3 {
+  margin: 0 0 12px;
+}
+.access-grid ul {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.access-grid li + li {
+  margin-top: 6px;
+}
+.access-grid button {
+  min-height: 44px;
+}
+@media (max-width: 600px) {
+  .access-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

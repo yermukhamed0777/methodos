@@ -63,13 +63,19 @@ export function installDiscovery(w = window) {
     ];
     return `<section class="home-directions" aria-labelledby="directions-title"><div class="section-heading"><div><span class="eyebrow">CHOOSE YOUR DIRECTION</span><h2 id="directions-title">What brings you here today?</h2></div><p>No perfect plan needed. Start with one question.</p></div><div class="direction-grid">${cards.map(([n, title, text, view, label]) => `<article class="direction-card"><span class="direction-number" aria-hidden="true">${n}</span><h3>${title}</h3><p>${text}</p><button class="secondary" data-view="${view}">${label} →</button></article>`).join('')}</div></section><section class="home-proof" aria-label="About the collection"><p><strong>${escape(universities.length)}</strong> university profiles</p><p><strong>${escape(courses.length)}</strong> courses & learning resources</p><p><strong>Official sources</strong> with review dates</p><p><strong>Your workspace</strong> stays private</p></section>`;
   }
+  function accessGuide() {
+    return `<section class="home-access" aria-labelledby="access-title"><div class="section-heading"><div><span class="eyebrow">OPEN TO EXPLORE, PRIVATE TO SAVE</span><h2 id="access-title">What you can do right now</h2></div><p>No account needed to browse the collection.</p></div><div class="access-grid"><article class="glass-card"><h3>Explore freely</h3><ul><li>Compare opportunities and university research profiles</li><li>Browse courses, skills and career routes</li><li>Ask BARYS to guide you to the right place</li></ul></article><article class="glass-card"><h3>Save it with an account</h3><ul><li>Keep a shortlist and a plan you can return to</li><li>Store documents and admissions notes privately</li><li>Use the source-grounded AI assistant</li></ul><button class="secondary" id="home-sign-in">Sign in to save →</button></article></div></section>`;
+  }
   function home() {
     const epoch = ++homeEpoch;
-    panel.innerHTML = `<div class="discovery-home"><header class="welcome-hero"><div><span class="eyebrow">YOUR NEXT POSSIBILITY</span><h1>A little curiosity.<br>A world of possibilities.</h1><p>Find the opportunity, university or skill that moves you forward. Start exploring; save your next step when you’re ready.</p><div class="work-actions"><button class="primary" data-view="finder">Find an opportunity →</button><button class="secondary" data-view="universities">Explore universities</button></div></div><figure class="welcome-mascot"><img src="/assets/white-lion.svg" width="160" height="160" alt="BARYS, your white-lion guide"><figcaption>Big possibilities.<br>One small next step.</figcaption></figure></header></div>`;
+    panel.innerHTML = `<div class="discovery-home"><header class="welcome-hero"><div><span class="eyebrow">YOUR NEXT POSSIBILITY</span><h1>A little curiosity.<br>A world of possibilities.</h1><p>Find the opportunity, university or skill that moves you forward. Start exploring; save your next step when you’re ready. Browsing is open to everyone.</p><div class="work-actions"><button class="primary" data-view="finder">Find an opportunity →</button><button class="secondary" data-view="universities">Explore universities</button></div></div><figure class="welcome-mascot"><img src="/assets/white-lion.svg" width="160" height="160" alt="BARYS, your white-lion guide"><figcaption>Big possibilities.<br>One small next step.</figcaption></figure></header></div>`;
     d.querySelector('#breadcrumb-title').textContent = 'Start here';
     panel
       .querySelector('.discovery-home')
       .insertAdjacentHTML('beforeend', directions());
+    panel
+      .querySelector('.discovery-home')
+      .insertAdjacentHTML('beforeend', accessGuide());
     const upcoming = deadlineRadar([
       ...(w.PROSPECTO_INTELLIGENCE?.records || []),
       ...(w.PROSPECTO_DEVELOPMENT?.opportunities || []),
@@ -109,6 +115,10 @@ export function installDiscovery(w = window) {
         });
     }
   }
+  d.addEventListener('click', (event) => {
+    if (event.target?.closest?.('#home-sign-in'))
+      w.ProspectoAuth?.promptSignIn?.('save your next step');
+  });
   w.ProspectoPlatform.render = (view) => {
     if (view === 'home') home();
     else if (view === 'campus') campus.render();
