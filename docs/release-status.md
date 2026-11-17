@@ -2,6 +2,24 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit. No rollback to Opportunity Explorer is part of this release.
 
+## Phase 5 design and discovery clarity · 18 November 2026
+
+Three independent PRs, each from current `main` and merged only after green CI; no dependent stack:
+
+| PR                                                                     | Merge commit | What changed                                                                                                                                                                                                                                                                                                                                           | Tests   |
+| ---------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| [#31](https://github.com/yermukhamed0777/opportunity-explorer/pull/31) | `af16793`    | Extended the existing liquid-glass system to Home, direction/university/work cards, BARYS and state surfaces; one action hierarchy with a 44 px minimum and a single focus treatment; ambient page gradients rather than full-page blur; solid fallbacks for no-blur and reduced-transparency; short hover lift only with reduced-motion no-preference | 203/203 |
+| [#32](https://github.com/yermukhamed0777/opportunity-explorer/pull/32) | `156cb68`    | University cards lead with the full name, labelled location and review line, visible “Research directory profile” badge and vacancy caveat, and a Research context heading; Home now distinguishes open browsing from saved work and offers a sign-in action wired to the existing prompt                                                              | 204/204 |
+| [#33](https://github.com/yermukhamed0777/opportunity-explorer/pull/33) | `9f37d7a`    | Signed-in Home adds real resume points: active plan task, most recently opened source with an id-validated internal link, and optional setup — all from state already loaded by the workspace                                                                                                                                                          | 206/206 |
+
+Every PR ran `npm run check`, `npm run format:check` and `git diff --check` before merge; GitHub Actions `check` is green on all three merge commits.
+
+**Visual findings.** Local dev server at 1440×900, 430×932 and 375×812 in both themes: no horizontal overflow (`scrollWidth 360` ≤ `clientWidth 375` at 375 px); primary button text legible on the accent gradient; secondary and hub-tab states remain distinct; university names wrap without mid-word breaks; the new access and resume cards stack cleanly on a phone. Evidence: `docs/preview/home-glass-light.png`, `docs/preview/home-glass-dark-mobile.png`, `docs/preview/university-card-light.png`, `docs/preview/home-access-mobile.png`, `docs/preview/continue-mobile.png`. The only browser console entry was the expected local `503 /api/config` because no Supabase env is present. No real account or production data was used; the signed-in state was simulated locally for the visual check.
+
+Public discovery stayed open throughout. Bookmarks, private folders, documents, profile data and AI calls remain gated; no verification label, university, opportunity or deadline was invented. Registration email delivery remains **unverified** — see [auth-verification.md](auth-verification.md).
+
+**Production is stale: `npm run check:live` still reports 3/6 at `9f37d7a`.** None of the Phase 5 work is visible to students yet. See [deployment handoff](deploy-verification.md) for the three stale markers, the Git-connection hypothesis and the exact post-deployment checks.
+
 ## Phase 4 student guidance and reliability · 17 November 2026
 
 Merged into `main` through PRs [#15](https://github.com/yermukhamed0777/opportunity-explorer/pull/15)–[#24](https://github.com/yermukhamed0777/opportunity-explorer/pull/24), then follow-ups [#25](https://github.com/yermukhamed0777/opportunity-explorer/pull/25)–[#29](https://github.com/yermukhamed0777/opportunity-explorer/pull/29); `main` was `2aff9a1` at the start of the release-hardening PR. The stack was landed bottom-up with each branch retargeted to `main` and its checks green before merging.

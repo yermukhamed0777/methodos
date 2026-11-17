@@ -13,6 +13,9 @@
 - Added a catalog integrity gate (`npm run check:data`) to `npm run check`, rejecting duplicate ids, non-HTTPS sources, impossible dates and unknown references.
 - The AI allowance now reports its real reset time, and a failed request returns the typed question instead of discarding it.
 - Archived three expired cycles (NASA Space Apps 2026, Haven game jam 2026, EPFL life-sciences summer 2027) so closed deadlines are no longer offered as live options.
+- Extended the glass design system to Home, university and work cards, BARYS and state surfaces with one action hierarchy and solid fallbacks.
+- Made university names, location, research context and directory status unmistakable, and explained what is open to browse versus saved with an account.
+- Added real signed-in resume points on Home from existing workspace state without new network calls or invented records.
 
 ## 5.0.0 · 12 November 2026
 

@@ -25,7 +25,7 @@ about new-user registration, and what still needs the owner.
   `email_not_confirmed`, `invalid_credentials`, `over_email_send_rate_limit`,
   `otp_expired`, `flow_state_expired`, `flow_state_not_found` and
   `bad_code_verifier`.
-- **Local tests cover the parts that do not need an inbox.** 202 tests pass,
+- **Local tests cover the parts that do not need an inbox.** 206 tests pass,
   including `tests/auth-signup.test.js` for address masking, the
   already-registered signal, cooldown copy and message routing.
 
