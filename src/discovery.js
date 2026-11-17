@@ -1,4 +1,10 @@
-import { greeting, nextSteps, deadlineRadar } from './discovery-model.js';
+import {
+  greeting,
+  nextSteps,
+  recentSource,
+  needsSetup,
+  deadlineRadar,
+} from './discovery-model.js';
 import { officialLink } from './university-cards.js';
 import { installCampus } from './campus.js';
 import { installBarys } from './barys.js';
@@ -104,7 +110,21 @@ export function installDiscovery(w = window) {
             w.ProspectoAuth.user.user_metadata?.display_name ||
             '';
           const steps = nextSteps(state);
-          slot.innerHTML = `<div class="section-heading"><div><span class="eyebrow">A SPACE FOR YOUR NEXT STEP</span><h2>${escape(greeting(name))}</h2><p>How’s your day? Pick one thing you’d like to move forward.</p></div><button class="secondary" data-view="dashboard">My workspace →</button></div>${steps.length ? `<ul class="next-step-list">${steps.map((item) => `<li><strong>${escape(item.title)}</strong><span>${escape(item.due_date || 'No date set')} · ${escape(item.state)}</span></li>`).join('')}</ul><button class="text-button" data-view="plan">Open my planner →</button>` : '<p>No active plan tasks yet. One small step is enough to begin.</p><button class="secondary" data-view="plan">Make my first plan</button>'}`;
+          const recent = recentSource(state);
+          const setup = needsSetup(state);
+          const recentId = String(recent?.resource_id || '');
+          const safeRecentId = /^[a-z0-9-]{1,120}$/.test(recentId)
+            ? recentId
+            : '';
+          const resume = [
+            recent
+              ? `<article class="glass-card resume-card"><span class="eyebrow">PICK UP A SOURCE</span><h3>${escape(recent.title)}</h3><p>${escape(String(recent.viewed_at || '').slice(0, 10) || 'Recently opened')} · ${escape(recent.kind || 'Source')}</p>${safeRecentId ? `<a class="secondary" href="/?opportunity=${encodeURIComponent(safeRecentId)}">Open source →</a>` : '<button class="secondary" data-view="finder">Find it again →</button>'}</article>`
+              : '',
+            setup
+              ? '<article class="glass-card resume-card"><span class="eyebrow">MAKE IT YOURS</span><h3>Finish your setup</h3><p>A few saved preferences make suggestions more useful. Setup is optional.</p><button class="secondary" data-view="onboarding">Continue setup →</button></article>'
+              : '',
+          ].filter(Boolean);
+          slot.innerHTML = `<div class="section-heading"><div><span class="eyebrow">A SPACE FOR YOUR NEXT STEP</span><h2>${escape(greeting(name))}</h2><p>How’s your day? Pick one thing you’d like to move forward.</p></div><button class="secondary" data-view="dashboard">My workspace →</button></div>${steps.length ? `<ul class="next-step-list">${steps.map((item) => `<li><strong>${escape(item.title)}</strong><span>${escape(item.due_date || 'No date set')} · ${escape(item.state)}</span></li>`).join('')}</ul><button class="text-button" data-view="plan">Open my planner →</button>` : '<p>No active plan tasks yet. One small step is enough to begin.</p><button class="secondary" data-view="plan">Make my first plan</button>'}${resume.length ? `<div class="resume-grid">${resume.join('')}</div>` : ''}`;
         })
         .catch(() => {
           if (slot.isConnected)

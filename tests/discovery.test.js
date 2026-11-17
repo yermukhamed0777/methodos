@@ -79,6 +79,13 @@ test('signed-in Home escapes profile content and never paints tasks into a depar
     resolve({
       preferences: { basic: { name: '<script>alert(1)</script>' } },
       plan_items: [{ title: '<img src=x>', state: 'Planned' }],
+      recent_views: [
+        {
+          title: '<img src=x onerror=1>',
+          resource_id: 'javascript:alert(1)',
+          viewed_at: '2026-11-16T10:00:00Z',
+        },
+      ],
     });
     await new Promise((done) => setImmediate(done));
     assert.equal(w.document.querySelector('.home-continuation script'), null);
@@ -87,6 +94,20 @@ test('signed-in Home escapes profile content and never paints tasks into a depar
       w.document.querySelector('.next-step-list').textContent,
       /<img src=x>/,
     );
+    const resume = w.document.querySelector('.resume-grid');
+    assert.ok(resume, 'signed-in Home offers real resume points');
+    assert.equal(
+      resume.querySelector('img'),
+      null,
+      'source titles stay escaped',
+    );
+    assert.match(resume.textContent, /<img src=x onerror=1>/);
+    assert.equal(
+      resume.querySelector('a[href*="javascript"]'),
+      null,
+      'unsafe resource ids never become links',
+    );
+    assert.match(resume.textContent, /Finish your setup/);
     w.ProspectoPlatform.render('home');
     w.ProspectoPlatform.render('finder');
     resolve({ preferences: { basic: { name: 'Old' } }, plan_items: [] });

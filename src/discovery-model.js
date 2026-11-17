@@ -33,3 +33,21 @@ export function nextSteps(state) {
     .sort((a, b) => (a.due_date || '9999').localeCompare(b.due_date || '9999'))
     .slice(0, 3);
 }
+
+// Signed-in continuation only reads state the workspace already holds. It never
+// invents a saved item, and it never calls a provider or writes to the account.
+export function recentSource(state = {}) {
+  return (
+    [...(state.recent_views || [])]
+      .filter(
+        (item) => item && typeof item.title === 'string' && item.title.trim(),
+      )
+      .sort((a, b) =>
+        String(b.viewed_at || '').localeCompare(String(a.viewed_at || '')),
+      )[0] || null
+  );
+}
+
+export function needsSetup(state = {}) {
+  return state.preferences?.onboarding_complete !== true;
+}
