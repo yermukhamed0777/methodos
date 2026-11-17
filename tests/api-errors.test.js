@@ -247,3 +247,37 @@ test('drafting configuration, invalid input, denied quota and quota-service outa
     assert(!JSON.stringify(res.body).includes('PRIVATE_DATABASE_DETAILS'));
   }
 });
+
+test('an exhausted daily allowance returns catalog results with a reset window', async () => {
+  const deps = dependencies({ allowed: false }),
+    res = response();
+  await createChatHandler(deps.options)(
+    { method: 'POST', body: { message: 'materials' } },
+    res,
+  );
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.mode, 'catalog');
+  assert.equal(res.body.quota.exhausted, true);
+  assert.ok(res.body.quota.retryAfter > 0);
+  assert.match(res.body.notice, /00:00 UTC/);
+  assert.match(res.body.notice, /catalog results below are still real/i);
+  assert.equal(res.headers['Retry-After'], String(res.body.quota.retryAfter));
+  assert.equal(deps.calls.generate, 0);
+});
+
+test('a quota service outage stays a 503 and never claims a reset window', async () => {
+  const deps = dependencies({
+      quotaError: { message: 'PRIVATE_DATABASE_DETAILS' },
+    }),
+    res = response();
+  await createChatHandler(deps.options)(
+    { method: 'POST', body: { message: 'materials' } },
+    res,
+  );
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.body.mode, 'catalog');
+  assert.equal(res.body.quota, undefined);
+  assert.equal(res.headers['Retry-After'], undefined);
+  assert(!JSON.stringify(res.body).includes('PRIVATE_DATABASE_DETAILS'));
+  assert.equal(deps.calls.generate, 0);
+});

@@ -3,6 +3,7 @@ import { isGatewayConfigured } from '../lib/ai-config.js';
 import { generateWithFallback, gatewayDiagnostic } from '../lib/ai-gateway.js';
 import { developmentContext } from '../lib/development-context.js';
 import { requireUser } from '../lib/auth.js';
+import { quotaNotice, secondsUntilUtcMidnight } from '../lib/quota.js';
 import {
   searchResources,
   fallbackAnswer,
@@ -131,26 +132,38 @@ export function createChatHandler({
         url: o.url,
         checkedOn: o.checkedOn,
       }));
-      const fallback = (notice, status = 200) =>
-        res.status(status).json({
+      const fallback = (notice, status = 200, extra = {}) => {
+        if (extra.retryAfter != null)
+          res.setHeader('Retry-After', String(extra.retryAfter));
+        const { retryAfter, ...body } = extra;
+        return res.status(status).json({
           mode: 'catalog',
           text: fallbackAnswer(results),
           references,
           routes: navigationFor(results),
           notice,
+          ...body,
           requestId,
         });
+      };
       if (!isGatewayConfigured(env))
         return fallback(
           'AI generation is not configured. Showing catalog search.',
         );
       const { data: allowed, error: quotaError } =
         await db.rpc('reserve_ai_request');
-      if (quotaError || !allowed)
+      if (quotaError)
         return fallback(
-          'AI planning has reached its daily allowance or is temporarily unavailable. Catalog search still works.',
-          quotaError ? 503 : 200,
+          'AI planning is temporarily unavailable. Catalog search still works.',
+          503,
         );
+      if (!allowed) {
+        const retryAfter = secondsUntilUtcMidnight();
+        return fallback(quotaNotice(retryAfter), 200, {
+          retryAfter,
+          quota: { exhausted: true, retryAfter },
+        });
+      }
       try {
         const { text, aiModel, usedFallback } = await generate(
           {
