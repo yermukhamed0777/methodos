@@ -18,6 +18,8 @@ Validation on the merged tree: build, lint, typecheck, `format:check` and **186 
 
 Not claimed: live AI generation, a screen-reader or high-contrast manual pass, or a visual check of the 404 page. Deployment identifiers are recorded after checking the production build, not inferred from local tests.
 
+**Production was checked after these merges and still serves the pre-#15 build.** `/glass.css` and `/404.html` return `404`, and the live BARYS dialog lacks the “Tell BARYS what you need” field that exists in `src/barys.js` on `main`. GitHub Actions is green for `c3cf6cc`; the gap is in the deployment pipeline, not the repository. See [production deployment check](deploy-verification.md) for the evidence table and the exact Vercel settings to inspect.
+
 ## Phase 3 Home, campus and BARYS · 16 November 2026
 
 The theme foundation is merged in [PR #13](https://github.com/yermukhamed0777/opportunity-explorer/pull/13), at `32b68bf0ade825086243b96000a66618056b3e37`.
