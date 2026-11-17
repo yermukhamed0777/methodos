@@ -180,7 +180,10 @@ const students = ids(
   }),
 );
 assert(students.includes('eth-ssrf-2027'));
-assert(students.includes('epfl-life-sciences-srp-2027'));
+// The EPFL summer 2027 application closed on 15 November 2026, so the record is
+// archived and must no longer be offered as a live research option.
+assert(data.find((o) => o.id === 'epfl-life-sciences-srp-2027').archived);
+assert(!students.includes('epfl-life-sciences-srp-2027'));
 console.log(
   'Passed: tracker backup validation, unknown IDs, note limits, calendar dates, escaping and UTF-8 line folding.',
 );
