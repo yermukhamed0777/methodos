@@ -5,6 +5,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import configHandler from '../api/config.js';
 import chatHandler from '../api/chat.js';
+import coachHandler from '../api/coach.js';
 import catalogHandler from '../api/catalog.js';
 import discoverHandler from '../api/discover.js';
 import renewalHandler from '../api/renewal.js';
@@ -43,6 +44,7 @@ export function createPreviewServer() {
       '/api/account': accountHandler,
       '/api/admin': adminHandler,
       '/api/chat': chatHandler,
+      '/api/coach': coachHandler,
       '/api/catalog': catalogHandler,
       '/api/discover': discoverHandler,
       '/api/renewal': renewalHandler,

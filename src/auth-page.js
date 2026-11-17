@@ -7,12 +7,29 @@ import {
   RECOVERY_PATH,
   CALLBACK_PATH,
 } from './auth-flow.js';
+import { authHelpFor } from './auth-help.js';
 const $ = (s) => document.querySelector(s);
 const url = new URL(location.href);
 const next = safeNext(url.searchParams.get('next'), url.origin);
 let client, recoveryUserId;
 const status = (message) => {
   $('#auth-status').textContent = message;
+  const help = authHelpFor(message);
+  const body = $('#auth-help-body');
+  if (!body) return;
+  body.replaceChildren();
+  const title = document.createElement('strong');
+  title.textContent = help.title;
+  const steps = document.createElement('ol');
+  for (const step of help.steps) {
+    const li = document.createElement('li');
+    li.textContent = step;
+    steps.append(li);
+  }
+  const link = document.createElement('a');
+  link.href = help.action.href;
+  link.textContent = help.action.label;
+  body.append(title, steps, link);
 };
 function show(form, title, intro) {
   document

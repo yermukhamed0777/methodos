@@ -137,10 +137,14 @@ function render(view) {
   resourcesView = view;
   if (
     !window.ProspectoAuth.user &&
-    ['assistant', 'activities'].includes(view)
+    ['assistant', 'coach', 'activities'].includes(view)
   ) {
     $('#platform-panel').innerHTML = gateHTML(
-      view === 'assistant' ? 'the AI assistant' : 'personal activities',
+      view === 'assistant'
+        ? 'the AI assistant'
+        : view === 'coach'
+          ? 'the application writing coach'
+          : 'personal activities',
     );
     return;
   }
@@ -177,6 +181,7 @@ function render(view) {
     resourceList(view);
   } else if (view === 'activities') renderActivities();
   else if (view === 'assistant') renderAssistant();
+  else if (view === 'coach') renderCoach();
 }
 window.ProspectoPlatform = {
   render,
@@ -239,6 +244,7 @@ async function initialize() {
       'universities',
       'activities',
       'assistant',
+      'coach',
       'sources',
       ...(window.ProspectoWorkspace?.views || []),
     ].includes(hash)
@@ -263,7 +269,7 @@ async function loadAccount(nextUser) {
   $('#account-button').textContent = user ? 'Account' : 'Sign in';
   if (!user) {
     window.ProspectoTracker.setCloud({ saved: [], progress: {} });
-    if (['activities', 'assistant'].includes(resourcesView))
+    if (['activities', 'assistant', 'coach'].includes(resourcesView))
       render(resourcesView);
     return;
   }
@@ -513,6 +519,18 @@ function renderMessages() {
     box.append(div);
   }
 }
+function renderCoach() {
+  $('#platform-panel').innerHTML =
+    heading(
+      'WRITE FROM EVIDENCE',
+      'Application writing coach.',
+      'Turn your own verified notes into a draft section. Nothing is saved or submitted, and the model cannot invent facts about you.',
+    ) +
+    `<div class="coach-layout"><form id="coach-form" class="coach-form"><label>Opportunity or goal<input id="coach-target" maxlength="160" required placeholder="e.g. summer research in materials"></label><label>Section<select id="coach-section">${options(
+      ['motivation', 'experience', 'plan'],
+      'motivation',
+    )}</select></label><label>Your own notes<textarea id="coach-notes" maxlength="3000" rows="7" placeholder="Only include experiences and facts you can verify."></textarea></label><button class="primary" id="coach-send" type="submit">Draft this section →</button><p class="resource-note">Mentions of AI require sign-in and the shared daily allowance. Without AI, you still receive an honest writing skeleton.</p></form><section id="coach-result" class="coach-result" role="status" aria-live="polite"><p>Your draft will appear here. Review every claim before using it.</p></section></div>`;
+}
 document.addEventListener('input', (e) => {
   if (e.target.id === 'career-skills') {
     careerSkills = e.target.value;
@@ -757,6 +775,67 @@ document.addEventListener('submit', async (e) => {
       $('#activity-priority').value,
     );
     button.disabled = false;
+  }
+  if (e.target.id === 'coach-form') {
+    e.preventDefault();
+    const button = $('#coach-send'),
+      result = $('#coach-result');
+    const target = $('#coach-target').value.trim();
+    const notes = $('#coach-notes').value;
+    const section = $('#coach-section').value;
+    button.disabled = true;
+    button.textContent = 'Drafting…';
+    result.textContent = 'Preparing an evidence-based draft…';
+    try {
+      const response = await window.ProspectoAuth.fetch('/api/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, notes, section }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || 'The coach is unavailable.');
+      result.replaceChildren();
+      const badge = document.createElement('span');
+      badge.className = 'coach-badge';
+      badge.textContent = data.mode === 'ai' ? 'AI draft' : 'Writing skeleton';
+      const text = document.createElement('pre');
+      text.textContent = data.text;
+      result.append(badge, text);
+      if (data.references?.length) {
+        const refs = document.createElement('div');
+        refs.className = 'coach-sources';
+        for (const ref of data.references) {
+          const a = document.createElement('a');
+          a.textContent = `${ref.name} · ${ref.checkedOn} ↗`;
+          a.href = ref.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          refs.append(a);
+        }
+        result.append(refs);
+      }
+      const notice = document.createElement('p');
+      notice.className = 'resource-note';
+      notice.textContent = data.notice;
+      result.append(notice);
+      const save = document.createElement('button');
+      save.className = 'secondary';
+      save.type = 'button';
+      save.textContent = 'Save as a private activity';
+      save.addEventListener('click', () =>
+        addActivity(
+          'Application draft: ' + target,
+          null,
+          data.text.slice(0, 3000),
+        ),
+      );
+      result.append(save);
+    } catch (err) {
+      result.textContent = err.message;
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Draft this section →';
+    }
   }
   if (e.target.id === 'chat-form') {
     e.preventDefault();

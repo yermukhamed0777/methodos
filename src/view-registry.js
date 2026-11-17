@@ -52,6 +52,7 @@ export const HUBS = [
       ['saved-library', 'Saved library'],
       ['activities', 'Activities'],
       ['assistant', 'AI assistant'],
+      ['coach', 'Application coach'],
     ],
   },
 ];
@@ -66,6 +67,7 @@ export const PRIVATE_VIEWS = new Set([
   'saved-library',
   'activities',
   'assistant',
+  'coach',
   'profile',
   'privacy',
   'onboarding',
