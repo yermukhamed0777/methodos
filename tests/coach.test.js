@@ -105,7 +105,12 @@ test('coach returns an honest skeleton when AI is not configured or quota is exh
     assert.equal(res.body.mode, 'template');
     assert.match(res.body.text, /draft skeleton/);
     assert.match(res.body.text, /I built a small battery cell/);
-    assert.equal(res.body.references[0].id, 'course-materials');
+    // Ranking is relevance-first, so the published record is cited alongside
+    // the closest catalog entries rather than pinned to position 0.
+    assert(
+      res.body.references.some((r) => r.id === 'course-materials'),
+      'published record is cited',
+    );
     assert.deepEqual(res.body.routes[0], { view: 'courses', label: 'Courses' });
     assert.equal(setup.calls.generate, 0);
   }
