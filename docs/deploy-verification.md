@@ -1,8 +1,12 @@
 # Production deployment check · 17 November 2026 (second pass)
 
-`main` is `09bf33b082500731ff62f522001f8814bab055e0` (merge of PR #27).
-GitHub Actions: `check` **success** for `09bf33b` and `c3cf6cc`.
-Production: **still the pre-#15 build.** `npm run check:live` reports **3/6**.
+`main` was `2a4cdde08f2917c9754b1b470aae09ebc1083a20` (merge of PR #28) when this
+pass was recorded. The investigation below was run at `09bf33b`; PR #28 added only
+`npm run check:live` and documentation, and the probe still reports **3/6** at
+`2a4cdde`. Re-run `npm run check:live` for the current figure rather than trusting
+this paragraph.
+GitHub Actions: `check` **success** for `2a4cdde`, `09bf33b` and `c3cf6cc`.
+Production: **still the pre-#15 build.**
 
 ## 1. What the live site serves
 
@@ -65,10 +69,11 @@ deploys automatically, and a Vercel commit status will appear on GitHub, which
 makes staleness detectable next time.
 
 **B. Deploy the exact commit once.** On the owner’s machine, from a clean checkout
-of `09bf33b`:
+of the latest `main`:
 
 ```
-git checkout 09bf33b
+git pull --ff-only
+git rev-parse HEAD     # record this SHA as the deployment source
 npm ci --ignore-scripts
 npx vercel link        # choose the existing opportunity-explorer project
 npx vercel --prod
@@ -84,7 +89,8 @@ SHA and the READY state, then run `npm run check:live` — it must print **6/6**
   entry, so there is no dashboard or API path from this environment.
 - No token, CLI session, project link, Actions secret or deploy hook exists, so a
   deployment cannot be created or promoted.
-- Nothing was force-pushed, reverted or re-tagged; `main` is intact at `09bf33b`.
+- Nothing was force-pushed, reverted or re-tagged; `main` is intact and matches
+  the commits listed above.
 
 ## 5. Verification to repeat once deployed
 

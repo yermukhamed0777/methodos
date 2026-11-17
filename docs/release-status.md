@@ -4,7 +4,7 @@ The expansion connects Explore, Build Your Profile, Professional Pathways, Admis
 
 ## Phase 4 student guidance and reliability · 17 November 2026
 
-Merged into `main` through PRs [#15](https://github.com/yermukhamed0777/opportunity-explorer/pull/15)–[#24](https://github.com/yermukhamed0777/opportunity-explorer/pull/24), then follow-ups [#25](https://github.com/yermukhamed0777/opportunity-explorer/pull/25)–[#27](https://github.com/yermukhamed0777/opportunity-explorer/pull/27); `main` is `09bf33b` after the last merge. The stack was landed bottom-up with each branch retargeted to `main` and its checks green before merging.
+Merged into `main` through PRs [#15](https://github.com/yermukhamed0777/opportunity-explorer/pull/15)–[#24](https://github.com/yermukhamed0777/opportunity-explorer/pull/24), then follow-ups [#25](https://github.com/yermukhamed0777/opportunity-explorer/pull/25)–[#27](https://github.com/yermukhamed0777/opportunity-explorer/pull/27); `main` is `2a4cdde` after the last merge. The stack was landed bottom-up with each branch retargeted to `main` and its checks green before merging.
 
 - **Guidance and writing.** BARYS gained a local intent router (no network, no model call), the assistant returns validated navigation routes, sign-in recovery help is derived only from the visible status message, and the application coach drafts from reviewed records plus the student's own notes without inventing facts.
 - **Planning.** Deadline triage ranks verified provider dates and personal tasks; pathway cards share only a validated public ID; deadline export now produces RFC 5545-valid calendars with folded lines and exclusive all-day end dates.
@@ -18,7 +18,7 @@ Validation on the merged tree: build, lint, typecheck, `format:check` and **186 
 
 Not claimed: live AI generation, a screen-reader or high-contrast manual pass, or a visual check of the 404 page. Deployment identifiers are recorded after checking the production build, not inferred from local tests.
 
-**Production was checked after these merges and still serves the pre-#15 build.** `npm run check:live` reports **3/6**: `/glass.css` and `/404.html` return `404`, and `/bootstrap.js` lacks the “Tell BARYS what you need” marker added in `edc2447`. GitHub Actions is green for `09bf33b`. The cause is not the repository: the repo has **zero GitHub deployment records and zero commit statuses on any commit**, no deploy workflow, no Actions secrets and no deploy hook, so the Vercel project is not connected to this GitHub repository and deploys are manual. See [production deployment check](deploy-verification.md) for the evidence table, the smallest owner action and the re-verification checklist.
+**Production was checked after these merges and still serves the pre-#15 build.** `npm run check:live` reports **3/6**: `/glass.css` and `/404.html` return `404`, and `/bootstrap.js` lacks the “Tell BARYS what you need” marker added in `edc2447`. GitHub Actions is green for `2a4cdde`. The cause is not the repository: the repo has **zero GitHub deployment records and zero commit statuses on any commit**, no deploy workflow, no Actions secrets and no deploy hook, so the Vercel project is not connected to this GitHub repository and deploys are manual. See [production deployment check](deploy-verification.md) for the evidence table, the smallest owner action and the re-verification checklist.
 
 ## Phase 3 Home, campus and BARYS · 16 November 2026
 
