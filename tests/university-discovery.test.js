@@ -15,6 +15,11 @@ test('university cards prioritize the full name and keep detailed sources discov
     checkedOn: '2026-11-11',
   });
   assert.match(html, /<h2>A &lt;University&gt;<\/h2>/);
+  assert.match(html, /class="university-place"/);
+  assert.match(html, /Research directory profile/);
+  assert.match(html, /Research context/);
+  // The directory-versus-vacancy distinction is visible, not buried in details.
+  assert.match(html.split('<details')[0], /Not an open vacancy/);
   assert.match(html, /<details/);
   assert.match(html, /https:\/\/example.edu\/research/);
   assert.match(html, /not an open vacancy/);

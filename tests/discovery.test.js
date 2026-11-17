@@ -32,6 +32,15 @@ test('root opens a separate Home while opportunity links retain the finder', asy
           w.document.querySelector('h1').textContent,
           /possibilities/,
         );
+        assert.match(
+          w.document.querySelector('.welcome-hero').textContent,
+          /Browsing is open to everyone/,
+        );
+        const access = w.document.querySelector('.home-access');
+        assert.ok(access, 'first visit explains open browsing vs saved work');
+        assert.match(access.textContent, /Explore freely/);
+        assert.match(access.textContent, /Save it with an account/);
+        assert.ok(w.document.querySelector('#home-sign-in'));
         assert.equal(
           w.document.querySelector('[data-view=universities]').textContent,
           'Explore universities',
@@ -86,6 +95,31 @@ test('signed-in Home escapes profile content and never paints tasks into a depar
       w.document.querySelector('#platform-panel').textContent,
       'Other view',
     );
+  } finally {
+    await w.happyDOM.close();
+  }
+});
+
+test('the Home sign-in action opens the account prompt without navigating', async () => {
+  const w = new Window({ url: 'https://app.example/#home' });
+  try {
+    w.document.write(
+      '<main><section id="platform-panel"></section></main><strong id="breadcrumb-title"></strong>',
+    );
+    let purpose = '';
+    w.ProspectoAuth = {
+      user: null,
+      promptSignIn: (value) => {
+        purpose = value;
+      },
+    };
+    w.ProspectoWorkspace = { views: [] };
+    w.ProspectoPlatform = { render: () => {} };
+    w.ProspectoTracker = { setView: () => {} };
+    installDiscovery(w);
+    w.ProspectoPlatform.render('home');
+    w.document.querySelector('#home-sign-in').click();
+    assert.equal(purpose, 'save your next step');
   } finally {
     await w.happyDOM.close();
   }
