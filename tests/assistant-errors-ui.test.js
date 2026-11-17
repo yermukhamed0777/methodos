@@ -29,6 +29,7 @@ test(
         mode: 'catalog',
         text: 'Catalog fallback remains available.',
         references: [],
+        routes: [{ view: 'courses', label: 'Courses' }],
         notice: 'AI generation is unavailable.',
       };
       w.ProspectoAuth = {
@@ -84,6 +85,11 @@ test(
       assert.match(
         w.document.querySelector('#platform-panel').textContent,
         /AI generation is unavailable/,
+      );
+      assert.equal(
+        w.document.querySelector('.chat-routes [data-view=courses]')
+          .textContent,
+        'Courses',
       );
       payload = { error: 'The source collection is temporarily unavailable.' };
       await submit();

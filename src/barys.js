@@ -1,5 +1,8 @@
 import { greeting } from './discovery-model.js';
 import { escape } from './university-cards.js';
+import { guidePlan } from './guide-intent.js';
+import { safeNext } from './auth-flow.js';
+import { VIEW_LABELS } from './view-registry.js';
 
 export function guideFor(view) {
   return (
@@ -57,7 +60,7 @@ export function installBarys(w = window) {
     )
     .join(
       '',
-    )}</div><p class="resource-note">Built-in guidance works without AI. Your private workspace still requires sign-in.</p><button class="text-button" data-barys-view="assistant">Open the AI assistant (sign-in required) →</button></div>`;
+    )}</div><form class="barys-ask" id="barys-ask-form"><label for="barys-ask-input">Tell BARYS what you need</label><input id="barys-ask-input" maxlength="300" placeholder="e.g. I forgot my password"><button class="secondary" type="submit">Guide me →</button></form><div id="barys-plan" class="barys-plan" role="status" aria-live="polite"></div><p class="resource-note">Built-in guidance works without AI. This guide routes your request locally; no message is sent to an AI model.</p><button class="text-button" data-barys-view="assistant">Open the AI assistant (sign-in required) →</button></div>`;
   d.body.append(launcher, dialog);
   const context = d.createElement('section');
   context.className = 'barys-context';
@@ -74,7 +77,85 @@ export function installBarys(w = window) {
   } catch {
     /* Session memory is optional. */
   }
-  let returnFocus;
+  let returnFocus,
+    lastQuestion = '';
+  const planBox = dialog.querySelector('#barys-plan');
+  function showPlan(plan, question) {
+    planBox.replaceChildren();
+    const title = d.createElement('strong');
+    title.textContent = plan.title;
+    planBox.append(title);
+    const list = d.createElement('ul');
+    for (const step of plan.steps) {
+      const li = d.createElement('li');
+      li.textContent = step;
+      list.append(li);
+    }
+    planBox.append(list);
+    const actions = d.createElement('div');
+    actions.className = 'barys-plan-actions';
+    if (plan.kind === 'auth') {
+      const link = d.createElement('a');
+      link.className = 'secondary';
+      const next = safeNext(w.location.href, w.location.origin);
+      link.href =
+        plan.action === 'reset'
+          ? '/reset-password'
+          : '/login?next=' + encodeURIComponent(next);
+      link.textContent =
+        plan.action === 'reset'
+          ? 'Open the reset page →'
+          : 'Open the sign-in page →';
+      actions.append(link);
+    } else if (
+      plan.kind === 'view' &&
+      (!plan.requiresAuth || w.ProspectoAuth?.user)
+    ) {
+      const button = d.createElement('button');
+      button.className = 'secondary';
+      button.type = 'button';
+      button.dataset.barysView = plan.view;
+      button.textContent = `Go to ${plan.label} →`;
+      actions.append(button);
+    } else if (plan.kind === 'view') {
+      const button = d.createElement('button');
+      button.className = 'primary';
+      button.type = 'button';
+      button.dataset.barysAccess = plan.view;
+      button.textContent = `Sign in to open ${plan.label} →`;
+      actions.append(button);
+    }
+    if (w.ProspectoAuth?.user) {
+      const ai = d.createElement('button');
+      ai.className = 'text-button';
+      ai.type = 'button';
+      ai.dataset.barysAi = '1';
+      ai.textContent = 'Ask the AI assistant for a deeper answer →';
+      actions.append(ai);
+    } else {
+      const signIn = d.createElement('a');
+      signIn.className = 'text-button';
+      signIn.href =
+        '/login?next=' +
+        encodeURIComponent(safeNext(w.location.href, w.location.origin));
+      signIn.textContent = 'Sign in for AI planning →';
+      actions.append(signIn);
+    }
+    planBox.append(actions);
+    planBox.dataset.question = question.slice(0, 300);
+  }
+  dialog.querySelector('#barys-ask-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = dialog.querySelector('#barys-ask-input');
+    const question = input.value.trim();
+    if (!question) return;
+    lastQuestion = question;
+    input.value = '';
+    showPlan(
+      guidePlan(question, { signedIn: !!w.ProspectoAuth?.user }),
+      question,
+    );
+  });
   function open() {
     returnFocus = d.activeElement;
     const [title, text] = guideFor(d.body.dataset.currentView);
@@ -133,6 +214,31 @@ export function installBarys(w = window) {
         /* Optional. */
       }
       d.querySelector('#guide-btn')?.focus();
+    }
+    const access = event.target.closest('[data-barys-access]');
+    if (access) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      returnFocus = null;
+      dialog.close();
+      w.ProspectoNavigation?.navigate(access.dataset.barysAccess);
+      w.ProspectoAuth?.promptSignIn?.(
+        'continue to ' +
+          (VIEW_LABELS[access.dataset.barysAccess] || 'your workspace'),
+      );
+    }
+    const ai = event.target.closest('[data-barys-ai]');
+    if (ai) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      returnFocus = null;
+      dialog.close();
+      try {
+        w.sessionStorage.setItem('prospecto-ai-prefill', lastQuestion);
+      } catch {
+        /* Optional session handoff. */
+      }
+      w.ProspectoNavigation?.navigate('assistant');
     }
     const action = event.target.closest('[data-barys-view]');
     if (action) {

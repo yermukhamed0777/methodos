@@ -1,31 +1,18 @@
+import { PATH_VIEWS, SAFE_HASH_VIEWS } from './view-registry.js';
 export const RECOVERY_PATH = '/reset-password';
 export const CALLBACK_PATH = '/auth/callback';
 export function safeNext(value, origin) {
   try {
     const url = new URL(value || '/', origin);
-    const paths = {
-      '/admissions': 'universities',
-      '/professional-pathways': 'professionals',
-      '/research': 'research',
-      '/funding': 'funding',
-      '/my-plan': 'plan',
-      '/system-health': 'admin',
-      '/dashboard': 'dashboard',
-      '/search': 'finder',
-    };
-    if (url.origin !== origin || (!paths[url.pathname] && url.pathname !== '/'))
-      return '/';
-    if (paths[url.pathname] && !url.hash) url.hash = '#' + paths[url.pathname];
+    const view = PATH_VIEWS[url.pathname];
+    if (url.origin !== origin || (!view && url.pathname !== '/')) return '/';
+    if (view && !url.hash) url.hash = '#' + view;
     const safe = new URL('/', origin);
     const opportunity = url.searchParams.get('opportunity');
     if (opportunity && /^[a-z0-9-]{1,120}$/.test(opportunity))
       safe.searchParams.set('opportunity', opportunity);
-    if (
-      /^#(explore|latest|saved|deadlines|universities|skills|careers|activities|assistant|sources|dashboard|onboarding|profile|documents|courses|plan|pathways|finder|privacy|professionals|projects|research|cv-library|funding|admissions-folders|locations|comparison|whats-new|admin|saved-library)$/.test(
-        url.hash,
-      )
-    )
-      safe.hash = url.hash;
+    const hashView = /^#([a-z-]+)$/.exec(url.hash)?.[1];
+    if (hashView && SAFE_HASH_VIEWS.has(hashView)) safe.hash = url.hash;
     return safe.pathname + safe.search + safe.hash;
   } catch {
     return '/';

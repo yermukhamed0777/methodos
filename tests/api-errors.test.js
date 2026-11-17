@@ -146,6 +146,69 @@ test('gateway failures report 503 while retaining labelled catalog results and q
   assert.equal(deps.calls.generate, 1);
 });
 
+test('chat responses expose validated navigation routes for retrieved records', async () => {
+  const db = {
+    rpc: async () => ({ data: true, error: null }),
+    from: () => ({
+      select() {
+        return this;
+      },
+      range: async () => ({
+        error: null,
+        data: [
+          {
+            status: 'Published',
+            payload: {
+              id: 'course-materials',
+              kind: 'course',
+              name: 'Materials course',
+              summary: 'Materials science',
+              checkedOn: '2026-11-01',
+              url: 'https://example.edu/course',
+            },
+          },
+          {
+            status: 'Published',
+            payload: {
+              id: 'university-materials',
+              kind: 'university',
+              name: 'Materials university',
+              summary: 'Materials research',
+              checkedOn: '2026-11-01',
+              url: 'https://example.edu/university',
+            },
+          },
+        ],
+      }),
+    }),
+  };
+  const res = response();
+  await createChatHandler({
+    env: {},
+    authenticate: async () => ({ db, user: { id: 'verified-user' } }),
+    getContext: async () => ({ profileConsent: false }),
+  })({ method: 'POST', body: { message: 'materials' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.mode, 'catalog');
+  assert.equal(res.body.routes.length, 3);
+  assert.deepEqual(res.body.routes.slice(0, 2), [
+    { view: 'courses', label: 'Courses' },
+    { view: 'universities', label: 'Universities' },
+  ]);
+  assert(
+    res.body.routes.every((route) =>
+      [
+        'finder',
+        'courses',
+        'universities',
+        'skills',
+        'professionals',
+        'pathways',
+      ].includes(route.view),
+    ),
+  );
+});
+
 test('plan drafting accepts OIDC without an API key and returns an unsaved, validated draft', async () => {
   const deps = dependencies(),
     res = response();
