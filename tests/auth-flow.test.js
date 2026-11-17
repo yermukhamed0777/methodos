@@ -186,12 +186,17 @@ test('auth routes and the public preview load directly; private APIs remain prot
       assert.equal(r.status, 401);
       assert.equal(r.headers.get('cache-control'), 'private, no-store');
     }
-    const r = await fetch(base + '/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'materials' }),
-    });
-    assert.equal(r.status, 401);
+    for (const [path, body] of [
+      ['/api/chat', { message: 'materials' }],
+      ['/api/coach', { target: 'materials research' }],
+    ]) {
+      const r = await fetch(base + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      assert.equal(r.status, 401);
+    }
   } finally {
     server.close();
     await once(server, 'close');

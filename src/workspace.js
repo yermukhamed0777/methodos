@@ -1,6 +1,7 @@
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { triageDeadlines } from '../lib/deadline-triage.js';
 import { sharedPathId, shareLinkHTML } from './path-card.js';
+import { glassStat } from './ui-components.js';
 import { gateHTML } from './access.js';
 import {
   filterCourses,
@@ -299,9 +300,9 @@ function dashboard() {
     (!p.onboarding_complete
       ? `<div class="work-notice"><strong>Setup is optional.</strong> ${p.onboarding_step} of 4 steps saved. ${go('onboarding', 'Continue setup')}</div>`
       : '') +
-    `<div class="work-stat-grid"><div class="work-card"><strong>${thisWeek.reduce((n, x) => n + Number(x.weekly_hours), 0)} hours</strong><p>Planned this week across your plans</p></div><div class="work-card"><strong>${state.course_progress.filter((x) => x.state === 'Completed').length} courses</strong><p>Marked completed by you</p></div><div class="work-card"><strong>${state.profile_records.length} records</strong><p>Evidence you added or reviewed</p></div></div><div class="work-two"><section class="work-card"><h2>This week</h2>${thisWeek.length ? thisWeek.map((x) => `<div class="work-list-row"><div><strong>${E(x.title)}</strong><p>${E(x.kind)} · ${x.weekly_hours} h · ${E(x.state)}</p></div>${button('edit-item', 'Edit', x.id)}</div>`).join('') : empty('Choose one small task to start.', go('plan', 'Open my plan'))}${go('plan', 'All plans')}</section><section class="work-card"><h2>Evidence to develop</h2>${gaps.map((x) => `<h3>${E(x.name)}</h3><p>${E(x.gap)} ${E(x.next)}</p>`).join('') || '<p>Review your recorded evidence and add outcomes.</p>'}${go('profile', 'Review my profile')}</section></div>` +
+    `<div class="work-stat-grid">${glassStat('Planned this week across your plans', thisWeek.reduce((n, x) => n + Number(x.weekly_hours), 0) + ' hours')}${glassStat('Marked completed by you', state.course_progress.filter((x) => x.state === 'Completed').length + ' courses')}${glassStat('Evidence you added or reviewed', state.profile_records.length + ' records')}</div><div class="work-two"><section class="work-card glass-card"><h2>This week</h2>${thisWeek.length ? thisWeek.map((x) => `<div class="work-list-row"><div><strong>${E(x.title)}</strong><p>${E(x.kind)} · ${x.weekly_hours} h · ${E(x.state)}</p></div>${button('edit-item', 'Edit', x.id)}</div>`).join('') : empty('Choose one small task to start.', go('plan', 'Open my plan'))}${go('plan', 'All plans')}</section><section class="work-card glass-card"><h2>Evidence to develop</h2>${gaps.map((x) => `<h3>${E(x.name)}</h3><p>${E(x.gap)} ${E(x.next)}</p>`).join('') || '<p>Review your recorded evidence and add outcomes.</p>'}${go('profile', 'Review my profile')}</section></div>` +
     `<section><h2>Possibilities to explore</h2><div class="resource-grid">${suggested.map(({ o, fit }) => `<article class="work-card">${tag(availability(o))}<h3>${E(o.name)}</h3><p>${E(fit.reasons.join(' · '))}</p><p class="resource-note">${E(fit.cautions[0] || o.note)}</p>${go('finder', 'Check full eligibility & source')}</article>`).join('')}</div></section>` +
-    `<section class="work-card deadline-triage"><h2>Deadline triage · next ${p.reminder_days || 30} days</h2>${
+    `<section class="work-card deadline-triage glass-panel"><h2>Deadline triage · next ${p.reminder_days || 30} days</h2>${
       ranked.length
         ? '<ol class="triage-list">' +
           ranked
@@ -1040,7 +1041,7 @@ function pathways() {
   const shared = sharedPathId(window.location.href);
   const highlighted = shared ? D.pathways.find((p) => p.id === shared) : null;
   const banner = highlighted
-    ? `<section class="work-card shared-path"><span class="work-tag">Shared path</span><h2>${E(highlighted.name)}</h2><p>${E(highlighted.education)}</p><p class="resource-note">Shared from the public catalog. No personal data was included; verify the source before acting.</p></section>`
+    ? `<section class="work-card shared-path glass-panel"><span class="work-tag">Shared path</span><h2>${E(highlighted.name)}</h2><p>${E(highlighted.education)}</p><p class="resource-note">Shared from the public catalog. No personal data was included; verify the source before acting.</p></section>`
     : '';
   return (
     heading(
