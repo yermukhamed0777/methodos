@@ -1,102 +1,105 @@
-# Production deployment check · 17 November 2026 (second pass)
+# Deployment handoff · 17 November 2026
 
-`main` was `2a4cdde08f2917c9754b1b470aae09ebc1083a20` (merge of PR #28) when this
-pass was recorded. The investigation below was run at `09bf33b`; PR #28 added only
-`npm run check:live` and documentation, and the probe still reports **3/6** at
-`2a4cdde`. Re-run `npm run check:live` for the current figure rather than trusting
-this paragraph.
-GitHub Actions: `check` **success** for `2a4cdde`, `09bf33b` and `c3cf6cc`.
-Production: **still the pre-#15 build.**
+## Tested commit and current state
 
-## 1. What the live site serves
+- **Latest tested implementation:** `53ef553b8993d538ff8f92be4331d29516bddd18` on
+  `codex/release-hardening` (auth-order fix + live-checker review).
+  `npm run check`, `npm run format:check` and `git diff --check` were run on this
+  tree. Merge base: `2aff9a1a6297b39bc590a28430a0356f57bcfb11`.
+- The only later commit in this PR is documentation. **The commit to deploy is
+  `git rev-parse origin/main` at deploy time**, not a SHA copied from an older
+  handoff. Record that SHA as the deployment source.
+- GitHub Actions `check`: **success** on `2aff9a1` and on this PR.
+- **Production is still stale. Nothing in this PR is live until a deployment
+  happens.** `npm run check:live` currently reports **3/6**.
 
-`node scripts/check-live.js` (added in this change) probes markers that only
-exist at or after a known commit:
+## The three stale-production markers
 
-```
-FAIL  glass.css is served — HTTP 404                        (merged in PR #18)
-FAIL  branded 404 page is served — HTTP 404                 (merged in PR #23)
-FAIL  BARYS asks for a request — HTTP 200, marker missing   (merged in PR #15)
-PASS  sign-in page offers account creation — HTTP 200
-PASS  public config answers — HTTP 200
-PASS  anonymous chat is rejected — HTTP 401
-3/6 live checks passed
-```
+These are the three checks that fail on
+`https://opportunity-explorer-ruddy.vercel.app/` and prove the deployed build is
+older than the merged code:
 
-`/bootstrap.js` returns 200 but does not contain “Tell BARYS what you need”,
-which was introduced in `edc2447` (PR #15). The live build therefore predates the
-first merge of 17 November and matches the Phase 3 release documented for
-`5c0e185`.
+1. `GET /glass.css` → `404` (CSS added in PR #18).
+2. `GET /404.html` → `404` with the platform default page (added in PR #23).
+3. `GET /bootstrap.js` → `200`, but no “Tell BARYS what you need” marker (added in
+   PR #15).
 
-Anonymous `/api/chat` is correctly rejected (`401 login_required`) when the body
-is valid. A malformed body returns `400` **before** the auth gate runs; that is an
-ordering observation, not an access bypass, and no catalog data is returned.
+Passing now, on the stale build: `/login` (200), `/api/config` (200), and an
+anonymous `POST /api/chat` with a valid body (401). The live build still answers
+`400` for an anonymous malformed body because it predates this PR's auth-order
+fix; that is expected until the new commit is deployed.
 
-## 2. Why automatic deployment did not happen
+## What the deployment evidence establishes — and what it does not
 
-Checked, with results:
+Measured from GitHub and the local checkout:
 
-| Check                                             | Result                                                               |
-| ------------------------------------------------- | -------------------------------------------------------------------- |
-| GitHub Deployments API for this repo              | **0 deployments, ever** (`?per_page=100`)                            |
-| Commit statuses on `09bf33b`                      | none; combined state `pending`                                       |
-| Commit statuses on `5c0e185` (last known release) | **0**                                                                |
-| `.github/workflows/`                              | only `ci.yml` (build, lint, typecheck, tests, audit) — no deploy job |
-| Repository Actions secrets / variables            | none                                                                 |
-| Deploy-hook references in the repo                | none                                                                 |
-| Installed connectors                              | GitHub only; no Vercel connector exists in the catalog               |
-| Vercel CLI                                        | not installed                                                        |
-| `~/.vercel` auth, `VERCEL_*` env, `.env.local`    | absent                                                               |
-| `.vercel/` project link in the checkout           | absent                                                               |
+| Check                                                            | Result                                          |
+| ---------------------------------------------------------------- | ----------------------------------------------- |
+| GitHub Deployments API for this repo                             | **0 deployments, ever**                         |
+| Commit statuses on `09bf33b`, `2a4cdde`, `2aff9a1`               | none                                            |
+| Commit statuses on `5c0e185` (the build that appears live)       | **0**                                           |
+| `.github/workflows/`                                             | only `ci.yml`; no deploy job                    |
+| Actions secrets / variables, deploy-hook references              | none                                            |
+| Installed connectors                                             | GitHub only; no Vercel connector in the catalog |
+| Vercel CLI, `~/.vercel` auth, `VERCEL_*`, `.vercel/project.json` | absent                                          |
 
-Vercel’s GitHub integration writes both a Deployment and a commit status for every
-build. Neither exists for any commit, including the releases that are live. **The
-Vercel project is not connected to this GitHub repository**; the live site was
-produced by a manual deploy from the owner’s machine or dashboard. Pushing to
-`main` therefore cannot update production, no matter how green CI is.
+**Established:** GitHub CI has not deployed any of the 17 November commits, and no
+GitHub-side deployment was recorded even for the build that is live.
 
-No build log exists to inspect, because no build was ever requested for these
-commits.
+**Hypothesis, not proven:** that the Vercel project's Git repository is
+disconnected. GitHub's lack of deployment records is also consistent with a
+project connected to a different repository or branch, a paused deployment, an
+ignored build step, a build failing before it reports back, or deploys made from
+the Vercel CLI/dashboard with status reporting turned off. Only the Vercel project
+settings can distinguish these cases.
 
-## 3. Smallest owner action
+To confirm: Vercel → project → **Settings → Git** (connected repository and
+Production Branch), **Deployments** (a build for the latest SHA and its log),
+**Settings → Git → Ignored Build Step**, and **Settings → Environment Variables**
+(names only — never copy values into this document).
 
-Two options. The first fixes it permanently.
+No build log was available from this environment because no Vercel API path or
+credential exists here.
 
-**A. Connect the repository (recommended).** Vercel → project → **Settings → Git →
-Connect Git Repository** → select `yermukhamed0777/opportunity-explorer` → set
-**Production Branch** to `main` → **Deploy**. Every later merge to `main` then
-deploys automatically, and a Vercel commit status will appear on GitHub, which
-makes staleness detectable next time.
+## Smallest owner action
 
-**B. Deploy the exact commit once.** On the owner’s machine, from a clean checkout
-of the latest `main`:
+**A. Connect Git (permanent).** Vercel → project → Settings → Git → Connect Git
+Repository → `yermukhamed0777/opportunity-explorer` → Production Branch `main` →
+Deploy. Later merges then deploy automatically and write a GitHub commit status.
+
+**B. Deploy the tested commit once.** From a clean checkout:
 
 ```
 git pull --ff-only
-git rev-parse HEAD     # record this SHA as the deployment source
+git rev-parse HEAD     # deployment source SHA, must equal origin/main
 npm ci --ignore-scripts
-npx vercel link        # choose the existing opportunity-explorer project
+npx vercel link        # choose the EXISTING opportunity-explorer project
 npx vercel --prod
 ```
 
-Do not create a new project: that would produce a different alias and a new
-environment with no variables. Either way, record the deployment ID, the source
-SHA and the READY state, then run `npm run check:live` — it must print **6/6**.
+Do not create a new Vercel project: it would have a different alias and no
+environment variables. Record the deployment ID, source SHA, production alias and
+READY state here.
 
-## 4. What could not be done here
+## Exact post-deployment checks
 
-- No Vercel connector is installed, and the connector catalog contains no Vercel
-  entry, so there is no dashboard or API path from this environment.
-- No token, CLI session, project link, Actions secret or deploy hook exists, so a
-  deployment cannot be created or promoted.
-- Nothing was force-pushed, reverted or re-tagged; `main` is intact and matches
-  the commits listed above.
+1. Compare the deployment's **source SHA** with `git rev-parse origin/main`. They
+   must be identical; do not accept an older preview that merely looks current.
+2. `npm run check:live` → **6/6**. All six probes are read-only and
+   credential-free: five public GETs plus one anonymous POST that must be
+   rejected with 401/403. The script is deliberately outside `npm run check`
+   because production is known to be stale.
+3. Desktop and **375 px** viewport: `/`, `/login`, `/#finder`, `/404.html` load
+   with no browser-console errors.
+4. The BARYS dialog contains “Tell BARYS what you need”.
+5. `POST /api/chat` signed out returns `401` for **both** invalid and valid
+   bodies (the ordering fix), while signed-in invalid bodies still return `400`.
+6. Record the deployment ID, source SHA, alias and READY status, then repeat
+   `npm run check:live`.
 
-## 5. Verification to repeat once deployed
+## Not done / not claimed
 
-1. `npm run check:live` → 6/6.
-2. Desktop and 375 px: `/`, `/login`, `/#finder`, `/404.html` load without console
-   errors.
-3. The BARYS dialog contains “Tell BARYS what you need”.
-4. `/api/chat` with a valid body still returns `401` signed out.
-5. Record the deployment ID, source SHA, alias and READY state here.
+- No new Vercel project, no credentials changed, no production data written.
+- Production is **not** updated and signup email delivery is **not** verified
+  (see [auth-verification.md](auth-verification.md)).
+- No feature milestone was started while production is stale.
