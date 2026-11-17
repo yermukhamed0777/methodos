@@ -2,16 +2,10 @@
 
 ## Tested commit and current state
 
-- **Latest tested implementation:** `53ef553b8993d538ff8f92be4331d29516bddd18` on
-  `codex/release-hardening` (auth-order fix + live-checker review).
-  `npm run check`, `npm run format:check` and `git diff --check` were run on this
-  tree. Merge base: `2aff9a1a6297b39bc590a28430a0356f57bcfb11`.
-- The only later commit in this PR is documentation. **The commit to deploy is
-  `git rev-parse origin/main` at deploy time**, not a SHA copied from an older
-  handoff. Record that SHA as the deployment source.
-- GitHub Actions `check`: **success** on `2aff9a1` and on this PR.
-- **Production is still stale. Nothing in this PR is live until a deployment
-  happens.** `npm run check:live` currently reports **3/6**.
+- **Current `main` at the time of this update:** `9f37d7ad17b4b3e9808696f262b2ce56201db3d9` (merge of PR #33). GitHub Actions `check` **success** on `9f37d7a`, `156cb68` and `af16793`. Three further design/discovery PRs (#31–#33) are merged and CI-green since the previous handoff.
+- **Latest locally tested implementation:** `53ef553b8993d538ff8f92be4331d29516bddd18` (release-hardening tree), where `npm run check`, `npm run format:check` and `git diff --check` were first run. Each later PR repeated the same checks on its own tree and merged green.
+- **The commit to deploy is `git rev-parse origin/main` at deploy time**, not a SHA copied from an older handoff. Record that SHA as the deployment source.
+- **Production is still stale. Nothing from PRs #28–#33 is live.** `npm run check:live` reports **3/6** against `9f37d7a`.
 
 ## The three stale-production markers
 
