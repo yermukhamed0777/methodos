@@ -22,6 +22,28 @@ test('glass tokens cover both themes and respect transparency preferences', () =
   assert.match(auth, /class="auth-card glass-panel"/);
 });
 
+test('the glass language extends to everyday surfaces with solid fallbacks', () => {
+  const css = readFileSync('dist/glass.css', 'utf8');
+  for (const selector of [
+    '.welcome-hero',
+    '.direction-card',
+    '.university-grid .university-card',
+    '.work-card',
+    '.barys-dialog',
+  ])
+    assert.ok(
+      css.includes(selector),
+      selector + ' should use the glass surface',
+    );
+  assert.match(css, /--glass-action-fill:/);
+  assert.match(css, /--glass-focus-ring:/);
+  assert.match(css, /@supports not \([\s\S]*backdrop-filter/);
+  assert.match(css, /prefers-reduced-transparency: reduce[\s\S]*\.work-card/);
+  assert.match(css, /\.primary:focus-visible/);
+  // Form fields must stay opaque: translucency there hurts readability.
+  assert.doesNotMatch(css, /(?:input|textarea|select)[^{]*\{[^}]*--glass-fill/);
+});
+
 test('glass components escape content and keep accessible structure', () => {
   assert.equal(
     escapeHTML('<img src=x onerror=1>'),
