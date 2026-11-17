@@ -21,11 +21,17 @@ export function createChatHandler({
       return res.status(405).json({ error: 'Method not allowed' });
     let body, requestId;
     try {
-      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    } catch {
-      return res.status(400).json({ error: 'Send a valid JSON request.' });
-    }
-    try {
+      // Authenticate before parsing or validating the payload. A signed-out
+      // caller must receive one consistent 401 and must never learn how the
+      // body is validated, how large it may be, or which fields are required.
+      const authenticated = await authenticate(req, res);
+      if (!authenticated) return;
+      const { db, user } = authenticated;
+      try {
+        body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      } catch {
+        return res.status(400).json({ error: 'Send a valid JSON request.' });
+      }
       if (
         !body ||
         JSON.stringify(body).length > 18000 ||
@@ -36,9 +42,6 @@ export function createChatHandler({
         return res
           .status(400)
           .json({ error: 'Write a question of 1–1,500 characters.' });
-      const authenticated = await authenticate(req, res);
-      if (!authenticated) return;
-      const { db, user } = authenticated;
       requestId = randomUUID();
       res.setHeader('X-Prospecto-Request-Id', requestId);
       const permittedContext = await getContext(db, user.id);

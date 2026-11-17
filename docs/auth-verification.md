@@ -25,7 +25,7 @@ about new-user registration, and what still needs the owner.
   `email_not_confirmed`, `invalid_credentials`, `over_email_send_rate_limit`,
   `otp_expired`, `flow_state_expired`, `flow_state_not_found` and
   `bad_code_verifier`.
-- **Local tests cover the parts that do not need an inbox.** 195 tests pass,
+- **Local tests cover the parts that do not need an inbox.** 202 tests pass,
   including `tests/auth-signup.test.js` for address masking, the
   already-registered signal, cooldown copy and message routing.
 
@@ -54,6 +54,8 @@ these is evidence of a defect — they are simply unobserved.
 are present, but the newer masked-address message, already-registered guidance and
 resend cooldown are not live yet. The Supabase project is the same, so an owner
 test today would exercise the real email pipeline even though the UI is older.
+The `/api/chat` auth-order hardening added in the release-hardening PR does not
+change the signup path and does not make email delivery verifiable.
 
 ## Owner steps to close it
 

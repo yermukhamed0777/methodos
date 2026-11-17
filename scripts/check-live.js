@@ -1,23 +1,27 @@
 #!/usr/bin/env node
 // Proves which build is actually live.
 //
-// Merging to `main` and passing CI says nothing about production: this project
-// has been deployed manually, so the live site can lag by many commits. Each
-// check below targets a marker that only exists at or after a known commit, so a
-// stale deployment fails loudly instead of looking fine.
+// Merging to `main` and passing CI says nothing about production: the live site
+// can lag by many commits. Every check below is read-only and credential-free:
+// five GETs against public assets plus one anonymous POST that must be rejected.
+// It never signs in, never sends personal data and never writes to production.
+// It is deliberately NOT part of `npm run check`: production is known to be
+// stale, so a failing live probe must not block ordinary PRs.
 
 const DEFAULT_BASE = 'https://opportunity-explorer-ruddy.vercel.app';
 
-const CHECKS = [
+export const CHECKS = [
   {
     name: 'glass.css is served',
     path: '/glass.css',
+    hint: 'HTTP 200 with CSS containing --glass or backdrop-filter',
     expect: (r) => r.status === 200 && /--glass|backdrop-filter/.test(r.body),
-    detail: 'merged in PR #18 (design tokens)',
+    detail: 'merged in PR #18',
   },
   {
     name: 'branded 404 page is served',
     path: '/404.html',
+    hint: 'HTTP 200 containing "This page does not exist." and "Page not found"',
     expect: (r) =>
       r.status === 200 &&
       r.body.includes('This page does not exist.') &&
@@ -27,6 +31,7 @@ const CHECKS = [
   {
     name: 'BARYS asks for a request',
     path: '/bootstrap.js',
+    hint: 'HTTP 200 with JS containing "Tell BARYS what you need"',
     expect: (r) =>
       r.status === 200 && r.body.includes('Tell BARYS what you need'),
     detail: 'merged in PR #15',
@@ -34,15 +39,17 @@ const CHECKS = [
   {
     name: 'sign-in page offers account creation',
     path: '/login',
+    hint: 'HTTP 200 with "Resend confirmation email" and a signup action',
     expect: (r) =>
       r.status === 200 &&
       r.body.includes('Resend confirmation email') &&
       /Create account|sign up/i.test(r.body),
-    detail: 'sign-in entry point',
+    detail: 'public sign-in entry point',
   },
   {
     name: 'public config answers',
     path: '/api/config',
+    hint: 'HTTP 200 JSON with a supabaseUrl field',
     expect: (r) => {
       if (r.status !== 200) return false;
       try {
@@ -57,9 +64,10 @@ const CHECKS = [
     name: 'anonymous chat is rejected',
     path: '/api/chat',
     method: 'POST',
-    // A valid body is required: malformed input is rejected with 400 before the
-    // auth gate runs, which would hide whether the gate exists.
+    // A harmless valid body; a signed-out request must be rejected before any
+    // parsing, quota reservation or database work. No credentials are sent.
     body: JSON.stringify({ message: 'live deployment check' }),
+    hint: 'HTTP 401 or 403 for an anonymous POST with no Authorization header',
     expect: (r) => r.status === 401 || r.status === 403,
     detail: 'protected API must not answer signed-out callers',
   },
@@ -76,9 +84,15 @@ async function probe(base, check, fetchImpl = fetch) {
       signal: AbortSignal.timeout(15000),
     });
     const body = await response.text();
-    return { status: response.status, body, url, error: null };
+    return {
+      status: response.status,
+      body,
+      url,
+      headers: { 'content-type': response.headers.get('content-type') || '' },
+      error: null,
+    };
   } catch (error) {
-    return { status: 0, body: '', url, error: error.message };
+    return { status: 0, body: '', url, headers: {}, error: error.message };
   }
 }
 
@@ -88,7 +102,7 @@ export function summarize(results) {
     ok: results.length > 0 && failures.length === 0,
     passed: results.length - failures.length,
     total: results.length,
-    failures: failures.map((r) => `${r.name} (${r.detail})`),
+    failures: failures.map((r) => `${r.name}: ${r.note} (${r.detail})`),
   };
 }
 
@@ -98,22 +112,24 @@ async function main() {
   const results = [];
   for (const check of CHECKS) {
     const response = await probe(base, check);
-    let ok = false;
-    let note = response.error || `HTTP ${response.status}`;
-    if (!response.error) {
-      ok = check.expect(response);
-      if (!ok) note = `HTTP ${response.status}, expected marker missing`;
-    }
+    const ok = !response.error && check.expect(response);
+    const note = response.error
+      ? `network error: ${response.error}; expected ${check.hint}`
+      : `HTTP ${response.status}, ${response.headers?.['content-type'] || 'unknown type'}; expected ${check.hint}`;
     results.push({ name: check.name, detail: check.detail, ok, note });
-    console.log(`${ok ? 'PASS' : 'FAIL'}  ${check.name} — ${note}`);
+    console.log(
+      `${ok ? 'PASS' : 'FAIL'}  ${check.name} — ${ok ? `HTTP ${response.status} (${check.detail})` : note}`,
+    );
   }
   const summary = summarize(results);
   console.log(
     `\n${summary.passed}/${summary.total} live checks passed for ${base}`,
   );
   if (!summary.ok) {
+    console.log('\nFailed checks:');
+    for (const failure of summary.failures) console.log('  - ' + failure);
     console.log(
-      '\nThis deployment does not match the current main. Deploy the exact tested commit, then re-run.',
+      '\nThis deployment does not match the expected main. Deploy the exact tested commit, then re-run. This script is not part of npm run check.',
     );
     process.exit(1);
   }

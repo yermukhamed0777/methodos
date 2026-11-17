@@ -61,13 +61,15 @@ test('chat validates requests and rejects unsigned catalog access', async () => 
     assert.equal(r.body.code, 'login_required');
     r = res();
     await chat({ method: 'POST', body: { message: 'x'.repeat(1501) } }, r);
-    assert.equal(r.statusCode, 400);
+    assert.equal(r.statusCode, 401, 'auth precedes payload validation');
+    assert.equal(r.body.code, 'login_required');
     r = res();
     await chat({ method: 'GET' }, r);
     assert.equal(r.statusCode, 405);
     r = res();
     await chat({ method: 'POST', body: 'not-json' }, r);
-    assert.equal(r.statusCode, 400);
+    assert.equal(r.statusCode, 401, 'auth precedes JSON parsing');
+    assert.equal(r.body.code, 'login_required');
   } finally {
     if (old) process.env.AI_GATEWAY_MODEL = old;
   }
