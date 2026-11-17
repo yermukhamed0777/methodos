@@ -13,6 +13,34 @@
   color: var(--text-primary);
 }
 
+.triage-list {
+  margin: 12px 0;
+  padding-left: 22px;
+}
+
+.triage-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.triage-list li:last-child {
+  border-bottom: 0;
+}
+
+.triage-date {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.shared-path,
+.work-card.is-shared {
+  border-color: var(--accent-primary);
+}
+
+.shared-path .work-tag {
+  margin-bottom: 10px;
+}
+
 .work-card p {
   line-height: 1.65;
 }
