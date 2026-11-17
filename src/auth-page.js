@@ -8,6 +8,12 @@ import {
   CALLBACK_PATH,
 } from './auth-flow.js';
 import { authHelpFor } from './auth-help.js';
+import {
+  RESEND_COOLDOWN_SECONDS,
+  cooldownLabel,
+  outcomeMessage,
+  signupOutcome,
+} from './auth-signup.js';
 const $ = (s) => document.querySelector(s);
 const url = new URL(location.href);
 const next = safeNext(url.searchParams.get('next'), url.origin);
@@ -179,12 +185,16 @@ document.addEventListener('submit', async (e) => {
         : await client.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       form.querySelector('[name=password]').value = '';
-      if (signup && !result.data.session)
-        status(
-          'Please check your inbox to confirm your account. After confirmation, sign in here. Check spam if the message is missing.',
-        );
-      else if (await verified()) location.replace(next);
-      else status('Please check your inbox to confirm your account.');
+      if (signup) {
+        const outcome = signupOutcome(result.data);
+        if (outcome === 'signed-in' && (await verified())) {
+          location.replace(next);
+          return;
+        }
+        status(outcomeMessage(outcome, email));
+      } else if (await verified()) {
+        location.replace(next);
+      } else status('Please check your inbox to confirm your account.');
     }
   } catch (error) {
     status(authMessage(error));
@@ -192,11 +202,34 @@ document.addEventListener('submit', async (e) => {
     buttons.forEach((b) => (b.disabled = false));
   }
 });
+let resendTimer;
+// Supabase sends one confirmation email per minute. Without a local cooldown a
+// second click only produces a provider rate-limit error, so the button counts
+// down instead of failing.
+function startResendCooldown(button, seconds = RESEND_COOLDOWN_SECONDS) {
+  let remaining = Math.max(1, Math.ceil(seconds));
+  clearInterval(resendTimer);
+  button.disabled = true;
+  button.textContent = cooldownLabel(remaining);
+  resendTimer = setInterval(() => {
+    remaining -= 1;
+    if (remaining > 0) {
+      button.textContent = cooldownLabel(remaining);
+      return;
+    }
+    clearInterval(resendTimer);
+    resendTimer = null;
+    button.disabled = false;
+    button.textContent = cooldownLabel(0);
+  }, 1000);
+}
 $('#resend-confirmation').addEventListener('click', async (e) => {
-  const form = $('#login-form'),
+  const button = e.target,
+    form = $('#login-form'),
     email = form.elements.email;
-  if (!email.reportValidity() || !client) return;
-  e.target.disabled = true;
+  if (button.disabled || !email.reportValidity() || !client) return;
+  button.disabled = true;
+  button.textContent = 'Sending…';
   try {
     const { error } = await client.auth.resend({
       type: 'signup',
@@ -207,10 +240,19 @@ $('#resend-confirmation').addEventListener('click', async (e) => {
     status(
       'If confirmation is needed, check your inbox to confirm your account. Open the newest message.',
     );
+    startResendCooldown(button);
   } catch (error) {
     status(authMessage(error));
-  } finally {
-    e.target.disabled = false;
+    if (
+      ['over_email_send_rate_limit', 'over_request_rate_limit'].includes(
+        error?.code,
+      )
+    )
+      startResendCooldown(button);
+    else {
+      button.disabled = false;
+      button.textContent = cooldownLabel(0);
+    }
   }
 });
 initialize().catch((error) => {

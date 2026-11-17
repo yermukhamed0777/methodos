@@ -2,6 +2,22 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit. No rollback to Opportunity Explorer is part of this release.
 
+## Phase 4 student guidance and reliability · 17 November 2026
+
+Merged into `main` through PRs [#15](https://github.com/yermukhamed0777/opportunity-explorer/pull/15)–[#24](https://github.com/yermukhamed0777/opportunity-explorer/pull/24); `main` was at `1b19f66` after the last merge. The stack was landed bottom-up with each branch retargeted to `main` and its checks green before merging.
+
+- **Guidance and writing.** BARYS gained a local intent router (no network, no model call), the assistant returns validated navigation routes, sign-in recovery help is derived only from the visible status message, and the application coach drafts from reviewed records plus the student's own notes without inventing facts.
+- **Planning.** Deadline triage ranks verified provider dates and personal tasks; pathway cards share only a validated public ID; deadline export now produces RFC 5545-valid calendars with folded lines and exclusive all-day end dates.
+- **Search.** Catalog ranking is weighted and deterministic. Titles outrank incidental prose, source URLs are no longer evidence, and ties are stable. This replaced `JSON.stringify().includes()` scoring that matched “art” inside “earth”.
+- **Reliability.** `npm run check` now starts with `npm run check:data`, which rejects duplicate ids, non-HTTPS sources, impossible or future review dates and unknown course/field/stage references. Three expired cycles were archived, so the gate reports zero warnings.
+- **Access and polish.** View changes are announced to screen readers and update the document title; assistant and coach requests expose `aria-busy` progress; high-contrast and reduced-motion fallbacks exist; a branded 404 page offers recovery links validated against the view registry; the AI allowance reports its real reset time and a failed request returns the typed question.
+
+Validation on the merged tree: build, lint, typecheck, `format:check` and **186 tests** passed, plus the dependency audit in CI. The registration-clarity branch adds 9 tests for **195**.
+
+**Registration is configured but the email round trip is still unverified.** Production `/api/config` returns `200` with a Supabase project and publishable key, and the signup code path is reachable, but no confirmation email has been observed end to end. See [public registration: verification status](auth-verification.md) for the evidence, the exact owner steps, and the reason custom SMTP must be checked before inviting students.
+
+Not claimed: live AI generation, a screen-reader or high-contrast manual pass, or a visual check of the 404 page. Deployment identifiers are recorded after checking the production build, not inferred from local tests.
+
 ## Phase 3 Home, campus and BARYS · 16 November 2026
 
 The theme foundation is merged in [PR #13](https://github.com/yermukhamed0777/opportunity-explorer/pull/13), at `32b68bf0ade825086243b96000a66618056b3e37`.
