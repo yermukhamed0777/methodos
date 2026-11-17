@@ -6,6 +6,13 @@
 - Added a grounded application writing coach with unsaved drafts and an honest skeleton fallback.
 - Added an optional OpenAI-compatible provider so generation does not depend on one deployment gateway.
 - Added a shared view registry and fixed auth return links for campus and home views.
+- Replaced substring catalog scoring with weighted, deterministic ranking; titles now outrank incidental mentions and source URLs are no longer treated as evidence.
+- Added deadline triage, shareable pathway cards, a standards-compliant calendar export and a branded 404 page with recovery links.
+- Added glass design tokens and reusable component helpers with reduced-transparency, reduced-motion and high-contrast fallbacks.
+- Added route announcements, `aria-busy` progress states and an accessibility statement.
+- Added a catalog integrity gate (`npm run check:data`) to `npm run check`, rejecting duplicate ids, non-HTTPS sources, impossible dates and unknown references.
+- The AI allowance now reports its real reset time, and a failed request returns the typed question instead of discarding it.
+- Archived three expired cycles (NASA Space Apps 2026, Haven game jam 2026, EPFL life-sciences summer 2027) so closed deadlines are no longer offered as live options.
 
 ## 5.0.0 · 12 November 2026
 

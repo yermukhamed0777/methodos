@@ -273,7 +273,7 @@
       "checkedOn": "2026-11-06",
       "addedOn": "2026-11-06",
       "finalDeadline": "2026-11-15",
-      "archived": false
+      "archived": true
     },
     {
       "id": "haven",
@@ -322,7 +322,7 @@
       "checkedOn": "2026-11-06",
       "addedOn": "2026-11-06",
       "finalDeadline": "2026-11-15",
-      "archived": false
+      "archived": true
     },
     {
       "id": "hackbi",
@@ -1047,7 +1047,7 @@
       "access": "International",
       "checkedOn": "2026-11-06",
       "addedOn": "2026-11-06",
-      "archived": false,
+      "archived": true,
       "aid": true,
       "deadlineConfirmed": true,
       "id": "epfl-life-sciences-srp-2027",
