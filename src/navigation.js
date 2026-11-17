@@ -6,9 +6,30 @@ export function hubFor(view) {
   return HUBS.find((h) => h.items.some(([v]) => v === view)) || HUBS[3];
 }
 const aliases = { explore: 'finder' };
+export function viewLabel(view) {
+  if (view === 'home') return 'Start here';
+  for (const hub of HUBS)
+    for (const [id, label] of hub.items) if (id === view) return label;
+  return view.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase());
+}
 export function installNavigation(w = window) {
   const d = w.document;
   let admin = false;
+  // A polite live region tells screen-reader users which view loaded, since
+  // focus lands on <main> and the heading change alone is not announced.
+  function announce(view) {
+    let region = d.querySelector('#route-announcer');
+    if (!region) {
+      region = d.createElement('p');
+      region.id = 'route-announcer';
+      region.className = 'visually-hidden';
+      region.setAttribute('role', 'status');
+      region.setAttribute('aria-live', 'polite');
+      region.setAttribute('aria-atomic', 'true');
+      d.body.append(region);
+    }
+    region.textContent = 'Now viewing ' + viewLabel(view);
+  }
   const valid = SAFE_HASH_VIEWS;
   const current = () =>
     aliases[w.location.hash.slice(1)] ||
@@ -55,6 +76,7 @@ export function installNavigation(w = window) {
   }
   function navigate(next, { push = true, focus = true } = {}) {
     const view = aliases[next] || (valid.has(next) ? next : 'finder');
+    const previous = d.body.dataset.currentView;
     if (push && current() !== view) {
       const url = new URL(w.location.href);
       url.hash = view;
@@ -71,6 +93,10 @@ export function installNavigation(w = window) {
       w.scrollTo({ top: 0, behavior: 'instant' });
       const main = d.querySelector('main');
       main?.focus({ preventScroll: true });
+      if (view !== previous) {
+        announce(view);
+        d.title = viewLabel(view) + ' — ProspectoAI';
+      }
     }
   }
   d.addEventListener(
