@@ -76,11 +76,49 @@ function dependencies({
   };
 }
 
-test('chat returns 400 only for malformed JSON and invalid user payloads', async () => {
+test('anonymous chat requests get one consistent 401 before any payload work', async () => {
+  let authCalls = 0;
   const handler = createChatHandler({
-    authenticate: () =>
-      assert.fail('Invalid input must stop before auth or data work'),
+    authenticate: async (_req, res) => {
+      authCalls++;
+      res.status(401).json({
+        error: 'Sign in to use ProspectoAI.',
+        code: 'login_required',
+      });
+      return null;
+    },
+    getContext: async () => assert.fail('private context must not be read'),
+    generate: async () => assert.fail('AI generation must not run'),
   });
+  const bodies = [
+    undefined,
+    '{',
+    'not-json',
+    null,
+    {},
+    { message: '' },
+    { message: 'x'.repeat(1501) },
+    { message: 'materials' },
+  ];
+  for (const body of bodies) {
+    const res = response();
+    await handler({ method: 'POST', body }, res);
+    assert.equal(res.statusCode, 401);
+    assert.equal(res.body.code, 'login_required');
+    const text = JSON.stringify(res.body);
+    assert(!text.includes('Write a question'), 'no validation detail leaked');
+    assert(!text.includes('valid JSON'), 'no parse detail leaked');
+  }
+  assert.equal(authCalls, bodies.length, 'auth runs exactly once per request');
+  const wrongMethod = response();
+  await handler({ method: 'GET' }, wrongMethod);
+  assert.equal(wrongMethod.statusCode, 405, 'method handling comes first');
+  assert.equal(authCalls, bodies.length, 'GET never reaches auth');
+});
+
+test('authenticated invalid payloads still return 400 without data work', async () => {
+  const deps = dependencies();
+  const handler = createChatHandler(deps.options);
   for (const body of [
     '{',
     null,
@@ -91,7 +129,10 @@ test('chat returns 400 only for malformed JSON and invalid user payloads', async
     const res = response();
     await handler({ method: 'POST', body }, res);
     assert.equal(res.statusCode, 400);
+    assert.match(res.body.error, /valid JSON|Write a question/);
   }
+  assert.equal(deps.calls.quota, 0, 'no quota is reserved for invalid input');
+  assert.equal(deps.calls.generate, 0, 'no model call for invalid input');
 });
 
 test('chat distinguishes catalog outages (503) from unexpected server errors (500) without leaking data', async (t) => {
@@ -262,6 +303,11 @@ test('an exhausted daily allowance returns catalog results with a reset window',
   assert.match(res.body.notice, /00:00 UTC/);
   assert.match(res.body.notice, /catalog results below are still real/i);
   assert.equal(res.headers['Retry-After'], String(res.body.quota.retryAfter));
+  assert.equal(
+    deps.calls.quota,
+    1,
+    'the quota guard still runs for signed-in users',
+  );
   assert.equal(deps.calls.generate, 0);
 });
 
