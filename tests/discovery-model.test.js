@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { greeting, nextSteps, deadlineRadar } from '../src/discovery-model.js';
+import {
+  greeting,
+  nextSteps,
+  recentSource,
+  needsSetup,
+  deadlineRadar,
+} from '../src/discovery-model.js';
 test('greetings use local hours and never invent a profile name', () => {
   assert.equal(greeting('', new Date(2026, 10, 16, 9)), 'Good morning.');
   assert.equal(
@@ -42,4 +48,36 @@ test('home continuation only includes real active tasks in due-date order', () =
   );
   assert.equal(tasks[0].title, 'No date');
   assert.deepEqual(nextSteps({}), []);
+});
+
+test('continuation picks the most recently opened real source', () => {
+  const state = {
+    recent_views: [
+      {
+        title: 'Old source',
+        viewed_at: '2026-11-01T10:00:00Z',
+        resource_id: 'old',
+      },
+      {
+        title: 'Latest <source>',
+        viewed_at: '2026-11-16T10:00:00Z',
+        resource_id: 'rsi',
+      },
+      { title: '   ', viewed_at: '2026-11-17T10:00:00Z' },
+    ],
+  };
+  assert.equal(recentSource(state).title, 'Latest <source>');
+  assert.equal(recentSource({}), null);
+});
+
+test('setup continues until explicitly completed', () => {
+  assert.equal(needsSetup({}), true);
+  assert.equal(
+    needsSetup({ preferences: { onboarding_complete: false } }),
+    true,
+  );
+  assert.equal(
+    needsSetup({ preferences: { onboarding_complete: true } }),
+    false,
+  );
 });

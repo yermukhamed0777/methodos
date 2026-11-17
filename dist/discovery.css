@@ -511,9 +511,40 @@ body:has(.barys-launcher) main {
 .home-continuation {
   margin-top: 24px;
   padding: 28px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--glass-border);
   border-radius: 18px;
-  background: var(--bg-surface);
+  background: linear-gradient(
+    145deg,
+    var(--glass-fill),
+    var(--glass-fill-soft)
+  );
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-highlight);
+}
+.resume-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.resume-card h3 {
+  margin: 10px 0 8px;
+  font-size: 1.1rem;
+}
+.resume-card p {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+}
+.resume-card a.secondary {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .resume-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .home-continuation p {
   color: var(--text-secondary);
