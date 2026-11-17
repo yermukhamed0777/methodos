@@ -42,10 +42,18 @@ These require a real inbox and the Supabase dashboard, so they remain open:
    custom SMTP (for example Resend, Postmark or SES).
 5. Signup rate limits are appropriate for public traffic.
 
-**Why these are open:** the owner inbox is not available here, this environment
-blocks outbound requests to the project’s `/auth/v1/settings` endpoint, and the
-Supabase dashboard needs credentials that are not part of this repository. None
-of these is evidence of a defect — they are simply unobserved.
+**Why these are open:** the owner inbox is not available here, and no tool in
+this environment can read the project’s auth configuration. Checked explicitly:
+there is no Supabase connector installed (the connector catalog has none), no
+Supabase CLI, no `~/.supabase` session, no `SUPABASE_*` environment variable and
+no `.env.local`; outbound requests to `/auth/v1/settings` are blocked. None of
+these is evidence of a defect — they are simply unobserved.
+
+**Which build you would be testing:** production still serves the pre-#15 build
+(see [production deployment check](deploy-verification.md)). Sign-in and signup
+are present, but the newer masked-address message, already-registered guidance and
+resend cooldown are not live yet. The Supabase project is the same, so an owner
+test today would exercise the real email pipeline even though the UI is older.
 
 ## Owner steps to close it
 
