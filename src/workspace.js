@@ -1,5 +1,6 @@
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { triageDeadlines } from '../lib/deadline-triage.js';
+import { buildCalendar, deadlineEvents } from '../lib/ics.js';
 import { sharedPathId, shareLinkHTML } from './path-card.js';
 import { glassStat } from './ui-components.js';
 import { gateHTML } from './access.js';
@@ -317,7 +318,7 @@ function dashboard() {
             .join('') +
           '</ol>'
         : '<p>No verified or planned dates in this window. Unknown cycles are never guessed.</p>'
-    }<p class="resource-note">Ranked by date, then source confidence. A published date can still change; confirm at the official source.</p></section>` +
+    }${ranked.length ? `<div class="work-actions">${button('export-deadlines', 'Export these dates to my calendar')}</div>` : ''}<p class="resource-note">Ranked by date, then source confidence. A published date can still change; confirm at the official source.</p></section>` +
     (p.in_app_reminders
       ? `<section class="work-card"><h2>Reminders · next ${p.reminder_days} days</h2>${deadlines.length ? deadlines.map((x) => `<p>${tag(x.due_date, 'deadline')} ${E(x.title)} ${button('calendar', 'Calendar', x.id)}</p>`).join('') : '<p>No dated plan tasks in this window. These reminders appear in this workspace; email and push notifications are not enabled.</p>'}</section>`
       : '') +
@@ -1329,41 +1330,40 @@ async function action(name, id, element) {
   }
   if (name === 'ai-plan') return aiPlan();
   if (name === 'calendar') {
-    const item = state.plan_items.find((x) => x.id === id),
-      escape = (x) =>
-        String(x)
-          .replaceAll('\\', '\\\\')
-          .replaceAll('\n', '\\n')
-          .replaceAll(',', '\\,')
-          .replaceAll(';', '\\;');
-    const stamp = item.due_date.replaceAll('-', ''),
-      date = new Date(item.due_date + 'T12:00:00Z');
-    date.setUTCDate(date.getUTCDate() + 1);
-    const ics = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//ProspectoAI//Personal plan//EN',
-      'BEGIN:VEVENT',
-      'UID:' + item.id + '@prospectoai',
-      'DTSTAMP:' +
-        new Date().toISOString().replace(/[-:]/g, '').split('.')[0] +
-        'Z',
-      'DTSTART;VALUE=DATE:' + stamp,
-      'DTEND;VALUE=DATE:' + date.toISOString().slice(0, 10).replaceAll('-', ''),
-      'SUMMARY:' + escape(item.title),
-      'DESCRIPTION:' +
-        escape(
-          'Personal preparation task. Verify official application deadlines and timezone separately.',
-        ),
-      'BEGIN:VALARM',
-      'TRIGGER:-P1D',
-      'ACTION:DISPLAY',
-      'DESCRIPTION:ProspectoAI task reminder',
-      'END:VALARM',
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\r\n');
+    const item = state.plan_items.find((x) => x.id === id);
+    if (!item) return;
+    const ics = buildCalendar({
+      prodId: '-//ProspectoAI//Personal plan//EN',
+      events: [
+        {
+          uid: 'task-' + item.id,
+          date: item.due_date,
+          title: item.title,
+          description:
+            'Personal preparation task. Verify official application deadlines and timezone separately.',
+        },
+      ],
+    });
     download(ics, 'prospectoai-task.ics', 'text/calendar');
+    return;
+  }
+  if (name === 'export-deadlines') {
+    const ranked = triageDeadlines({
+      opportunities: D.opportunities,
+      tasks: state.plan_items,
+      windowDays: state.preferences?.reminder_days || 30,
+    });
+    if (!ranked.length) {
+      notify('No dated deadlines in this window to export.');
+      return;
+    }
+    const ics = buildCalendar({
+      events: deadlineEvents(ranked, { source: 'deadline' }),
+    });
+    download(ics, 'prospectoai-deadlines.ics', 'text/calendar');
+    notify(
+      `${ranked.length} date${ranked.length === 1 ? '' : 's'} exported. Calendar apps may take a minute to import the file.`,
+    );
     return;
   }
   if (name === 'compare-uni') {
