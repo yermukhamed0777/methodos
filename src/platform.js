@@ -905,6 +905,8 @@ document.addEventListener('submit', async (e) => {
       messages.push({ role: 'assistant', ...data });
     } catch (err) {
       if (epoch !== accountEpoch) return;
+      // Give the question back instead of making the student retype it.
+      input.value = message;
       messages.push({
         role: 'assistant',
         mode: 'catalog',
