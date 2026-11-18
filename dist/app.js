@@ -566,6 +566,7 @@
         }[view] ||
         {
           dashboard: 'My dashboard',
+          'my-learning': 'My Learning',
           profile: 'My development profile',
           documents: 'Private documents',
           courses: 'Courses & learning',

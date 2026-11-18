@@ -44,6 +44,7 @@ export const HUBS = [
     view: 'dashboard',
     items: [
       ['dashboard', 'Overview'],
+      ['my-learning', 'My Learning'],
       ['plan', 'Planner'],
       ['saved', 'Tracker'],
       ['deadlines', 'Deadlines'],
@@ -59,6 +60,7 @@ export const HUBS = [
 
 export const PRIVATE_VIEWS = new Set([
   'dashboard',
+  'my-learning',
   'plan',
   'saved',
   'deadlines',

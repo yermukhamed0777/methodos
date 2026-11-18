@@ -15,7 +15,13 @@ test('root opens a separate Home while opportunity links retain the finder', asy
         '<main><section id="platform-panel"></section></main><strong id="breadcrumb-title"></strong>',
       );
       let view;
-      w.ProspectoWorkspace = { views: [] };
+      let query;
+      w.ProspectoWorkspace = {
+        views: [],
+        openOpportunitySearch: (value) => {
+          query = value;
+        },
+      };
       w.ProspectoPlatform = { render: () => {} };
       w.ProspectoTracker = {
         setView: (next) => {
@@ -30,12 +36,16 @@ test('root opens a separate Home while opportunity links retain the finder', asy
       if (expected === 'home') {
         assert.match(
           w.document.querySelector('h1').textContent,
-          /possibilities/,
+          /Find your next opportunity/,
         );
-        assert.match(
-          w.document.querySelector('.welcome-hero').textContent,
-          /Browsing is open to everyone/,
-        );
+        w.document.querySelector('#home-search-query').value =
+          'summer research';
+        w.document
+          .querySelector('#home-opportunity-search')
+          .dispatchEvent(
+            new w.Event('submit', { bubbles: true, cancelable: true }),
+          );
+        assert.equal(query, 'summer research');
         const access = w.document.querySelector('.home-access');
         assert.ok(access, 'first visit explains open browsing vs saved work');
         assert.match(access.textContent, /Explore freely/);

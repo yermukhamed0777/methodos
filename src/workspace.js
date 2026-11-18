@@ -1,9 +1,17 @@
+import { rankEntries } from '../lib/search-index.js';
 import { verificationStatus } from '../lib/intelligence-core.js';
 import { triageDeadlines } from '../lib/deadline-triage.js';
 import { buildCalendar, deadlineEvents } from '../lib/ics.js';
 import { sharedPathId, shareLinkHTML } from './path-card.js';
 import { glassStat } from './ui-components.js';
 import { gateHTML } from './access.js';
+import {
+  activityCalendar,
+  activityLabels,
+  activityLevel,
+  localStudyDate,
+  validStudyDate,
+} from './learning-activity.js';
 import {
   discoveryChips,
   clearDiscoveryChip,
@@ -41,6 +49,7 @@ const TABLES = [
 ];
 const views = [
   'dashboard',
+  'my-learning',
   'onboarding',
   'profile',
   'documents',
@@ -101,7 +110,7 @@ const link = (url, label) => {
   }
 };
 const button = (action, label, id = '', cls = 'secondary') =>
-  `<button class="${cls}" data-work="${action}" data-id="${E(id)}">${E(label)}</button>`;
+  `<button type="button" class="${cls}" data-work="${action}" data-id="${E(id)}">${E(label)}</button>`;
 const go = (page, label) => button('go', label, page);
 const statusBadge = (r) => {
   const status = verificationStatus(r);
@@ -358,7 +367,7 @@ function profile() {
       )
       .join(
         '',
-      )}</div><div class="work-actions">${go('plan', 'Plans')}${go('courses', 'Course progress')}${go('activities', 'Activities')}${go('saved', 'Application tracker')}</div>`
+      )}</div><div class="work-actions">${go('plan', 'Plans')}${go('my-learning', 'My Learning')}${go('activities', 'Activities')}${go('saved', 'Application tracker')}</div>`
   );
 }
 function recordForm(id) {
@@ -494,6 +503,225 @@ function skillForm(id) {
     },
   );
 }
+async function fetchLearning() {
+  const rows = [];
+  for (let offset = 0; ; offset += 500) {
+    const query = db.from('learning_activity').select('*').eq('user_id', uid);
+    const { data, error } = await query
+      .order('study_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .order('id')
+      .range(offset, offset + 499);
+    if (['42P01', 'PGRST205'].includes(error?.code)) return null;
+    if (error)
+      throw Error('Your learning history could not load. Please retry.');
+    rows.push(...data);
+    if (data.length < 500) return rows;
+  }
+}
+
+let learningRows = [],
+  learningDate = '';
+const courseTitle = (id) =>
+  R.courses.find((course) => course.id === id)?.name ||
+  'Course no longer in catalog';
+const dayLabel = (date) =>
+  new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(date + 'T00:00:00Z'));
+function learningDay(rows, date) {
+  const entries = rows.filter((row) => row.study_date === date);
+  return `<h3>${E(dayLabel(date))}</h3><p>${entries.length} learning ${entries.length === 1 ? 'activity' : 'activities'}</p>${entries.length ? `<ul class="learning-entries">${entries.map((row) => `<li><div><strong>${E(courseTitle(row.course_id))}</strong><span>${E(activityLabels[row.kind])}${row.minutes ? ' · ' + row.minutes + ' min' : ''}${row.progress != null ? ' · ' + row.progress + '%' : ''}</span></div>${button('edit-learning', 'Edit entry', row.id, 'text-button')}</li>`).join('')}</ul>` : '<p>No activity logged on this day.</p>'}`;
+}
+
+function myLearning(rows) {
+  const today = localStudyDate();
+  const intro = heading(
+    'My Learning',
+    'Remember what you studied, when you studied it, and where to pick up.',
+  );
+  if (rows === null)
+    return (
+      intro +
+      '<div class="work-notice" role="status">The activity calendar is unavailable on this deployment. Your existing course records are still available.</div>' +
+      go('courses', 'Open courses')
+    );
+  const calendar = activityCalendar(rows, today);
+  if (!learningDate || learningDate < calendar.start || learningDate > today)
+    learningDate =
+      rows.find(
+        (row) => row.study_date >= calendar.start && row.study_date <= today,
+      )?.study_date || today;
+  const trackedIds = new Set([
+    ...state.course_progress.map((row) => row.course_id),
+    ...rows.map((row) => row.course_id),
+  ]);
+  const months = new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    timeZone: 'UTC',
+  });
+  const monthLabels = new Map();
+  calendar.days.forEach((day, index) => {
+    if (day && (day.date.endsWith('-01') || day.date === calendar.start)) {
+      const week = Math.floor(index / 7) + 1;
+      if (week === 1 || week >= 4)
+        monthLabels.set(week, months.format(new Date(day.date + 'T00:00:00Z')));
+    }
+  });
+  const cells = calendar.days
+    .map((day) => {
+      if (!day)
+        return '<span class="learning-square-placeholder" aria-hidden="true"></span>';
+      const count = day.entries.length;
+      const label = `${dayLabel(day.date)}: ${count} ${count === 1 ? 'activity' : 'activities'}`;
+      return `<button class="learning-square level-${activityLevel(count)}" type="button" data-study-day="${day.date}" tabindex="-1" aria-label="${E(label)}" title="${E(label)}" aria-pressed="${day.date === learningDate}"></button>`;
+    })
+    .join('');
+  return (
+    intro +
+    `<div class="work-actions learning-actions">${button('log-learning', 'Log learning activity', '', 'primary')}${go('courses', 'Browse courses')}</div><section class="work-card learning-calendar" aria-labelledby="learning-calendar-title"><div class="section-heading"><div><h2 id="learning-calendar-title">Learning activity</h2><p>Last 365 days · Self-reported activity</p></div><label>View a date<input type="date" id="learning-date" min="${calendar.start}" max="${today}" value="${learningDate}"></label></div><div class="learning-totals">${glassStat('Activities', calendar.count)}${glassStat('Active days', calendar.daily.size)}${glassStat('Courses completed', calendar.completed)}${glassStat('Study minutes logged', calendar.minutes)}</div><div class="learning-scroll" role="region" aria-label="Learning activity calendar, scroll to view more dates" tabindex="0"><div class="learning-months" aria-hidden="true">${[...monthLabels].map(([week, label]) => `<span style="grid-column:${week}">${E(label)}</span>`).join('')}</div><div class="learning-grid">${cells}</div></div><div class="learning-legend" aria-label="Daily activity levels">${['0', '1', '2', '3–4', '5+'].map((label, level) => `<span><i class="level-${level}" aria-hidden="true"></i>${label}</span>`).join('')}</div><p class="resource-note">Each dated start, study session, progress update, or completion counts as one activity. Use “View a date” to read entries with a keyboard.</p><div id="learning-day-result" aria-live="polite">${learningDay(rows, learningDate)}</div></section><section aria-labelledby="learning-courses-title"><h2 id="learning-courses-title">Your courses</h2>${
+      trackedIds.size
+        ? `<div class="resource-grid">${[...trackedIds]
+            .map((id) => {
+              const current = state.course_progress.find(
+                (row) => row.course_id === id,
+              );
+              const entries = rows.filter((row) => row.course_id === id);
+              const start = entries.find((row) => row.kind === 'started');
+              const completion = entries.find(
+                (row) => row.kind === 'completed',
+              );
+              const latest = entries.find((row) => row.progress != null);
+              const known = R.courses.some((course) => course.id === id);
+              return `<article class="work-card learning-course">${current ? tag(current.state) : ''}<h3>${E(courseTitle(id))}</h3><dl><dt>Started</dt><dd>${start ? E(dayLabel(start.study_date)) : 'Date not recorded'}</dd><dt>Completed</dt><dd>${completion ? E(dayLabel(completion.study_date)) : 'Date not recorded'}</dd>${latest ? `<dt>Reported progress</dt><dd><progress value="${latest.progress}" max="100" aria-label="Reported progress"></progress> ${latest.progress}%</dd>` : ''}</dl><div class="work-actions">${known ? button('course', 'Update course status', id) : ''}${button('log-learning', 'Log activity', id)}</div></article>`;
+            })
+            .join('')}</div>`
+        : empty(
+            'Choose a course to start tracking your learning.',
+            go('courses', 'Find a course'),
+          )
+    }</section>`
+  );
+}
+
+function learningForm(courseId, entry) {
+  const id = entry?.id || window.crypto.randomUUID();
+  const today = localStudyDate();
+  const choices = new Map(R.courses.map((course) => [course.id, course.name]));
+  if (courseId && !choices.has(courseId))
+    choices.set(courseId, courseTitle(courseId));
+  modal(
+    entry ? 'Edit learning activity' : 'Log learning activity',
+    choose('Course', 'course_id', [...choices], courseId, 'Choose a course') +
+      choose(
+        'Activity',
+        'kind',
+        Object.entries(activityLabels),
+        entry?.kind || 'study',
+      ) +
+      input(
+        'Study date',
+        'study_date',
+        entry?.study_date || today,
+        'date',
+        `min="1900-01-01" max="${today}" required`,
+      ) +
+      input(
+        'Minutes studied (optional)',
+        'minutes',
+        entry?.minutes,
+        'number',
+        'min="1" max="1440" step="1"',
+      ) +
+      input(
+        'Progress percent (optional)',
+        'progress',
+        entry?.progress,
+        'number',
+        'min="0" max="100" step="1"',
+      ) +
+      (entry
+        ? button('delete-learning', 'Delete entry', id, 'text-button')
+        : ''),
+    entry ? 'Save corrections' : 'Save activity',
+    async (fd) => {
+      const course_id = fd.get('course_id'),
+        kind = fd.get('kind'),
+        study_date = fd.get('study_date');
+      const numeric = (name) =>
+        fd.get(name) === '' ? null : Number(fd.get(name));
+      const minutes = numeric('minutes'),
+        progress = numeric('progress');
+      if (!choices.has(course_id) || !Object.hasOwn(activityLabels, kind))
+        throw Error('Choose a course and an activity.');
+      if (
+        !validStudyDate(study_date) ||
+        study_date > today ||
+        study_date < '1900-01-01'
+      )
+        throw Error('Choose a valid date on or before today.');
+      if (kind === 'progress' && progress === null)
+        throw Error('Enter the progress percentage you reached.');
+      if (
+        !entry &&
+        kind === 'progress' &&
+        learningRows.some(
+          (row) =>
+            row.course_id === course_id &&
+            row.kind === 'progress' &&
+            row.study_date === study_date &&
+            row.progress === progress,
+        )
+      )
+        throw Error('That progress update is already recorded for this day.');
+      const values = {
+        course_id,
+        kind,
+        study_date,
+        minutes,
+        progress: progress ?? (kind === 'completed' ? 100 : null),
+      };
+      const table = db.from('learning_activity');
+      const { error } = await (entry
+        ? table
+            .update(values)
+            .eq('user_id', uid)
+            .eq('id', id)
+            .select('id')
+            .single()
+        : table.upsert(
+            { ...values, id, user_id: uid },
+            { onConflict: 'id', ignoreDuplicates: true },
+          ));
+      if (error?.code === '23505')
+        throw Error(
+          'That course milestone or progress update is already logged. Edit the existing entry to correct it.',
+        );
+      if (error) throw Error('The activity could not be saved. Please retry.');
+      learningDate = study_date;
+    },
+  );
+}
+
+function selectLearningDay(date) {
+  const input = document.getElementById('learning-date');
+  if (!input || !validStudyDate(date) || date < input.min || date > input.max)
+    return;
+  learningDate = date;
+  input.value = date;
+  document
+    .querySelectorAll('[data-study-day][aria-pressed="true"]')
+    .forEach((cell) => cell.setAttribute('aria-pressed', 'false'));
+  document
+    .querySelector(`[data-study-day="${date}"]`)
+    ?.setAttribute('aria-pressed', 'true');
+  document.getElementById('learning-day-result').innerHTML = learningDay(
+    learningRows,
+    date,
+  );
+}
+
 function courses() {
   const items = filterCourses(R.courses, {
     query: courseSearch,
@@ -509,10 +737,10 @@ function courses() {
       'Courses with a purpose.',
       'Official courses and open learning resources. Link learning to evidence and a plan.',
     ) +
-    `<div class="work-notice">Pricing, regional access, auditing and certificates can change. Check university access for LinkedIn Learning. Unknown duration or level is shown explicitly.</div><div class="course-filterbar"><label>Search course, field, or provider<input id="work-course-search" value="${E(courseSearch)}" type="search" maxlength="150" placeholder="Try Python, materials or leadership"></label><label>Learning provider<select id="work-course-provider">${select([...new Set(R.courses.map(providerName).filter(Boolean))].sort(), selectedProvider, 'All providers')}</select></label><label>Format<select id="work-course-format">${select([...new Set(R.courses.map((c) => c.format).filter(Boolean))].map((x) => [x, x]).concat([['unknown', 'Format not yet reviewed']]), selectedFormat, 'All formats')}</select></label>${button('reset-courses', 'Clear filters')}</div><p role="status">${items.length} courses${courseSearch || selectedProvider || selectedFormat ? ' match your filters' : ' in the collection'}</p>${!items.length ? '<div class="work-empty"><h2>No courses match yet.</h2><p>Try another provider or a broader skill.</p>' + button('reset-courses', 'Show all courses') + '</div>' : pager()}<div class="resource-grid">${page.rows
+    `<div class="work-actions">${go('my-learning', 'My Learning')}</div><div class="work-notice">Pricing, regional access, auditing and certificates can change. Check university access for LinkedIn Learning. Unknown duration or level is shown explicitly.</div><div class="course-filterbar"><label>Search course, field, or provider<input id="work-course-search" value="${E(courseSearch)}" type="search" maxlength="150" placeholder="Try Python, materials or leadership"></label><label>Learning provider<select id="work-course-provider">${select([...new Set(R.courses.map(providerName).filter(Boolean))].sort(), selectedProvider, 'All providers')}</select></label><label>Format<select id="work-course-format">${select([...new Set(R.courses.map((c) => c.format).filter(Boolean))].map((x) => [x, x]).concat([['unknown', 'Format not yet reviewed']]), selectedFormat, 'All formats')}</select></label>${button('reset-courses', 'Clear filters')}</div><p role="status">${items.length} courses${courseSearch || selectedProvider || selectedFormat ? ' match your filters' : ' in the collection'}</p>${!items.length ? '<div class="work-empty"><h2>No courses match yet.</h2><p>Try another provider or a broader skill.</p>' + button('reset-courses', 'Show all courses') + '</div>' : pager()}<div class="resource-grid">${page.rows
       .map((c) => {
         const p = state.course_progress.find((x) => x.course_id === c.id);
-        return `<article class="work-card">${tag(p?.state || 'Not saved')}<h2>${E(c.name)}</h2><p>${E(c.provider)}${c.institution ? ' · ' + E(c.institution) : ''}</p><p>${E((c.skills || []).join(' · '))}</p><dl><dt>Level</dt><dd>${E(c.level || 'Not verified')}</dd><dt>Duration</dt><dd>${E(c.duration || 'Not verified')}</dd><dt>Format</dt><dd>${E(c.format || 'Provider online course')}</dd><dt>Access and cost</dt><dd>${E(c.auditing || c.costType)}</dd><dt>Certificate</dt><dd>${E(c.certificate || 'Confirm provider conditions and price')}</dd></dl><p class="resource-note">Checked ${c.checkedOn}. Completion does not guarantee professional qualification.</p><div class="resource-links">${link(c.url, 'Official course page')}</div><div class="work-actions">${button('course', 'Save / update learning', c.id)}${button('quick-plan', 'Add to plan', c.name)}</div>${p?.notes ? `<p>Your notes: ${E(p.notes)}</p>` : ''}</article>`;
+        return `<article class="work-card">${tag(p?.state || 'Not saved')}<h2>${E(c.name)}</h2><p>${E(c.provider)}${c.institution ? ' · ' + E(c.institution) : ''}</p><p>${E((c.skills || []).join(' · '))}</p><dl><dt>Level</dt><dd>${E(c.level || 'Not verified')}</dd><dt>Duration</dt><dd>${E(c.duration || 'Not verified')}</dd><dt>Format</dt><dd>${E(c.format || 'Provider online course')}</dd><dt>Access and cost</dt><dd>${E(c.auditing || c.costType)}</dd><dt>Certificate</dt><dd>${E(c.certificate || 'Confirm provider conditions and price')}</dd></dl><p class="resource-note">Checked ${c.checkedOn}. Completion does not guarantee professional qualification.</p><div class="resource-links">${link(c.url, 'Official course page')}</div><div class="work-actions">${button('course', 'Track course', c.id)}${uid && p ? button('log-learning', 'Log study', c.id, 'text-button') : ''}${button('quick-plan', 'Add to plan', c.name)}</div>${p?.notes ? `<p>Your notes: ${E(p.notes)}</p>` : ''}</article>`;
       })
       .join('')}</div>${items.length ? pager() : ''}`
   );
@@ -962,12 +1190,15 @@ function opportunities() {
     })),
   ];
 }
+let originOpportunityButton;
+function opportunityDetails(o) {
+  return `${statusBadge(o)}<p>${E(o.org)} · ${E(o.country || o.region)}</p><div class="work-actions opportunity-cta">${link(o.url, 'View official source')}${o.recordId ? `<button class="secondary" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}</div><h3>Who should check</h3><p>${E(o.eligibility)}</p><h3>Funding / costs</h3><p>${E(o.funding || 'Not verified')}</p><h3>Dates, format and commitment</h3><p>${E(o.finalDeadline || o.deadline || 'Current deadline not confirmed')} · ${E(o.duration || o.effort || 'Check the provider')} · ${E(o.format || 'Check the provider')}</p><h3>Before you apply</h3><p>${E(o.note || o.caution || 'Check the current eligibility and application notice at the source.')}</p><p>${E(fitReasons(o, state.preferences).reasons.join('; '))}</p><p class="resource-note">Reviewed ${E(o.checkedOn)}. ${E(verificationStatus(o).description)}</p>${button('quick-plan', 'Add preparation task', o.name)}`;
+}
 function finder() {
   const all = opportunities();
   let items = all.filter((o) => {
     const text = JSON.stringify(o).toLowerCase();
     return (
-      (!search.q || text.includes(search.q.toLowerCase())) &&
       (!search.field ||
         o.fieldIds?.includes(search.field) ||
         o.fields?.includes('All subjects')) &&
@@ -990,6 +1221,11 @@ function finder() {
       (!search.availability || !availability(o).startsWith('Closed'))
     );
   });
+  if (search.q)
+    items = rankEntries(items, search.q, {
+      limit: items.length,
+      floorRatio: 0,
+    });
   items.sort((a, b) => {
     if (search.sort === 'name')
       return (a.name || '').localeCompare(b.name || '');
@@ -997,6 +1233,7 @@ function finder() {
       return (a.finalDeadline || a.deadline || '9999').localeCompare(
         b.finalDeadline || b.deadline || '9999',
       );
+    if (search.q) return b.score - a.score;
     const af = fitReasons(a, state.preferences).fieldMatch,
       bf = fitReasons(b, state.preferences).fieldMatch;
     return (
@@ -1025,14 +1262,14 @@ function finder() {
       )
       .join(
         '',
-      )}</div><div class="results-toolbar"><p><strong>${items.length} ${items.length === 1 ? 'record' : 'records'}</strong> · sorted by field relevance, then published deadline</p><label class="sort-label">Sort<select id="discovery-sort"><option value="relevance"${search.sort === 'name' || search.sort === 'deadline' ? '' : ' selected'}>Best fit</option><option value="deadline"${search.sort === 'deadline' ? ' selected' : ''}>Soonest deadline</option><option value="name"${search.sort === 'name' ? ' selected' : ''}>Name A–Z</option></select></label></div><p class="discovery-context">A directory is not an individual vacancy; unknown cycles are never labelled open.</p><div class="resource-grid">${
+      )}</div><div class="results-toolbar"><p><strong>${items.length} ${items.length === 1 ? 'record' : 'records'}</strong></p><label class="sort-label">Sort<select id="discovery-sort"><option value="relevance"${search.sort === 'name' || search.sort === 'deadline' ? '' : ' selected'}>Best fit</option><option value="deadline"${search.sort === 'deadline' ? ' selected' : ''}>Soonest deadline</option><option value="name"${search.sort === 'name' ? ' selected' : ''}>Name A–Z</option></select></label></div><p class="discovery-context">A directory is not an individual vacancy; unknown cycles are never labelled open.</p><div class="opportunity-browser"><div class="resource-grid opportunity-results">${
       items
         .map((o) => {
           const fit = fitReasons(o, state.preferences);
-          return `<article class="work-card discovery-card"><div class="card-classification">${statusBadge(o)}${tag(o.type)}</div><h2><button class="title-button" data-work="opportunity-detail" data-id="${E(o.id)}">${E(o.name)}</button></h2><p class="discovery-provider">${E(o.org)} · ${E(o.country || o.region)}</p><a class="discovery-source" href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">${E(sourceLinkLabel(o))}</a><p class="discovery-summary">${E(o.eligibility)}</p><dl class="discovery-facts"><div><dt>Funding / cost</dt><dd>${E(o.funding || 'Not verified')}</dd></div><div><dt>Application deadline</dt><dd>${E(o.finalDeadline || o.deadline || 'Not confirmed')}</dd></div></dl><p class="resource-note">Reviewed ${E(o.checkedOn)} · ${E(verificationStatus(o).description)}</p><div class="work-actions">${button('opportunity-detail', 'View details', o.id)}${o.recordId ? `<button class="text-button" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}${button('quick-plan', 'Add to plan', o.name, 'text-button')}</div></article>`;
+          return `<article class="work-card discovery-card" data-opportunity-card><div class="card-classification">${statusBadge(o)}${tag(o.type)}</div><h2><button class="title-button" data-work="opportunity-detail" data-id="${E(o.id)}">${E(o.name)}</button></h2><p class="discovery-provider">${E(o.org)} · ${E(o.country || o.region)}</p><a class="discovery-source" href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">${E(sourceLinkLabel(o))}</a><p class="discovery-summary">${E(o.eligibility)}</p><dl class="discovery-facts"><div><dt>Funding / cost</dt><dd>${E(o.funding || 'Not verified')}</dd></div><div><dt>Application deadline</dt><dd>${E(o.finalDeadline || o.deadline || 'Not confirmed')}</dd></div></dl><p class="resource-note">Reviewed ${E(o.checkedOn)} · ${E(verificationStatus(o).description)}</p><div class="work-actions">${button('opportunity-detail', 'View details', o.id)}${o.recordId ? `<button class="text-button" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}${button('quick-plan', 'Add to plan', o.name, 'text-button')}</div></article>`;
         })
         .join('') || empty('No matches. Broaden a filter or reset the search.')
-    }</div>`
+    }</div><aside class="work-card opportunity-preview" id="opportunity-preview" aria-labelledby="opportunity-preview-title" hidden></aside></div>`
   );
 }
 function universities() {
@@ -1112,9 +1349,12 @@ async function render(next) {
     '<div class="loading-skeleton" role="status" aria-label="Loading view"><span></span><span></span><span></span></div>';
   try {
     await load();
+    const history = next === 'my-learning' ? await fetchLearning() : null;
     if (view !== next) return;
+    if (next === 'my-learning') learningRows = history || [];
     const renderers = {
       dashboard,
+      'my-learning': () => myLearning(history),
       onboarding,
       profile,
       documents,
@@ -1129,6 +1369,13 @@ async function render(next) {
     panel.innerHTML =
       `<p id="work-status" class="work-status" role="status"></p>` +
       renderers[next]();
+    const calendarScroll = panel.querySelector('.learning-scroll');
+    if (calendarScroll) {
+      const selected = calendarScroll.querySelector('[aria-pressed="true"]');
+      calendarScroll.scrollLeft = selected
+        ? selected.offsetLeft - calendarScroll.clientWidth / 2
+        : calendarScroll.scrollWidth;
+    }
     if (next === 'privacy') {
       const response = await A.fetch('/api/account');
       const data = await response.json();
@@ -1140,6 +1387,7 @@ async function render(next) {
             : '<p>Account deletion is not yet enabled. The site owner must add the server-only Supabase secret in Vercel. You can delete individual records and files now.</p>';
     }
   } catch (err) {
+    if (view !== next) return;
     panel.innerHTML = `<div role="alert" class="work-card"><p>${E(err.message)}</p>${button('retry', 'Retry loading')}</div>`;
   }
 }
@@ -1151,6 +1399,10 @@ window.ProspectoWorkspace = {
     return state;
   },
   modal,
+  openOpportunitySearch: (query) => {
+    search = { q: query.trim().slice(0, 150) };
+    window.ProspectoNavigation?.navigate('finder');
+  },
   openTask: (title) =>
     uid ? itemForm('', title) : A.promptSignIn?.('create a personal plan'),
 };
@@ -1165,10 +1417,28 @@ async function action(name, id, element) {
       'reset-courses',
       'course-page',
       'opportunity-detail',
+      'close-opportunity-detail',
     ].includes(name)
   ) {
     A.promptSignIn?.('save and personalize your learning');
     return;
+  }
+  if (name === 'log-learning') return learningForm(id);
+  if (name === 'edit-learning') {
+    const entry = learningRows.find((row) => row.id === id);
+    if (entry) return learningForm(entry.course_id, entry);
+  }
+  if (name === 'delete-learning') {
+    if (
+      !learningRows.some((row) => row.id === id) ||
+      !confirm('Remove this learning activity from your calendar?')
+    )
+      return;
+    await unwrap(
+      db.from('learning_activity').delete().eq('user_id', uid).eq('id', id),
+    );
+    document.getElementById('work-dialog')?.close();
+    return render('my-learning');
   }
   if (name === 'reset-courses') {
     coursePage = 1;
@@ -1199,12 +1469,34 @@ async function action(name, id, element) {
   if (name === 'opportunity-detail') {
     const o = opportunities().find((r) => r.id === id);
     if (!o) throw Error('This record is unavailable.');
-    return modal(
-      o.name,
-      `${statusBadge(o)}<p>${E(o.org)} · ${E(o.country || o.region)}</p><h3>Who should check</h3><p>${E(o.eligibility)}</p><h3>Funding / costs</h3><p>${E(o.funding || 'Not verified')}</p><h3>Dates, format & commitment</h3><p>${E(o.finalDeadline || o.deadline || 'Current deadline not confirmed')} · ${E(o.duration || o.effort || 'Check the provider')} · ${E(o.format || 'Check the provider')}</p><h3>Before you apply</h3><p>${E(o.note || o.caution || 'Check the current official eligibility and application notice.')}</p><p>${E(fitReasons(o, state.preferences).reasons.join('; '))}</p><p class="resource-note">Reviewed ${E(o.checkedOn)}. ${E(verificationStatus(o).description)}</p><div class="resource-links">${link(o.url, 'Official provider source')}</div><div class="work-actions">${button('quick-plan', 'Add preparation task', o.name)}${o.recordId ? `<button class="secondary" data-intel="save" data-id="${E(o.recordId)}">Save to my library</button>` : ''}</div>`,
-      '',
-      null,
-    );
+    const preview = document.getElementById('opportunity-preview');
+    if (preview && window.matchMedia('(min-width: 1280px)').matches) {
+      originOpportunityButton = element;
+      document
+        .querySelector('.opportunity-results [data-selected]')
+        ?.removeAttribute('data-selected');
+      element
+        .closest('[data-opportunity-card]')
+        ?.setAttribute('data-selected', 'true');
+      preview.innerHTML = `<header class="opportunity-preview-header"><h2 id="opportunity-preview-title" tabindex="-1">${E(o.name)}</h2>${button('close-opportunity-detail', 'Close details', '', 'text-button')}</header>${opportunityDetails(o)}`;
+      preview.hidden = false;
+      preview.parentElement.classList.add('has-preview');
+      preview.querySelector('h2').focus();
+      return;
+    }
+    return modal(o.name, opportunityDetails(o), '', null);
+  }
+  if (name === 'close-opportunity-detail') {
+    const preview = document.getElementById('opportunity-preview');
+    if (!preview) return;
+    preview.hidden = true;
+    preview.parentElement.classList.remove('has-preview');
+    originOpportunityButton
+      ?.closest('[data-opportunity-card]')
+      ?.removeAttribute('data-selected');
+    originOpportunityButton?.focus();
+    originOpportunityButton = null;
+    return;
   }
   if (name === 'retry') {
     ready = false;
@@ -1440,6 +1732,7 @@ async function action(name, id, element) {
     return;
   }
   if (name === 'export') {
+    const learningActivity = await fetchLearning();
     await load(true);
     const other = await Promise.all(
       [
@@ -1462,6 +1755,9 @@ async function action(name, id, element) {
           product: 'ProspectoAI',
           exportedAt: new Date().toISOString(),
           ...state,
+          ...(learningActivity === null
+            ? {}
+            : { learning_activity: learningActivity }),
           profile: other[0].data,
           activities: other[1].data,
           tracker: other[2].data,
@@ -1514,6 +1810,8 @@ function download(text, name, type) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 document.addEventListener('click', async (e) => {
+  const studyDay = e.target.closest('[data-study-day]');
+  if (studyDay) return selectLearningDay(studyDay.dataset.studyDay);
   const filterButton = e.target.closest('#discovery-filter-toggle');
   if (filterButton) {
     const panel = document.getElementById('discovery-filters');
@@ -1612,6 +1910,7 @@ document.addEventListener('submit', async (e) => {
   }
 });
 document.addEventListener('change', (e) => {
+  if (e.target.id === 'learning-date') return selectLearningDay(e.target.value);
   if (['work-course-provider', 'work-course-format'].includes(e.target.id)) {
     const id = e.target.id;
     if (id === 'work-course-provider') selectedProvider = e.target.value;
