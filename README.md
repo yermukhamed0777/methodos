@@ -14,7 +14,16 @@ A place to explore education and career possibilities, build useful skills and k
 
 - Research programmes, scholarships, hackathons and olympiads, with filters, comparisons and deadline reminders.
 - **Search for Universities**: laboratories, undergraduate research, prototyping and distinctive degree partnerships. No score thresholds or admission predictions.
-- GitHub integration test entry to verify connection (2026-11-19).
+- GitHub integration test 1: README edit (2026-11-19)
+- GitHub integration test 2: CSS improvements
+- GitHub integration test 3: Security audit
+- GitHub integration test 4: Modern UI elements
+- GitHub integration test 5: Responsive design
+- GitHub integration test 6: Performance optimization
+- GitHub integration test 7: Accessibility updates
+- GitHub integration test 8: Dark mode implementation
+- GitHub integration test 9: Animation system
+- GitHub integration test 10: Visual hierarchy
 - **Skills for Your Major or Career**: 33 field maps with evidence-based progress, tools, projects and official course links.
 - **Internships and Jobs**: official career sources and individual postings. A source directory is clearly distinguished from a vacancy; missing deadlines are not guessed.
 - A private account workspace with a saved application tracker, profile and private activities. Activities support notes, dates, categories, priority, progress, filtering and sorting.
