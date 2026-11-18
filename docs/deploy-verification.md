@@ -1,8 +1,15 @@
-# Deployment handoff · 17 November 2026
+# Deployment handoff · 19 November 2026
 
-## Tested commit and current state
+## Final source and deployment state (19 November 2026)
 
-- **Current `main` at the time of this update:** `9f37d7ad17b4b3e9808696f262b2ce56201db3d9` (merge of PR #33). GitHub Actions `check` **success** on `9f37d7a`, `156cb68` and `af16793`. Three further design/discovery PRs (#31–#33) are merged and CI-green since the previous handoff.
+- **Final tested `main`:** `dde9f074dbd62f8ce71fa458f8c6c6928e21215e` (merge of PR #34), clean checkout, no open PRs. GitHub Actions `check` **success** on `dde9f07`. `npm run check` → **206/206**, `npm run format:check` clean, `git diff --check` clean.
+- **Production:** the owner independently checked on 19 November that the alias `opportunity-explorer-ruddy.vercel.app` still resolves to deployment `dpl_2vNHzHmPHmANQmrFg5oAea4Z1h8w` at source `5c0e185`. I could not inspect Vercel directly to confirm that ID or its READY state. `npm run check:live` again reported **3/6** on this pass: `/glass.css` and `/404.html` are 404 and `/bootstrap.js` lacks the BARYS marker.
+- **Automatic deployment status: UNKNOWN.** No Vercel connector is installed, the catalog has no Vercel connector, and there is no Vercel CLI, `~/.vercel` auth, `VERCEL_*` variable, `.vercel/` project link, Actions secret or deploy hook. GitHub shows no deployment records, which establishes only that GitHub CI did not deploy these commits. Whether the Vercel project's Git integration is connected, paused, filtered or pointed elsewhere remains a hypothesis that only project settings can confirm.
+- **Smallest owner action:** in the **existing** `opportunity-explorer` Vercel project, confirm Settings → Git (repository, Production Branch, Ignored Build Step), then deploy `dde9f07` through that project or connect the repository and redeploy `main`. Do not create a new project or change environment variables/database. Record the deployment ID, source SHA, alias and READY state, then require `npm run check:live` **6/6** and source SHA equality with `git rev-parse origin/main`.
+
+## Tested commit and earlier state
+
+- **Current `main` at the previous update:** `9f37d7ad17b4b3e9808696f262b2ce56201db3d9` (merge of PR #33). GitHub Actions `check` **success** on `9f37d7a`, `156cb68` and `af16793`. PRs #31–#33 are merged and CI-green.
 - **Latest locally tested implementation:** `53ef553b8993d538ff8f92be4331d29516bddd18` (release-hardening tree), where `npm run check`, `npm run format:check` and `git diff --check` were first run. Each later PR repeated the same checks on its own tree and merged green.
 - **The commit to deploy is `git rev-parse origin/main` at deploy time**, not a SHA copied from an older handoff. Record that SHA as the deployment source.
 - **Production is still stale. Nothing from PRs #28–#33 is live.** `npm run check:live` reports **3/6** against `9f37d7a`.
