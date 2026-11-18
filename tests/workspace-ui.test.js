@@ -24,6 +24,7 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
       'profile_records',
       'user_skills',
       'course_progress',
+      'learning_activity',
       'plans',
       'plan_items',
       'saved_searches',
@@ -38,6 +39,12 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
         filters = [];
       const q = {
         select() {
+          return q;
+        },
+        order() {
+          return q;
+        },
+        range() {
           return q;
         },
         eq(k, v) {
@@ -77,13 +84,16 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
               const values = Array.isArray(value) ? value : [value],
                 changed = [];
               for (const v of values) {
-                const key = v.skill_id
-                  ? 'skill_id'
-                  : v.course_id
-                    ? 'course_id'
-                    : v.id
-                      ? 'id'
-                      : 'user_id';
+                const key =
+                  table === 'learning_activity'
+                    ? 'id'
+                    : v.skill_id
+                      ? 'skill_id'
+                      : v.course_id
+                        ? 'course_id'
+                        : v.id
+                          ? 'id'
+                          : 'user_id';
                 let old =
                   mode === 'upsert'
                     ? rows.find((x) => x[key] === v[key])
@@ -174,6 +184,24 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
   await click('[data-work=course]');
   await submit('#work-dialog form');
   assert.equal(tables.course_progress[0].state, 'Planned');
+  await render('my-learning');
+  assert.equal(w.document.querySelectorAll('[data-study-day]').length, 365);
+  await click('[data-work=log-learning]');
+  w.document.querySelector('#work-dialog [name=course_id]').value =
+    tables.course_progress[0].course_id;
+  w.document.querySelector('#work-dialog [name=minutes]').value = '35';
+  await submit('#work-dialog form');
+  assert.equal(tables.learning_activity.length, 1);
+  assert.equal(tables.learning_activity[0].minutes, 35);
+  await render('my-learning');
+  assert.match(
+    w.document.querySelector('#learning-day-result').textContent,
+    /35 min/,
+  );
+  assert.equal(
+    w.document.querySelectorAll('.learning-grid .level-1').length,
+    1,
+  );
   await render('skills');
   await click('[data-work=skill]');
   w.document.querySelector('[name=state]').value = 'Demonstrated';
@@ -190,6 +218,19 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
   assert(w.document.querySelector('table'));
   assert.equal(w.document.querySelectorAll('thead th').length, 2);
   await render('finder');
+  assert.ok(
+    w.document.querySelector('.discovery-query input'),
+    'the finder query is visible before filters',
+  );
+  assert.match(
+    w.document.querySelector('#work-search button[type=submit]').textContent,
+    /Search/,
+  );
+  assert.ok(w.document.querySelector('.results-toolbar'));
+  assert.ok(w.document.querySelector('#discovery-filter-toggle'));
+  w.document.querySelector('#discovery-filter-toggle').click();
+  await settle();
+  assert.equal(w.document.querySelector('#discovery-filters').open, true);
   await submit('#work-search');
   assert(w.document.querySelector('[data-view-source]'));
   for (const v of ['dashboard', 'pathways', 'documents', 'privacy'])

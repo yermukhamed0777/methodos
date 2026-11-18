@@ -235,6 +235,12 @@
           <button class="filter-toggle" id="filter-toggle">
             <i data-icon="sliders"></i>Filters
           </button>
+          <button class="primary" id="search-submit" type="button">
+            Search
+          </button>
+          <button class="text-button" id="search-clear" type="button">
+            Clear
+          </button>
         </div>
         <div class="type-tabs" role="group" aria-label="Opportunity type">
           <button data-type="" class="active">
@@ -381,6 +387,7 @@
             </div>
           </details>
           <section id="results" class="results" tabindex="-1">
+            <div id="active-filters" aria-label="Active filters"></div>
             <div class="results-toolbar">
               <div>
                 <h2 id="results-count" aria-live="polite">23 opportunities</h2>
@@ -441,7 +448,6 @@
               </p>
             </section>
             <div id="feed-notice" class="feed-notice" hidden=""></div>
-            <div id="active-filters"></div>
             <div id="card-grid" class="card-grid"></div>
             <div id="empty" class="empty" hidden="">
               <i data-icon="search"></i>
@@ -473,9 +479,18 @@
         ><button class="primary" id="compare-btn">Compare options ↗</button>
       </div>
     </div>
-    <dialog id="detail-dialog" aria-labelledby="detail-title">
+    <dialog
+      id="detail-dialog"
+      class="detail-dialog"
+      aria-labelledby="detail-title"
+    >
       <button class="dialog-close" aria-label="Close details">×</button>
-      <div id="detail-content"></div>
+      <div
+        id="detail-rail"
+        class="detail-rail"
+        aria-label="Results in this view"
+      ></div>
+      <div id="detail-content" class="detail-content"></div>
     </dialog>
     <dialog
       id="compare-dialog"

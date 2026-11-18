@@ -74,7 +74,7 @@ export function installDiscovery(w = window) {
   }
   function home() {
     const epoch = ++homeEpoch;
-    panel.innerHTML = `<div class="discovery-home"><header class="welcome-hero"><div><span class="eyebrow">YOUR NEXT POSSIBILITY</span><h1>A little curiosity.<br>A world of possibilities.</h1><p>Find the opportunity, university or skill that moves you forward. Start exploring; save your next step when you’re ready. Browsing is open to everyone.</p><div class="work-actions"><button class="primary" data-view="finder">Find an opportunity →</button><button class="secondary" data-view="universities">Explore universities</button></div></div><figure class="welcome-mascot"><img src="/assets/white-lion.svg" width="160" height="160" alt="BARYS, your white-lion guide"><figcaption>Big possibilities.<br>One small next step.</figcaption></figure></header></div>`;
+    panel.innerHTML = `<div class="discovery-home"><header class="welcome-hero welcome-search-hero"><div><h1>Find your next opportunity.</h1><p>Explore research, scholarships and learning from official sources.</p><form id="home-opportunity-search" class="home-search"><label for="home-search-query">Search opportunities</label><div><input id="home-search-query" name="q" type="search" maxlength="150" placeholder="Try summer research or a scholarship"><button class="primary" type="submit">Search</button></div></form><nav class="home-shortcuts" aria-label="Start exploring"><button type="button" class="secondary" data-view="universities">Universities &amp; Admissions</button><button type="button" class="secondary" data-view="campus">Campus Opportunities</button><button type="button" class="secondary" data-view="courses">Courses &amp; Skills</button></nav></div><figure class="welcome-mascot"><img src="/assets/white-lion.svg" width="160" height="160" alt=""><figcaption><button type="button" class="text-button" data-open-barys>Ask BARYS for a starting point</button></figcaption></figure></header></div>`;
     d.querySelector('#breadcrumb-title').textContent = 'Start here';
     panel
       .querySelector('.discovery-home')
@@ -124,7 +124,7 @@ export function installDiscovery(w = window) {
               ? '<article class="glass-card resume-card"><span class="eyebrow">MAKE IT YOURS</span><h3>Finish your setup</h3><p>A few saved preferences make suggestions more useful. Setup is optional.</p><button class="secondary" data-view="onboarding">Continue setup →</button></article>'
               : '',
           ].filter(Boolean);
-          slot.innerHTML = `<div class="section-heading"><div><span class="eyebrow">A SPACE FOR YOUR NEXT STEP</span><h2>${escape(greeting(name))}</h2><p>How’s your day? Pick one thing you’d like to move forward.</p></div><button class="secondary" data-view="dashboard">My workspace →</button></div>${steps.length ? `<ul class="next-step-list">${steps.map((item) => `<li><strong>${escape(item.title)}</strong><span>${escape(item.due_date || 'No date set')} · ${escape(item.state)}</span></li>`).join('')}</ul><button class="text-button" data-view="plan">Open my planner →</button>` : '<p>No active plan tasks yet. One small step is enough to begin.</p><button class="secondary" data-view="plan">Make my first plan</button>'}${resume.length ? `<div class="resume-grid">${resume.join('')}</div>` : ''}`;
+          slot.innerHTML = `<div class="section-heading"><div><span class="eyebrow">A SPACE FOR YOUR NEXT STEP</span><h2>${escape(greeting(name))}</h2><p>How’s your day? Pick one thing you’d like to move forward.</p></div><button class="secondary" data-view="dashboard">My workspace →</button></div><button class="text-button" data-view="my-learning">My Learning →</button>${steps.length ? `<ul class="next-step-list">${steps.map((item) => `<li><strong>${escape(item.title)}</strong><span>${escape(item.due_date || 'No date set')} · ${escape(item.state)}</span></li>`).join('')}</ul><button class="text-button" data-view="plan">Open my planner →</button>` : '<p>No active plan tasks yet. One small step is enough to begin.</p><button class="secondary" data-view="plan">Make my first plan</button>'}${resume.length ? `<div class="resume-grid">${resume.join('')}</div>` : ''}`;
         })
         .catch(() => {
           if (slot.isConnected)
@@ -135,6 +135,13 @@ export function installDiscovery(w = window) {
         });
     }
   }
+  d.addEventListener('submit', (event) => {
+    if (event.target?.id !== 'home-opportunity-search') return;
+    event.preventDefault();
+    w.ProspectoWorkspace?.openOpportunitySearch?.(
+      event.target.querySelector('input').value,
+    );
+  });
   d.addEventListener('click', (event) => {
     if (event.target?.closest?.('#home-sign-in'))
       w.ProspectoAuth?.promptSignIn?.('save your next step');
