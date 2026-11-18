@@ -1,7 +1,21 @@
 # Public registration: verification status
 
-Last updated 17 November 2026. This page records what has actually been checked
+Last updated 19 November 2026. This page records what has actually been checked
 about new-user registration, and what still needs the owner.
+
+## Owner-reported journey check · 19 November 2026
+
+The owner reported that after signing back in they could see courses they had
+saved as **In progress** and others as **Completed**, with the state retained
+across a fresh browser session. This is an owner observation, not an independent
+browser check by this assistant: no account identifier, email, password or
+private record was shared or inspected, and the specific account and steps were
+not observed here. It supports **signed-in course-progress persistence** only.
+
+It does **not** establish that a brand-new address received a confirmation email:
+the owner did not report seeing the message or opening its link. Signup email
+delivery therefore remains **unverified**, as does whether the account used in
+this check was newly created. Confirmation and access controls were not changed.
 
 ## Verified
 

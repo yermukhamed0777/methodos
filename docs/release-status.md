@@ -2,6 +2,13 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit. No rollback to Opportunity Explorer is part of this release.
 
+## Final handoff · 19 November 2026
+
+- **Source:** `main` `dde9f074dbd62f8ce71fa458f8c6c6928e21215e` (PR #34), clean, no open PRs; GitHub Actions `check` **success**. `npm run check` 206/206, `npm run format:check` and `git diff --check` clean.
+- **Production:** owner-reported deployment `dpl_2vNHzHmPHmANQmrFg5oAea4Z1h8w` at `5c0e185` on the production alias; `check:live` **3/6** here. No Vercel access in this environment; automatic deployment status **unknown**. See [deployment handoff](deploy-verification.md).
+- **User journeys:** owner reports signed-in course progress (In progress / Completed) persists after signing back in. New-user email delivery and confirmation remain unverified because the owner did not report receiving the message. See [auth verification](auth-verification.md).
+- **Unresolved:** deploying the exact green `main` commit through the existing Vercel project; owner-controlled new-address signup → confirmation → sign-in; confirming custom SMTP and recipient reachability in Supabase settings.
+
 ## Phase 5 design and discovery clarity · 18 November 2026
 
 Three independent PRs, each from current `main` and merged only after green CI; no dependent stack:
