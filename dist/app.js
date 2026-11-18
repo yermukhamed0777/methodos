@@ -374,12 +374,44 @@
       view,
     };
   }
+  const CHIP_FILTERS = [
+    ['type', () => type, () => (type = '')],
+    ['query', () => $('#search').value, () => ($('#search').value = '')],
+    ['field', () => $('#field').value, () => ($('#field').value = '')],
+    ['stage', () => $('#stage').value, () => ($('#stage').value = '')],
+    ['location', () => $('#location').value, () => ($('#location').value = '')],
+    ['access', () => $('#access').value, () => ($('#access').value = '')],
+    ['cost', () => $('#cost').value, () => ($('#cost').value = '')],
+    ['from', () => $('#date-from').value, () => ($('#date-from').value = '')],
+    ['to', () => $('#date-to').value, () => ($('#date-to').value = '')],
+    [
+      'confirmed',
+      () => $('#confirmed-only').checked,
+      () => ($('#confirmed-only').checked = false),
+    ],
+    [
+      'closed',
+      () => $('#include-closed').checked,
+      () => ($('#include-closed').checked = false),
+    ],
+  ];
+  function currentStatus(o) {
+    return (
+      window.ProspectoVerification?.(o) || {
+        label: 'Awaiting Review',
+        tone: 'review',
+        description: 'Current application availability is not verified.',
+      }
+    );
+  }
+  function sourceLabel(o) {
+    if (o.isDirectory || o.type === 'Directory') return 'View directory ↗';
+    if (currentStatus(o).label === 'Verified Open' && o.applicationUrl)
+      return 'View application source ↗';
+    return 'View official source ↗';
+  }
   function verificationBadge(o) {
-    const status = window.ProspectoVerification?.(o) || {
-      label: 'Awaiting Review',
-      tone: 'review',
-      description: 'Current application availability is not verified.',
-    };
+    const status = currentStatus(o);
     return `<span class="verification-badge status-${status.tone}" title="${esc(status.description)}">${esc(status.label)}</span>`;
   }
   function status(o) {
@@ -397,7 +429,7 @@
     return `<div class="fact"><div class="fact-label">${icon(i)}${label}</div><div class="fact-value">${esc(value)}</div>${note ? `<p class="fact-note">${esc(note)}</p>` : ''}</div>`;
   }
   function card(o) {
-    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" target="_blank" rel="noopener noreferrer">Provider source ↗</a><button class="details-btn" data-detail="${o.id}">Full details & sources →</button></div></div></article>`;
+    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" target="_blank" rel="noopener noreferrer">${esc(sourceLabel(o))}</a><button class="details-btn" data-detail="${o.id}">View details →</button></div></div></article>`;
   }
   function deadlineItem(o) {
     return `<article class="deadline-item"><div class="deadline-date">${esc(o.deadline)}</div><div><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="status-row">${verificationBadge(o)}${status(o)}</div><p>${esc(o.deadlineDetail)}</p></div><button class="details-btn" data-detail="${o.id}">Details →</button></article>`;
@@ -672,21 +704,37 @@
           : view === 'deadlines'
             ? 'Primary next deadlines. Read the details for secondary dates.'
             : 'Read the essentials here, then compare or open the provider source.';
+      const chipLabel = (key, value) =>
+        ({
+          confirmed: 'Confirmed deadlines',
+          closed: 'Closed included',
+          type: value,
+          query: 'Search: ' + value,
+          field: 'Field: ' + value,
+          stage: 'Stage: ' + value,
+          location: 'Location: ' + value,
+          access: 'Route: ' + value,
+          cost: value === 'Aid' ? 'Aid available' : 'Cost: ' + value,
+          from: 'From ' + value,
+          to: 'Through ' + value,
+          format: value,
+        })[key] || value;
       const chips = [
-        type,
-        f.stage,
-        f.field,
-        f.location,
-        f.access,
-        ...f.formats,
-        f.cost === 'Aid' ? 'Aid available' : f.cost,
-        f.from ? 'From ' + f.from : '',
-        f.to ? 'Through ' + f.to : '',
-        f.confirmed ? 'Confirmed deadlines' : '',
-        f.includeClosed ? 'Closed included' : '',
-      ].filter(Boolean);
+        ...CHIP_FILTERS.filter(([, read]) => read()).map(([key, read]) => ({
+          key,
+          label: chipLabel(key, String(read())),
+        })),
+        ...f.formats.map((format) => ({
+          key: 'format',
+          value: format,
+          label: chipLabel('format', format),
+        })),
+      ];
       $('#active-filters').innerHTML = chips
-        .map((t) => `<span class="active-chip">${esc(t)}</span>`)
+        .map(
+          ({ key, value, label }) =>
+            `<button type="button" class="active-chip" data-clear-chip="${esc(key)}"${value ? ` data-chip-value="${esc(value)}"` : ''} aria-label="Remove filter ${esc(label)}">${esc(label)} <span aria-hidden="true">×</span></button>`,
+        )
         .join('');
       grid.className = view === 'deadlines' ? 'deadline-list' : 'card-grid';
       if (view === 'deadlines') {
@@ -708,6 +756,8 @@
         : items.length === 1
           ? 'opportunity'
           : 'opportunities');
+    window.__prospectoDetailItems = items;
+    if ($('#detail-dialog').open && items.length) detailRail(items[0].id);
     $('#empty').hidden = !!items.length || (isFeed && feedState === 'loading');
     $('#empty-text').textContent = invalid
       ? 'The end date is before the start date. Adjust the deadline window.'
@@ -784,15 +834,34 @@
     else toast('Compare up to 3 opportunities. Remove one to add another.');
     render();
   }
+  function linkLabel(o, label, url) {
+    if (o.isDirectory || /directory|index|list/i.test(label))
+      return 'View directory ↗';
+    if (/admission/i.test(label)) return 'View admissions ↗';
+    return 'View official source ↗';
+  }
   function sourceList(o) {
-    return `<ul class="sources">${o.sources.map(([label, url]) => `<li><a href="${esc(safeLink(url))}" target="_blank" rel="noopener noreferrer">${esc(label)} <span>↗</span></a></li>`).join('')}</ul><p class="source-date">Provider sources reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}. Pages can change after this date.</p>`;
+    return `<ul class="sources">${o.sources.map(([label, url]) => `<li><a href="${esc(safeLink(url))}" target="_blank" rel="noopener noreferrer">${esc(linkLabel(o, label, url))}</a></li>`).join('')}</ul><p class="source-date">Provider sources reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}. Pages can change after this date.</p>`;
+  }
+  let detailOpener = null;
+  function detailRail(selectedId) {
+    const rail = $('#detail-rail');
+    if (!rail) return;
+    const choices = window.__prospectoDetailItems || [];
+    rail.innerHTML = `<div class="rail-heading"><strong>Results</strong><span>${choices.length} in this view</span></div>${choices
+      .map(
+        (o) =>
+          `<button type="button" class="rail-item ${o.id === selectedId ? 'rail-active' : ''}" data-detail="${esc(o.id)}"${o.id === selectedId ? ' aria-current="true"' : ''}><span>${esc(o.name)}</span><small>${esc(o.org)}</small></button>`,
+      )
+      .join('')}`;
   }
   function openDetail(id, show = true) {
     const o = byId(id);
     if (!o) return;
+    detailRail(id);
     $('#detail-content').innerHTML =
-      `<div class="dialog-eyebrow">${esc(o.type)} · ${esc(o.cycle)}</div><h2 id="detail-title">${esc(o.name)}</h2><p class="detail-org">${esc(o.org)}</p><p>${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div><div class="detail-grid"><div><h3>Who can apply</h3><p>${esc(o.eligibility)}</p><p><strong>Entry route:</strong> ${esc(o.access)}</p></div><div><h3>Next deadline</h3><p><strong>${esc(o.deadline)}</strong></p><p>${esc(o.deadlineDetail)}</p></div><div><h3>Funding & costs</h3><p><strong>${esc(o.cost)}</strong></p><p>${esc(o.costNote)}</p></div><div><h3>Where, when & how</h3><p>${esc(o.location)} · ${esc(o.formats.join(' / '))}</p><p>${esc(o.schedule)}</p><p>${esc(o.effort)} · ${esc(o.team)}</p></div></div><div class="attention"><strong>Before you commit</strong><p>${esc(o.caution)}</p></div><h3>What you could take away</h3><p>${esc(o.output)}</p><p class="editorial-label">Editorial assessment; admission, publication or an award is not guaranteed.</p><h3>A useful next step</h3><p>${esc(o.next)}</p><h3>Read the original sources</h3>${sourceList(o)}<div class="detail-actions"><button class="primary" data-save="${o.id}">${saved.has(o.id) ? 'Remove from shortlist' : 'Save to tracker'}</button>${o.deadlineConfirmed && o.deadlineStart === o.deadlineEnd ? `<button class="secondary" data-calendar="${o.id}">Export deadline reminder (.ics)</button>` : ''}<button class="secondary" data-share="${o.id}">Copy opportunity link</button></div><p class="calendar-note">Calendar exports are date reminders, not exact cut-offs. Check the deadline and timezone above. Notifications depend on your calendar settings.</p>`;
-    if (show) $('#detail-dialog').showModal();
+      `<button type="button" class="text-button detail-return" id="detail-return">← Back to results</button><div class="dialog-eyebrow">${esc(o.type)} · ${esc(o.cycle)}</div><h2 id="detail-title">${esc(o.name)}</h2><p class="detail-org">${esc(o.org)}</p><p>${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div><div class="detail-grid"><div><h3>Who can apply</h3><p>${esc(o.eligibility)}</p><p><strong>Entry route:</strong> ${esc(o.access)}</p></div><div><h3>Next deadline</h3><p><strong>${esc(o.deadline)}</strong></p><p>${esc(o.deadlineDetail)}</p></div><div><h3>Funding & costs</h3><p><strong>${esc(o.cost)}</strong></p><p>${esc(o.costNote)}</p></div><div><h3>Where, when & how</h3><p>${esc(o.location)} · ${esc(o.formats.join(' / '))}</p><p>${esc(o.schedule)}</p><p>${esc(o.effort)} · ${esc(o.team)}</p></div></div><div class="attention"><strong>Before you commit</strong><p>${esc(o.caution)}</p></div><h3>What you could take away</h3><p>${esc(o.output)}</p><p class="editorial-label">Editorial assessment; admission, publication or an award is not guaranteed.</p><h3>A useful next step</h3><p>${esc(o.next)}</p><h3>Read the original sources</h3>${sourceList(o)}<div class="detail-actions"><button class="primary" data-save="${o.id}">${saved.has(o.id) ? 'Remove from shortlist' : 'Save to tracker'}</button>${o.deadlineConfirmed && o.deadlineStart === o.deadlineEnd ? `<button class="secondary" data-calendar="${o.id}">Export deadline reminder (.ics)</button>` : ''}<button class="secondary" data-share="${o.id}">Copy opportunity link</button></div><p class="calendar-note">Calendar exports are date reminders, not exact cut-offs. Check the deadline and timezone above. Notifications depend on your calendar settings.</p>`;
+    if (show && !$('#detail-dialog').open) $('#detail-dialog').showModal();
   }
   function openComparison() {
     if (compare.size < 2) return;
@@ -863,6 +932,7 @@
       nav = event.target.closest('button[data-view]'),
       tab = event.target.closest('[data-type]');
     if (detail) {
+      detailOpener = detail;
       openDetail(detail.dataset.detail);
       return;
     }
@@ -994,6 +1064,30 @@
     el.addEventListener('change', render),
   );
   $('#search').addEventListener('input', render);
+  $('#search-submit').addEventListener('click', () => {
+    render();
+    $('#results').scrollIntoView({ block: 'start' });
+    $('#results').focus();
+  });
+  $('#search-clear').addEventListener('click', () => {
+    $('#search').value = '';
+    render();
+    $('#search').focus();
+  });
+  $('#active-filters').addEventListener('click', (event) => {
+    const chip = event.target.closest('[data-clear-chip]');
+    if (!chip) return;
+    const key = chip.dataset.clearChip;
+    const found = CHIP_FILTERS.find(([name]) => name === key);
+    if (found) found[2]();
+    else if (key === 'format') {
+      const input = $$('[name=format]').find(
+        (el) => el.value === chip.dataset.chipValue,
+      );
+      if (input) input.checked = false;
+    }
+    render();
+  });
   $('#sort').addEventListener('change', render);
   $('#reset').addEventListener('click', reset);
   $('#empty-reset').addEventListener('click', () => {
@@ -1011,6 +1105,16 @@
   $$('.dialog-close').forEach((b) =>
     b.addEventListener('click', () => b.closest('dialog').close()),
   );
+  $('#detail-dialog').addEventListener('click', (event) => {
+    if (event.target.closest('#detail-return')) {
+      $('#detail-dialog').close();
+      (detailOpener || $('#results')).focus?.();
+    }
+  });
+  $('#detail-dialog').addEventListener('close', () => {
+    if (detailOpener?.isConnected) detailOpener.focus?.();
+    detailOpener = null;
+  });
   $$('dialog').forEach((d) =>
     d.addEventListener('click', (event) => {
       if (event.target === d) {

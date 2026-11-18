@@ -5,6 +5,11 @@ import { sharedPathId, shareLinkHTML } from './path-card.js';
 import { glassStat } from './ui-components.js';
 import { gateHTML } from './access.js';
 import {
+  discoveryChips,
+  clearDiscoveryChip,
+  sourceLinkLabel,
+} from '../lib/discovery-ui.js';
+import {
   filterCourses,
   paginateCourses,
   courseProvider as providerName,
@@ -986,6 +991,12 @@ function finder() {
     );
   });
   items.sort((a, b) => {
+    if (search.sort === 'name')
+      return (a.name || '').localeCompare(b.name || '');
+    if (search.sort === 'deadline')
+      return (a.finalDeadline || a.deadline || '9999').localeCompare(
+        b.finalDeadline || b.deadline || '9999',
+      );
     const af = fitReasons(a, state.preferences).fieldMatch,
       bf = fitReasons(b, state.preferences).fieldMatch;
     return (
@@ -995,20 +1006,30 @@ function finder() {
   });
   return (
     heading(
+      'DISCOVER',
       'Find your next opportunity.',
-      'Explore programmes and official directories internationally. Check every source for eligibility, time commitment, funding and current availability.',
+      'Explore programmes and official directories. Search first, then refine; every source keeps its review date.',
     ) +
-    `<details class="work-card discovery-filters"><summary>Search & filters</summary><form id="work-search" class="work-form"><div class="work-form-grid">${input('Search role, skill, duration or keyword', 'q', search.q, 'search', 'maxlength="150"')}${choose(
+    `<form id="work-search" class="work-form discovery-search-form"><label class="discovery-query">Search programmes, scholarships and directories<input id="work-search-q" name="q" type="search" maxlength="150" value="${E(search.q)}" placeholder="Try a subject, provider or location"></label><div class="work-actions discovery-search-actions"><button class="primary" type="submit">Search</button>${button('reset-search', 'Clear', '', 'text-button')}<button class="secondary" type="button" id="discovery-filter-toggle" aria-expanded="false" aria-controls="discovery-filters">Filters</button></div><details class="work-card discovery-filters" id="discovery-filters"><summary>Filters <span>Field, region, stage and availability</span></summary><div class="work-form-grid">${choose(
       'Field',
       'field',
       D.majors.map((x) => [x.id, x.name]),
       search.field,
       'All fields',
-    )}${choose('Region', 'region', ['Asia', 'Europe', 'North America', 'South America', 'Africa', 'Oceania', 'Middle East', 'Worldwide'], search.region, 'All regions')}${choose('Education stage', 'stage', D.stages, search.stage, 'All stages')}${choose('Opportunity type', 'type', D.opportunityTypes, search.type, 'All types')}${choose('Format', 'format', ['Remote', 'Hybrid', 'In person', 'On-site'], search.format, 'Any format')}${choose('Funding', 'funding', [['funded', 'Mentions funding / pay (verify)']], search.funding, 'Any funding')}${choose('Availability', 'availability', [['current', 'Exclude known closed / past cycles']], search.availability, 'Include preparation watchlists')}</div><div class="work-actions"><button class="primary">Apply filters</button>${button('reset-search', 'Reset')}${button('save-search', 'Save this search')}</div></form></details><div class="work-actions">${state.saved_searches.map((s) => `<span>${button('load-search', s.name, s.id)}${button('delete-search', 'Remove ' + s.name, s.id, 'text-button')}</span>`).join('')}</div><p>${items.length} records · sorted by field relevance, then published deadline. A directory is not an individual vacancy; unknown cycles are never labelled open.</p><div class="resource-grid">${
+    )}${choose('Region', 'region', ['Asia', 'Europe', 'North America', 'South America', 'Africa', 'Oceania', 'Middle East', 'Worldwide'], search.region, 'All regions')}${choose('Education stage', 'stage', D.stages, search.stage, 'All stages')}${choose('Opportunity type', 'type', D.opportunityTypes, search.type, 'All types')}${choose('Format', 'format', ['Remote', 'Hybrid', 'In person', 'On-site'], search.format, 'Any format')}${choose('Funding', 'funding', [['funded', 'Mentions funding / pay (verify)']], search.funding, 'Any funding')}${choose('Availability', 'availability', [['current', 'Exclude known closed / past cycles']], search.availability, 'Include preparation watchlists')}</div><div class="work-actions"><button class="primary">Apply filters</button>${button('reset-search', 'Reset')}${button('save-search', 'Save this search')}</div></details></form><div class="work-actions discovery-saved-searches">${state.saved_searches.map((s) => `<span>${button('load-search', s.name, s.id)}${button('delete-search', 'Remove ' + s.name, s.id, 'text-button')}</span>`).join('')}</div><div class="discovery-chips" aria-label="Active filters">${discoveryChips(
+      search,
+    )
+      .map(
+        (chip) =>
+          `<button class="active-chip" type="button" data-work="clear-search-chip" data-id="${E(chip.key)}" aria-label="Remove filter ${E(chip.label)}">${E(chip.label)} <span aria-hidden="true">×</span></button>`,
+      )
+      .join(
+        '',
+      )}</div><div class="results-toolbar"><p><strong>${items.length} ${items.length === 1 ? 'record' : 'records'}</strong> · sorted by field relevance, then published deadline</p><label class="sort-label">Sort<select id="discovery-sort"><option value="relevance"${search.sort === 'name' || search.sort === 'deadline' ? '' : ' selected'}>Best fit</option><option value="deadline"${search.sort === 'deadline' ? ' selected' : ''}>Soonest deadline</option><option value="name"${search.sort === 'name' ? ' selected' : ''}>Name A–Z</option></select></label></div><p class="discovery-context">A directory is not an individual vacancy; unknown cycles are never labelled open.</p><div class="resource-grid">${
       items
         .map((o) => {
           const fit = fitReasons(o, state.preferences);
-          return `<article class="work-card discovery-card"><div class="card-classification">${statusBadge(o)}${tag(o.type)}</div><h2><button class="title-button" data-work="opportunity-detail" data-id="${E(o.id)}">${E(o.name)}</button></h2><p class="discovery-provider">${E(o.org)} · ${E(o.country || o.region)}</p><a class="discovery-source" href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">Official source ↗</a><p class="discovery-summary">${E(o.eligibility)}</p><dl class="discovery-facts"><div><dt>Funding / cost</dt><dd>${E(o.funding || 'Not verified')}</dd></div><div><dt>Application deadline</dt><dd>${E(o.finalDeadline || o.deadline || 'Not confirmed')}</dd></div></dl><p class="resource-note">Reviewed ${E(o.checkedOn)} · ${E(verificationStatus(o).description)}</p><div class="work-actions">${button('opportunity-detail', 'View details', o.id)}${o.recordId ? `<button class="text-button" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}${button('quick-plan', 'Add to plan', o.name, 'text-button')}</div></article>`;
+          return `<article class="work-card discovery-card"><div class="card-classification">${statusBadge(o)}${tag(o.type)}</div><h2><button class="title-button" data-work="opportunity-detail" data-id="${E(o.id)}">${E(o.name)}</button></h2><p class="discovery-provider">${E(o.org)} · ${E(o.country || o.region)}</p><a class="discovery-source" href="${E(o.url)}" data-view-source="${E(o.id)}" target="_blank" rel="noopener noreferrer">${E(sourceLinkLabel(o))}</a><p class="discovery-summary">${E(o.eligibility)}</p><dl class="discovery-facts"><div><dt>Funding / cost</dt><dd>${E(o.funding || 'Not verified')}</dd></div><div><dt>Application deadline</dt><dd>${E(o.finalDeadline || o.deadline || 'Not confirmed')}</dd></div></dl><p class="resource-note">Reviewed ${E(o.checkedOn)} · ${E(verificationStatus(o).description)}</p><div class="work-actions">${button('opportunity-detail', 'View details', o.id)}${o.recordId ? `<button class="text-button" data-intel="save" data-id="${E(o.recordId)}">Save</button>` : ''}${button('quick-plan', 'Add to plan', o.name, 'text-button')}</div></article>`;
         })
         .join('') || empty('No matches. Broaden a filter or reset the search.')
     }</div>`
@@ -1375,6 +1396,10 @@ async function action(name, id, element) {
     }
     return render(view);
   }
+  if (name === 'clear-search-chip') {
+    search = clearDiscoveryChip(search, id);
+    return render(view);
+  }
   if (name === 'reset-search') {
     search = {
       q: '',
@@ -1489,6 +1514,15 @@ function download(text, name, type) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 document.addEventListener('click', async (e) => {
+  const filterButton = e.target.closest('#discovery-filter-toggle');
+  if (filterButton) {
+    const panel = document.getElementById('discovery-filters');
+    if (!panel) return;
+    const open = !panel.open;
+    panel.open = open;
+    filterButton.setAttribute('aria-expanded', String(open));
+    return;
+  }
   const source = e.target.closest('[data-view-source]');
   if (source && uid && ready) {
     const o = opportunities().find((x) => x.id === source.dataset.viewSource);
@@ -1530,7 +1564,11 @@ document.addEventListener('submit', async (e) => {
     const fd = new FormData(f);
     if (f.id === 'work-search') {
       search = Object.fromEntries(fd.entries());
-      return render(view);
+      return render(view).then(() =>
+        document.querySelector('.results-toolbar')?.scrollIntoView({
+          block: 'start',
+        }),
+      );
     }
     if (f.id === 'work-privacy') {
       await save('preferences', {
@@ -1584,6 +1622,10 @@ document.addEventListener('change', (e) => {
   if (e.target.id === 'work-field') {
     field = e.target.value || D.majors[0].id;
     render(view);
+  }
+  if (e.target.id === 'discovery-sort') {
+    search.sort = e.target.value;
+    return render(view);
   }
   if (e.target.id === 'work-plan') {
     selectedPlan = e.target.value;

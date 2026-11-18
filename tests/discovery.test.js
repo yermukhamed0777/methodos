@@ -43,7 +43,7 @@ test('root opens a separate Home while opportunity links retain the finder', asy
         assert.ok(w.document.querySelector('#home-sign-in'));
         assert.equal(
           w.document.querySelector('[data-view=universities]').textContent,
-          'Explore universities',
+          'Universities & Admissions',
         );
         nav.navigate('finder');
         nav.navigate('home');

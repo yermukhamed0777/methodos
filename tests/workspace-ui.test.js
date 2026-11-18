@@ -190,6 +190,19 @@ test('private workspace DOM workflows: onboarding, record review, plan edits, co
   assert(w.document.querySelector('table'));
   assert.equal(w.document.querySelectorAll('thead th').length, 2);
   await render('finder');
+  assert.ok(
+    w.document.querySelector('.discovery-query input'),
+    'the finder query is visible before filters',
+  );
+  assert.match(
+    w.document.querySelector('#work-search button[type=submit]').textContent,
+    /Search/,
+  );
+  assert.ok(w.document.querySelector('.results-toolbar'));
+  assert.ok(w.document.querySelector('#discovery-filter-toggle'));
+  w.document.querySelector('#discovery-filter-toggle').click();
+  await settle();
+  assert.equal(w.document.querySelector('#discovery-filters').open, true);
   await submit('#work-search');
   assert(w.document.querySelector('[data-view-source]'));
   for (const v of ['dashboard', 'pathways', 'documents', 'privacy'])
