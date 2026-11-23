@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShadeQueue | Shelter demonstration</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f4ef;color:#193933;font:16px/1.48 system-ui,sans-serif}main{max-width:980px;margin:auto;padding:28px 18px 50px}section,header{background:white;border:1px solid #cfdad2;padding:clamp(16px,3vw,32px);margin-bottom:16px;border-radius:12px}header{background:#153f37;color:white}h1,h2,h3,p{margin:0 0 12px}h1{font-size:2.3rem} .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}label{display:inline-grid;gap:4px;font-weight:650}button,select,input{font:inherit;padding:5px}button{cursor:pointer}svg,canvas{display:block;max-width:100%;height:auto}svg{width:100%;background:#fbfcf8;border:1px solid #c9d6ca;margin:14px 0}.frames{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.frames canvas{width:100%;border:1px solid #69786b;touch-action:manipulation}.quiet{color:#4d6358;font-size:.92rem}table{border-collapse:collapse;width:100%;margin:14px 0}th,td{padding:7px;text-align:left;border-bottom:1px solid #cdd6cd}th{background:#eaf3eb}a{color:#006852}@media(max-width:590px){.frames{grid-template-columns:1fr}td,th{font-size:.86rem}}
+</style><main><header><h1>ShadeQueue</h1><p>Team CoolQueue · City University of Hong Kong · SFT2026-070</p>Compare shade at eight standing points and one seat, then try a small image classifier on a pavement sample.</header>
+<section><h2>Where does one panel help?</h2><p>The shelter and passenger positions are fictional. The dated presets use approximate Hong Kong sun angles for 23 November 2026 at 22.3° N, 114.2° E. The original 40° scenario uses assumed angles. All points are evaluated at ground level.</p><div class="row"><label>Sun position<select id="time"><option value="14">14:00 HKT</option><option value="10">10:00 HKT</option><option value="12">12:00 HKT</option><option value="15">15:00 HKT</option><option value="fixture">Original 40° scenario</option></select></label><label>Panel on plan<select id="mode"><option value="queueEnd">Queue end</option><option value="benchSide">Beside bench</option><option value="roof">Existing roof only</option></select></label><label>Value assigned to a shaded seat<select id="weight"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label></div>
+<svg id="plan" viewBox="0 0 730 330" role="img" aria-label="Plan of shelter roofs, ground shadows and waiting points"></svg><p>Dashed outline = roof or added panel. Green patch = projected shade. Filled circle = shaded queue point. Hollow circle = exposed point. Square = seat reference point.</p><p id="angle"></p><table><thead><tr><th>Placement</th><th>Shaded queue</th><th>Seat point</th><th>Weighted total</th></tr></thead><tbody id="rows"></tbody></table><p class="quiet">Weighted total = shaded queue points + the selected weight if the seat point is shaded. Weight expresses a design preference. The two panels have identical dimensions. Shadow length equals roof height divided by the tangent of the solar elevation. Shadows from buildings and trees are omitted. North is up and east is right on this plan.</p></section>
+<section><h2>Can the image tell sun from shade?</h2><p>A nearest-centroid model learns two average colours from labelled pixels on one pavement crop. The green overlay marks pixels it assigns to shade. Try the dark strip to see where it makes a mistake.</p><div class="row"><label>Example<select id="sample"><option value="plain">Single pavement material</option><option value="strip">Add dark sunlit paving</option></select></label><label>Or open an empty pavement crop<input type="file" id="upload" accept="image/*"></label></div><p class="quiet">Images stay on this device. Crop to empty pavement before opening. New images need examples of both classes. On a phone, tap a sample in the left image.</p><div class="row"><label>Label the next pixel<select id="klass"><option value="shade">Shade</option><option value="sun">Sun</option></select></label><button id="reset">Clear labelled pixels</button></div><div class="frames"><div><h3>Source and labels</h3><canvas id="raw" aria-label="Source pavement crop. Tap to label pixels."></canvas></div><div><h3>Estimated shade</h3><canvas id="mask" aria-label="Predicted shade overlay"></canvas></div></div><p id="metric" aria-live="polite"></p><p class="quiet">A photographic estimate describes the captured surface in that moment. Stop rankings, community reports and operator review are proposed pilot features. The image classifier and the shadow calculation can be tested separately.</p></section>
+<p class="quiet">Solar calculation adapted from <a href="https://gml.noaa.gov/grad/solcalc/solareqns.PDF">NOAA General Solar Position Calculations</a>. All example images are generated test patterns.</p></main><script>
+const stopLayout = {
+  roof: [90,82,240,86], queueEnd: [330,82,180,86], benchSide: [90,205,180,86],
+  queue: Array.from({length:8}, (_, i) => [260 + 55*i,225]), bench: [235,310],
+  height:2.8, unitsPerMetre:32
+};
+function sunAt(hour) {
+  // NOAA fractional-year approximation for 23 November 2026, HKT (UTC+8).
+  const rad = Math.PI/180, lat = 22.3*rad, lon = 114.2;
+  const t = 2*Math.PI/365*(327-1+(hour-12)/24);
+  const {cos,sin} = Math;
+  const eq = 229.18*(0.000075+0.001868*cos(t)-0.032077*sin(t)-0.014615*cos(2*t)-0.040849*sin(2*t));
+  const d = 0.006918-0.399912*cos(t)+0.070257*sin(t)-0.006758*cos(2*t)+0.000907*sin(2*t)-0.002697*cos(3*t)+0.00148*sin(3*t);
+  const h = ((60*hour+eq+4*lon-60*8)/4-180)*rad;
+  const east = -cos(d)*sin(h), north = cos(lat)*sin(d)-sin(lat)*cos(d)*cos(h);
+  const up = sin(lat)*sin(d)+cos(lat)*cos(d)*cos(h);
+  return {elevation: Math.asin(up)/rad, bearing: Math.atan2(-east,-north)/rad};
+}
+function offset(sun) {
+  const rad = Math.PI/180, length = stopLayout.height*stopLayout.unitsPerMetre/Math.tan(sun.elevation*rad);
+  return [length*Math.sin(sun.bearing*rad), length*Math.cos(sun.bearing*rad)];
+}
+function assess(mode, sun) {
+  const boxes=[stopLayout.roof];
+  if(mode!=='roof') boxes.push(stopLayout[mode]);
+  const [dx,dy]=offset(sun);
+  const covers=([x,y])=>boxes.some(([a,b,w,h])=>a+dx<=x && x<=a+w+dx && b+dy<=y && y<=b+h+dy);
+  const hits=stopLayout.queue.map(covers);
+  return {hits, standing:hits.filter(Boolean).length, seat:covers(stopLayout.bench)};
+}
+
+// Supervised nearest-centroid classifier for an empty pavement crop.
+// Each class has one RGB centroid estimated from the user's examples.
+function fitColour(samples) {
+  if(!samples.sun.length || !samples.shade.length) return null;
+  const mean=rows=>[0,1,2].map(c=>rows.reduce((sum,p)=>sum+p[c],0)/rows.length);
+  return {sun:mean(samples.sun), shade:mean(samples.shade)};
+}
+function predictColour(pixel,model) {
+  const dist=center=>center.reduce((sum,v,c)=>sum+(pixel[c]-v)**2,0);
+  return dist(model.shade)<dist(model.sun);
+}
+function makeExample(darkStrip) {
+  const w=240,h=120,rgba=new Uint8ClampedArray(w*h*4),truth=[];
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    const i=y*w+x, shaded=x<80+Math.floor(y/3);
+    const base=shaded?[85,99,107]:(darkStrip && x>=180?[78,82,83]:[190,182,162]);
+    const noise=(13*x+29*y+7*x*y)%21-10;
+    for(let c=0;c<3;c++) rgba[4*i+c]=base[c]+noise;
+    rgba[4*i+3]=255;truth[i]=shaded;
+  }
+  return {w,h,rgba,truth};
+}
+const initialTaps={shade:[[20,25],[45,65],[60,100]],sun:[[128,24],[151,68],[159,101]]};
+function getPixel(img,x,y){const k=(y*img.w+x)*4;return Array.from(img.rgba.slice(k,k+3));}
+
+const by=id=>document.getElementById(id), names={roof:'Existing roof only',queueEnd:'Queue end',benchSide:'Beside bench'};
+function drawPlan(){
+ const sun=by('time').value==='fixture'?{bearing:40,elevation:40}:sunAt(Number(by('time').value));
+ const mode=by('mode').value, mapY=y=>358-y, [dx,dy]=offset(sun), output=assess(mode,sun);
+ const boxes=[stopLayout.roof];if(mode!=='roof')boxes.push(stopLayout[mode]);
+ const box=([x,y,w,h],u,v,attrs)=>'<rect x="'+(x+u)+'" y="'+mapY(y+v+h)+'" width="'+w+'" height="'+h+'" '+attrs+'/>';
+ let shapes=boxes.map(b=>box(b,dx,dy,'fill="#b0ddc9"')).join('')+boxes.map(b=>box(b,0,0,'fill="none" stroke="#80692f" stroke-width="2" stroke-dasharray="6 4"')).join('');
+ stopLayout.queue.forEach(([x,y],i)=>{shapes+='<circle cx="'+x+'" cy="'+mapY(y)+'" r="9" stroke="#1d5041" stroke-width="2" fill="'+(output.hits[i]?'#1d5041':'white')+'"/>';});
+ const [x,y]=stopLayout.bench;shapes+=box([x-8,y-8,16,16],0,0,'stroke="#1d5041" stroke-width="2" fill="'+(output.seat?'#1d5041':'white')+'"')+'<text x="'+(x+17)+'" y="'+(mapY(y)+5)+'">Seat</text>';
+ by('plan').innerHTML=shapes;by('angle').textContent='Solar elevation '+sun.elevation.toFixed(1)+'°. Shadow bearing '+((sun.bearing+360)%360).toFixed(1)+'° clockwise from north.';
+ by('rows').innerHTML=Object.entries(names).map(([id,name])=>{const r=assess(id,sun);return '<tr><td>'+name+'</td><td>'+r.standing+'/8</td><td>'+(r.seat?'Shaded':'Exposed')+'</td><td>'+(r.standing+(r.seat?Number(by('weight').value):0))+'</td></tr>';}).join('');
+}
+for(const id of ['time','mode','weight'])by(id).addEventListener('change',drawPlan);
+let img, points, imageSequence=0;
+function showImage(){
+ const {w,h,rgba}=img;const model=fitColour(Object.fromEntries(Object.entries(points).map(([k,p])=>[k,p.map(([x,y])=>getPixel(img,x,y))])));
+ const marked=new Uint8ClampedArray(rgba);let shaded=0,errors=0;
+ if(model)for(let i=0;i<w*h;i++){const v=predictColour(rgba.subarray(4*i,4*i+3),model);if(v){shaded++;for(let c=0;c<3;c++)marked[i*4+c]=Math.round((marked[i*4+c]+[40,205,117][c])/2);}if(img.truth && v!==img.truth[i])errors++;}
+ for(const [id,pixels] of [['raw',rgba],['mask',marked]]){const cv=by(id);cv.width=w;cv.height=h;cv.getContext('2d').putImageData(new ImageData(pixels,w,h),0,0);}
+ const ctx=by('raw').getContext('2d');for(const [key,ps] of Object.entries(points))for(const [x,y] of ps){ctx.strokeStyle=key==='sun'?'#ffdf34':'#7affcd';ctx.lineWidth=2;ctx.strokeRect(x-2,y-2,5,5);}
+ by('metric').textContent=points.shade.length+' shade labels · '+points.sun.length+' sun labels. '+(model?('Predicted shade '+(100*shaded/(w*h)).toFixed(1)+'% of this crop. '+(img.truth?'Known synthetic shade '+(100*img.truth.filter(Boolean).length/(w*h)).toFixed(1)+'%. Misclassified pixels '+(100*errors/(w*h)).toFixed(1)+'%.':'Real-photo accuracy is unknown.')):'Label at least one pixel of each class.');
+}
+function example(){imageSequence++;by('upload').value='';img=makeExample(by('sample').value==='strip');points=structuredClone(initialTaps);showImage();}
+by('sample').onchange=example;by('reset').onclick=()=>{points={sun:[],shade:[]};showImage();};
+by('raw').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();const x=Math.min(img.w-1,Math.max(0,Math.floor((e.clientX-r.left)/r.width*img.w)));const y=Math.min(img.h-1,Math.max(0,Math.floor((e.clientY-r.top)/r.height*img.h)));points[by('klass').value].push([x,y]);showImage();};
+by('upload').onchange=async e=>{const f=e.target.files[0];if(!f)return;const seq=++imageSequence;
+ try{const bm=await createImageBitmap(f);if(seq!==imageSequence){bm.close();return;}const scale=Math.min(1,480/Math.max(bm.width,bm.height)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(scale*bm.width));cv.height=Math.max(1,Math.round(scale*bm.height));const ctx=cv.getContext('2d');ctx.drawImage(bm,0,0,cv.width,cv.height);bm.close();img={w:cv.width,h:cv.height,rgba:ctx.getImageData(0,0,cv.width,cv.height).data};points={sun:[],shade:[]};by('sample').selectedIndex=-1;showImage();}catch{if(seq===imageSequence)by('metric').textContent='This file could not be opened. Choose a JPEG or PNG pavement crop.';}};
+drawPlan();example();
+</script></html>
