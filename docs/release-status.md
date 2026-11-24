@@ -2,6 +2,10 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit.
 
+## Final deployment · 24 November 2026
+
+PR #38 merged to `main` at `f56e29ad261f15e9e11c8bf9852c2288fde75e4d` after green CI ([run 45407547443](https://github.com/yermukhamed0777/opportunity-explorer/actions/runs/45407547443)). Vercel deployment `dpl_96Nd9rDF2TpG8aqZi4uRRnLyhNrZ` is `READY` on target `production` and aliased to `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes and the corrected catalog dates are live. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
+
 For the 24 November Methodos release candidate and current production checks, see the [deployment handoff](deploy-verification.md). The dated reports below describe earlier builds.
 
 ## Final handoff · 19 November 2026
