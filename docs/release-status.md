@@ -4,7 +4,7 @@ The expansion connects Explore, Build Your Profile, Professional Pathways, Admis
 
 ## Final deployment · 25 November 2026
 
-PR #40 merged to `main` at `415fcb9a81b6af1acac7e37b3e053480a2c09a82` after green CI and a passing Vercel preview check. Vercel deployment `dpl_CGpAxuPPzfME5azCKQAW7ETfaBya` is `READY` on target `production` and promoted to `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes, the corrected catalog dates are live, and signed-out coach requests return `401` before payload validation. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
+PR #40 merged to `main` at `415fcb9a81b6af1acac7e37b3e053480a2c09a82` after green CI and a passing Vercel preview check. It was promoted to production, then a documentation-only commit `288d1e91e5cdcbb98b4d18d8a77548b5c68b7ed3` became the current production deployment `dpl_BfEYM2q1YncigdGgPZ4MSo7VuyTL` at `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes, the corrected catalog dates are live, and signed-out coach requests return `401` before payload validation. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
 
 The 24 November release source was `f56e29a` (PR #38). The dated reports below describe earlier builds.
 

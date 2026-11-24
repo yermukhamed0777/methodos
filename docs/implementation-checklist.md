@@ -46,7 +46,7 @@ Baseline: GitHub main `d3ad28053becf1f0138c60ef2c8ed67e8dad1eea`, deployed Produ
 - [x] Run database/Storage isolation tests without retaining synthetic users.
 - [x] Build, formatting/lint, dependency audit, diff and secret review.
 - [x] Save migrations and apply to the connected project; verify advisors and grants.
-- [x] Save reviewed source to GitHub, pass CI, deploy exact source commit and smoke-test Production (`415fcb9`, `dpl_CGpAxuPPzfME5azCKQAW7ETfaBya`, live 8/8).
+- [x] Save reviewed source to GitHub, pass CI, deploy exact source commit and smoke-test Production (application `415fcb9`, current docs commit `288d1e9`, `dpl_BfEYM2q1YncigdGgPZ4MSo7VuyTL`, live 8/8).
 - [ ] Check safe clean Vercel alias; preserve working original URL.
 - [x] Prepare www.methodos.com DNS instructions; do not purchase or attach an unowned domain.
 - [ ] Report exact implementation counts, evidence, deployment identifiers and genuine owner actions.
