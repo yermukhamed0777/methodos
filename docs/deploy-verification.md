@@ -1,12 +1,12 @@
 # Deployment handoff
 
-## Methodos release deployed · 24 November 2026
+## Current release · 25 November 2026
 
-- **Source:** `main` `f56e29ad261f15e9e11c8bf9852c2288fde75e4d` (merge of PR #38). GitHub Actions `check` **success** on [run 45407547443](https://github.com/yermukhamed0777/methodos/actions/runs/45407547443). The tracked working tree was clean at that commit when the CLI deployment was created; only the untracked scratch file `inspect-output.mjs` remained and is excluded from Vercel.
-- **Deployment:** `dpl_96Nd9rDF2TpG8aqZi4uRRnLyhNrZ`, `https://opportunity-explorer-cwzi0irgw-erm1ham3d2204-2491.vercel.app`, target `production`, `READY`. It is aliased to the existing canonical origin `https://opportunity-explorer-ruddy.vercel.app/`. The `methodos-ruddy.vercel.app` alias returns `DEPLOYMENT_NOT_FOUND` and is not used.
-- **Git configuration:** the existing Vercel project is now connected to `yermukhamed0777/methodos` with production branch `main`. Before this, production served `334a54f`; that is why earlier releases never appeared. Git connection and deployment were done through the existing project; no environment value was changed and no new project was created.
-- **Repository rename (25 November 2026):** the GitHub repository and local folder are now `methodos`. Vercel keeps its connection by repository ID; the Vercel project name and production alias keep `opportunity-explorer` so students keep the working URL and configured auth redirects.
-- **Release checks:** `npm run check:live` **8/8**. The served `index.html`, `methodos-ui.css`, `app.js` and `404.html` have the same SHA-256 hashes as the local release files. Production `/api/catalog` now reports Lumiere’s deadline as `2026-11-29` and HKYPT as archived.
+- **Source:** `main` `415fcb9a81b6af1acac7e37b3e053480a2c09a82` (merge of PR #40, after the repository rename and the retained security/date/AI fixes). GitHub Actions `check` **success** on runs `45446144055` and `45446162205`; Vercel preview check also passed. The earlier release source was `f56e29a` (PR #38).
+- **Deployment:** `dpl_CGpAxuPPzfME5azCKQAW7ETfaBya`, `https://opportunity-explorer-f4h91cipe-erm1ham3d2204-2491.vercel.app`, target `production`, `READY`. It was promoted to the existing canonical origin `https://opportunity-explorer-ruddy.vercel.app/`. The `methodos-ruddy.vercel.app` alias still returns `DEPLOYMENT_NOT_FOUND` and is not used.
+- **Git configuration:** the existing Vercel project is connected to `yermukhamed0777/methodos` with production branch `main`. Before this, production served `334a54f`; that is why earlier releases never appeared. Git connection and deployment were done through the existing project; no environment value was changed and no new project was created.
+- **Repository rename:** the GitHub repository and local folder are now `methodos`. Vercel keeps its connection by repository ID; the Vercel project name and production alias keep `opportunity-explorer` so students keep the working URL and configured auth redirects.
+- **Release checks:** `npm run check:live` **8/8**. Served `index.html`, `methodos-ui.css`, `app.js`, `404.html` and `bootstrap.js` match local SHA-256 hashes. Production `/api/catalog` reports Lumiere’s deadline as `2026-11-29` and HKYPT as archived. Signed-out `POST /api/coach` now returns `401` for both malformed and empty bodies, confirming the authentication-order fix is live.
 - **Still owner-controlled:** new-address signup email delivery, confirmation round trip, recovery, real signed-in private-workspace flows, manual accessibility checks and the student pilot in [student-pilot.md](student-pilot.md). Configuration probes and DOM tests do not establish those outcomes.
 
 ## 24 November 2026 · Methodos release candidate

@@ -2,11 +2,11 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit.
 
-## Final deployment · 24 November 2026
+## Final deployment · 25 November 2026
 
-PR #38 merged to `main` at `f56e29ad261f15e9e11c8bf9852c2288fde75e4d` after green CI ([run 45407547443](https://github.com/yermukhamed0777/methodos/actions/runs/45407547443)). Vercel deployment `dpl_96Nd9rDF2TpG8aqZi4uRRnLyhNrZ` is `READY` on target `production` and aliased to `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes and the corrected catalog dates are live. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
+PR #40 merged to `main` at `415fcb9a81b6af1acac7e37b3e053480a2c09a82` after green CI and a passing Vercel preview check. Vercel deployment `dpl_CGpAxuPPzfME5azCKQAW7ETfaBya` is `READY` on target `production` and promoted to `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes, the corrected catalog dates are live, and signed-out coach requests return `401` before payload validation. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
 
-For the 24 November Methodos release candidate and current production checks, see the [deployment handoff](deploy-verification.md). The dated reports below describe earlier builds.
+The 24 November release source was `f56e29a` (PR #38). The dated reports below describe earlier builds.
 
 ## Final handoff · 19 November 2026
 
