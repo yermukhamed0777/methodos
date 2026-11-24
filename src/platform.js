@@ -946,7 +946,7 @@ document.addEventListener('prospecto-renewal-view', async () => {
             )
             .join('')
         : '<p>No pending entries in the latest report.</p>'
-    }</details><details><summary>Update history</summary>${(report.history || []).map((x) => `<p>${E(x.checkedAt)} — ${x.reachable}/${x.links} sources reachable; ${x.needsReview} review items.</p>`).join('') || '<p>No completed runs yet.</p>'}</details><p>${link('https://github.com/yermukhamed0777/opportunity-explorer/blob/main/docs/maintenance.md', 'Maintainer review workflow')}</p>`;
+    }</details><details><summary>Update history</summary>${(report.history || []).map((x) => `<p>${E(x.checkedAt)} — ${x.reachable}/${x.links} sources reachable; ${x.needsReview} review items.</p>`).join('') || '<p>No completed runs yet.</p>'}</details><p>${link('https://github.com/yermukhamed0777/methodos/blob/main/docs/maintenance.md', 'Maintainer review workflow')}</p>`;
   } catch {
     if (target.isConnected)
       target.innerHTML =

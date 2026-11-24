@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { Output } from 'ai';
+import { z } from 'zod';
 import { createConfigHandler } from '../api/config.js';
 import {
   isDirectConfigured,
@@ -66,6 +68,60 @@ test('direct generation sends a bounded request and never exposes the key', asyn
         { env: directEnv, fetcher: async () => jsonResponse({}, 401) },
       ),
     (error) => error.statusCode === 401,
+  );
+});
+
+test('direct generation requests and parses structured output', async () => {
+  let body;
+  const output = Output.object({
+    schema: z.object({ items: z.array(z.string().max(200)).min(1).max(8) }),
+  });
+  const result = await generateDirect(
+    {
+      system: 'Plan rules',
+      prompt: 'Build a study plan',
+      output,
+      maxOutputTokens: 800,
+    },
+    {
+      env: directEnv,
+      fetcher: async (_url, options) => {
+        body = JSON.parse(options.body);
+        return jsonResponse({
+          id: 'chatcmpl-structured',
+          choices: [
+            {
+              message: { content: '{"items":["Read one set of notes"]}' },
+              finish_reason: 'stop',
+            },
+          ],
+          usage: { prompt_tokens: 20, completion_tokens: 10, total_tokens: 30 },
+        });
+      },
+    },
+  );
+  assert.equal(body.response_format.type, 'json_schema');
+  assert.equal(body.response_format.json_schema.strict, true);
+  assert.equal(body.response_format.json_schema.name, 'output');
+  assert.deepEqual(body.response_format.json_schema.schema.type, 'object');
+  assert.deepEqual(result.output, { items: ['Read one set of notes'] });
+  assert.equal(result.text, '{"items":["Read one set of notes"]}');
+  assert.equal(result.aiModel, 'direct/gpt-4.1-nano');
+  await assert.rejects(
+    () =>
+      generateDirect(
+        { system: '', prompt: '', output },
+        {
+          env: directEnv,
+          fetcher: async () =>
+            jsonResponse({
+              choices: [
+                { message: { content: 'not json' }, finish_reason: 'stop' },
+              ],
+            }),
+        },
+      ),
+    /could not parse/,
   );
 });
 

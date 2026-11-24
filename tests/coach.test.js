@@ -66,9 +66,19 @@ const row = {
   },
 };
 
-test('coach rejects invalid input before authentication', async () => {
+test('coach authenticates before parsing or validating input', async () => {
+  let authCalls = 0;
   const handler = createCoachHandler({
-    authenticate: () => assert.fail('Invalid input must stop before auth'),
+    authenticate: async (_req, res) => {
+      authCalls++;
+      res.status(401).json({
+        error: 'Sign in to use Methodos.',
+        code: 'login_required',
+      });
+      return null;
+    },
+    generate: () =>
+      assert.fail('Generation must not run for a signed-out caller'),
   });
   for (const body of [
     '{',
@@ -79,8 +89,18 @@ test('coach rejects invalid input before authentication', async () => {
   ]) {
     const res = response();
     await handler({ method: 'POST', body }, res);
-    assert.equal(res.statusCode, 400);
+    assert.equal(res.statusCode, 401);
+    assert.equal(res.body.code, 'login_required');
+    assert(!JSON.stringify(res.body).includes('valid JSON'));
   }
+  assert.equal(authCalls, 5, 'auth runs exactly once per request');
+  const signedIn = deps({ rows: [] });
+  const invalid = response();
+  await createCoachHandler(signedIn.options)(
+    { method: 'POST', body: { target: '' } },
+    invalid,
+  );
+  assert.equal(invalid.statusCode, 400);
   assert.deepEqual(
     validateCoachInput({ target: 'test', section: 'unknown' }).value.section,
     'motivation',

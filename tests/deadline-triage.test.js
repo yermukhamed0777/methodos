@@ -71,6 +71,15 @@ test('triage rejects malformed dates and bounds the requested window', () => {
           name: 'Injection',
           finalDeadline: '2026-11-20<script>',
         },
+        { id: 'impossible', name: 'Impossible', finalDeadline: '2026-02-31' },
+      ],
+      tasks: [
+        {
+          id: 'impossible-task',
+          title: 'Impossible task',
+          due_date: '2026-04-31',
+          state: 'Preparing',
+        },
       ],
       today,
     }),

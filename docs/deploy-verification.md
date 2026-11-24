@@ -2,16 +2,17 @@
 
 ## Methodos release deployed · 24 November 2026
 
-- **Source:** `main` `f56e29ad261f15e9e11c8bf9852c2288fde75e4d` (merge of PR #38). GitHub Actions `check` **success** on [run 45407547443](https://github.com/yermukhamed0777/opportunity-explorer/actions/runs/45407547443). The tracked working tree was clean at that commit when the CLI deployment was created; only the untracked scratch file `inspect-output.mjs` remained and is excluded from Vercel.
+- **Source:** `main` `f56e29ad261f15e9e11c8bf9852c2288fde75e4d` (merge of PR #38). GitHub Actions `check` **success** on [run 45407547443](https://github.com/yermukhamed0777/methodos/actions/runs/45407547443). The tracked working tree was clean at that commit when the CLI deployment was created; only the untracked scratch file `inspect-output.mjs` remained and is excluded from Vercel.
 - **Deployment:** `dpl_96Nd9rDF2TpG8aqZi4uRRnLyhNrZ`, `https://opportunity-explorer-cwzi0irgw-erm1ham3d2204-2491.vercel.app`, target `production`, `READY`. It is aliased to the existing canonical origin `https://opportunity-explorer-ruddy.vercel.app/`. The `methodos-ruddy.vercel.app` alias returns `DEPLOYMENT_NOT_FOUND` and is not used.
-- **Git configuration:** the existing Vercel project is now connected to `yermukhamed0777/opportunity-explorer` with production branch `main`. Before this, production served `334a54f`; that is why earlier releases never appeared. Git connection and deployment were done through the existing project; no environment value was changed and no new project was created.
+- **Git configuration:** the existing Vercel project is now connected to `yermukhamed0777/methodos` with production branch `main`. Before this, production served `334a54f`; that is why earlier releases never appeared. Git connection and deployment were done through the existing project; no environment value was changed and no new project was created.
+- **Repository rename (25 November 2026):** the GitHub repository and local folder are now `methodos`. Vercel keeps its connection by repository ID; the Vercel project name and production alias keep `opportunity-explorer` so students keep the working URL and configured auth redirects.
 - **Release checks:** `npm run check:live` **8/8**. The served `index.html`, `methodos-ui.css`, `app.js` and `404.html` have the same SHA-256 hashes as the local release files. Production `/api/catalog` now reports Lumiere’s deadline as `2026-11-29` and HKYPT as archived.
 - **Still owner-controlled:** new-address signup email delivery, confirmation round trip, recovery, real signed-in private-workspace flows, manual accessibility checks and the student pilot in [student-pilot.md](student-pilot.md). Configuration probes and DOM tests do not establish those outcomes.
 
 ## 24 November 2026 · Methodos release candidate
 
 - Keep the existing Vercel project and working `https://opportunity-explorer-ruddy.vercel.app/` origin. The proposed `methodos-ruddy.vercel.app` alias returns `DEPLOYMENT_NOT_FOUND`; do not use it for auth or traffic.
-- GitHub's actual repository is `yermukhamed0777/opportunity-explorer`; `main` was `9722262` before the release candidate. The working production URL passed six legacy probes but lacked both Methodos release markers; the updated checker reported **6/8** before the release.
+- GitHub's actual repository is `yermukhamed0777/methodos`; `main` was `9722262` before the release candidate. The working production URL passed six legacy probes but lacked both Methodos release markers; the updated checker reported **6/8** before the release.
 - Merge the reviewed candidate only after CI. In the existing Vercel project, verify the connected repository and `main` branch, deploy the exact green merge SHA if automation has not done so, and record the deployment ID, source SHA, alias and READY status. Then require `npm run check:live` **8/8** and exercise the public and owner journeys in [the pilot checklist](student-pilot.md).
 
 The 19 November notes below are historical. Do not deploy their old SHA or use their six-probe threshold for the Methodos release.
@@ -81,7 +82,7 @@ credential exists here.
 ## Smallest owner action
 
 **A. Connect Git (permanent).** Vercel → project → Settings → Git → Connect Git
-Repository → `yermukhamed0777/opportunity-explorer` → Production Branch `main` →
+Repository → `yermukhamed0777/methodos` → Production Branch `main` →
 Deploy. Later merges then deploy automatically and write a GitHub commit status.
 
 **B. Deploy the tested commit once.** From a clean checkout:
