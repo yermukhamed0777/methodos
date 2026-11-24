@@ -19,7 +19,7 @@
       mode === 'system' ? (media?.matches ? 'dark' : 'light') : mode;
     d.documentElement.setAttribute('data-theme', resolved);
     const meta = d.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = resolved === 'dark' ? '#0b1018' : '#f5f7fb';
+    if (meta) meta.content = resolved === 'dark' ? '#0b0b0a' : '#fffdf4';
     if (select) select.value = mode;
   }
   function osChanged() {

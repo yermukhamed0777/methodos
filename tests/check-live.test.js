@@ -53,7 +53,7 @@ test('an empty run is not treated as success', () => {
 });
 
 test('every probe is credential-free and same-origin', () => {
-  assert.equal(CHECKS.length, 6);
+  assert.equal(CHECKS.length, 8);
   for (const check of CHECKS) {
     assert.match(check.path, /^\//, check.name + ' must be a relative path');
     assert.ok(check.hint.length > 15, check.name + ' needs an actionable hint');
@@ -82,4 +82,24 @@ test('the live probe is not part of the ordinary CI gate', () => {
   assert.equal(pkg.scripts['check:live'], 'node scripts/check-live.js');
   assert.ok(!pkg.scripts.check.includes('check:live'));
   assert.ok(!pkg.scripts.test.includes('check:live'));
+});
+
+test('Methodos release markers distinguish the redesign from the old shell', () => {
+  const [home, styles] = CHECKS;
+  const body = readFileSync('dist/index.html', 'utf8');
+  assert.equal(home.expect({ status: 200, body }), true);
+  assert.equal(
+    home.expect({ status: 200, body: body.replace('Methodos', 'ProspectoAI') }),
+    false,
+  );
+  const stylesheet = readFileSync('dist/methodos-ui.css', 'utf8');
+  assert.equal(
+    styles.expect({
+      status: 200,
+      body: stylesheet,
+      headers: { 'content-type': 'text/css' },
+    }),
+    true,
+  );
+  assert.equal(styles.expect({ status: 404, body: stylesheet }), false);
 });

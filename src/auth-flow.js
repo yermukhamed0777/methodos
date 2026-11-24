@@ -40,7 +40,7 @@ export function authMessage(error) {
     case 'email_not_confirmed':
       return 'Please check your inbox to confirm your account. You can resend the confirmation email below.';
     case 'invalid_credentials':
-      return 'The email or password is incorrect. Use your ProspectoAI account, or reset your password. If you just registered, confirm your email first.';
+      return 'The email or password is incorrect. Use your Methodos account, or reset your password. If you just registered, confirm your email first.';
     case 'over_email_send_rate_limit':
     case 'over_request_rate_limit':
       return 'Too many email requests. Wait before trying again. If this continues, email delivery needs to be configured by the site owner.';

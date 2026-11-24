@@ -15,7 +15,7 @@ function page() {
 test('the not-found page is a complete, indexable-free document', () => {
   assert.match(html, /<html lang="en">/);
   assert.match(html, /<meta name="robots" content="noindex" \/>/);
-  assert.match(html, /<title>Page not found — ProspectoAI<\/title>/);
+  assert.match(html, /<title>Page not found — Methodos<\/title>/);
   assert.equal(html.match(/<h1\b/g)?.length, 1);
 });
 

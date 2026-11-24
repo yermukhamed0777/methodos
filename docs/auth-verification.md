@@ -75,7 +75,7 @@ change the signup path and does not make email delivery verifiable.
 
 1. Open `https://opportunity-explorer-ruddy.vercel.app/login` in a **private
    window** and choose “Create account”.
-2. Use an address you control that is **not** an existing ProspectoAI account,
+2. Use an address you control that is **not** an existing Methodos account,
    with a password of at least 10 characters.
 3. Confirm the page names a masked address (`a***a@example.com`) matching what
    you typed. A mismatch means a typo was caught before you waited.

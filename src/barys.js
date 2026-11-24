@@ -47,7 +47,7 @@ export function installBarys(w = window) {
   dialog.id = 'barys-dialog';
   dialog.className = 'barys-dialog';
   dialog.setAttribute('aria-labelledby', 'barys-title');
-  dialog.innerHTML = `<header class="barys-header"><img src="/assets/white-lion.svg" width="64" height="64" alt=""><div><span class="eyebrow">YOUR WHITE-LION GUIDE</span><h2 id="barys-title">Hi, I’m BARYS.</h2></div><button type="button" class="text-button" data-close-barys aria-label="Close BARYS">×</button></header><div class="barys-body"><p id="barys-greeting">${escape(greeting())} What would you like to move forward?</p><p>I can help you find your way around ProspectoAI. Choose a direction and we’ll take one small step.</p><div class="barys-actions">${[
+  dialog.innerHTML = `<header class="barys-header"><img src="/assets/white-lion.svg" width="64" height="64" alt=""><div><span class="eyebrow">YOUR WHITE-LION GUIDE</span><h2 id="barys-title">Hi, I’m BARYS.</h2></div><button type="button" class="text-button" data-close-barys aria-label="Close BARYS">×</button></header><div class="barys-body"><p id="barys-greeting">${escape(greeting())} What would you like to move forward?</p><p>I can help you find your way around Methodos. Choose a direction and we’ll take one small step.</p><div class="barys-actions">${[
     ['finder', 'Find an opportunity'],
     ['universities', 'Choose a university'],
     ['campus', 'Explore my current university'],

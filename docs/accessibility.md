@@ -1,6 +1,6 @@
 # Accessibility statement
 
-This is the working accessibility reference for the ProspectoAI web app. It
+This is the working accessibility reference for the Methodos web app. It
 describes what is implemented, how it is verified, and what is still missing.
 It is not a conformance claim.
 

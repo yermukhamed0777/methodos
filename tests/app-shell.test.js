@@ -74,6 +74,12 @@ test('tracker account restoration and delayed feeds survive replacement workspac
     assert.deepEqual([...w.ProspectoTracker.snapshot().saved], [id]);
     w.ProspectoTracker.setView('dashboard');
     assert.equal(rendered, 'dashboard');
+    let quickSearchOpened = false;
+    w.ProspectoWorkspace.focusOpportunitySearch = () => {
+      quickSearchOpened = true;
+    };
+    w.document.querySelector('#topbar-search').click();
+    assert.equal(quickSearchOpened, true);
     completeFeed({
       ok: true,
       json: async () => ({ items: [], sources: [] }),

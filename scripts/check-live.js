@@ -1,16 +1,35 @@
 #!/usr/bin/env node
-// Proves which build is actually live.
+// Checks public release markers. Deployment metadata establishes the exact SHA.
 //
 // Merging to `main` and passing CI says nothing about production: the live site
 // can lag by many commits. Every check below is read-only and credential-free:
-// five GETs against public assets plus one anonymous POST that must be rejected.
+// public GETs plus one anonymous POST that must be rejected.
 // It never signs in, never sends personal data and never writes to production.
-// It is deliberately NOT part of `npm run check`: production is known to be
-// stale, so a failing live probe must not block ordinary PRs.
+// It is deliberately NOT part of `npm run check`: production may lag PRs.
 
 const DEFAULT_BASE = 'https://opportunity-explorer-ruddy.vercel.app';
 
 export const CHECKS = [
+  {
+    name: 'Methodos homepage is served',
+    path: '/',
+    hint: 'HTTP 200 with the Methodos title and the new stylesheet link',
+    expect: (r) =>
+      r.status === 200 &&
+      /<title>Methodos\b/.test(r.body) &&
+      r.body.includes('href="/methodos-ui.css"'),
+    detail: 'Methodos release shell',
+  },
+  {
+    name: 'Methodos stylesheet is served',
+    path: '/methodos-ui.css',
+    hint: 'HTTP 200 CSS with the Methodos palette tokens',
+    expect: (r) =>
+      r.status === 200 &&
+      (r.headers?.['content-type'] || '').includes('text/css') &&
+      r.body.includes('--ui-yellow:'),
+    detail: 'Methodos redesign asset',
+  },
   {
     name: 'glass.css is served',
     path: '/glass.css',
@@ -129,7 +148,7 @@ async function main() {
     console.log('\nFailed checks:');
     for (const failure of summary.failures) console.log('  - ' + failure);
     console.log(
-      '\nThis deployment does not match the expected main. Deploy the exact tested commit, then re-run. This script is not part of npm run check.',
+      '\nRelease checks failed. Check the deployment source SHA and the failing routes, then re-run. This script is not part of npm run check.',
     );
     process.exit(1);
   }

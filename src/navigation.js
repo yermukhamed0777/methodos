@@ -95,7 +95,7 @@ export function installNavigation(w = window) {
       main?.focus({ preventScroll: true });
       if (view !== previous) {
         announce(view);
-        d.title = viewLabel(view) + ' — ProspectoAI';
+        d.title = viewLabel(view) + ' — Methodos';
       }
     }
   }

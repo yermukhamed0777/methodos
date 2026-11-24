@@ -82,7 +82,7 @@ test('anonymous chat requests get one consistent 401 before any payload work', a
     authenticate: async (_req, res) => {
       authCalls++;
       res.status(401).json({
-        error: 'Sign in to use ProspectoAI.',
+        error: 'Sign in to use Methodos.',
         code: 'login_required',
       });
       return null;

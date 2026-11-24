@@ -35,7 +35,7 @@ const HELP = [
     /password|reset|update/i,
     'Password help',
     [
-      'Use the email address of your ProspectoAI account.',
+      'Use the email address of your Methodos account.',
       'Open only the newest reset message.',
       'Choose at least 10 characters and sign in again.',
     ],
@@ -65,7 +65,7 @@ const HELP = [
 const DEFAULT = {
   title: 'Need help signing in?',
   steps: [
-    'Use the email and password of your ProspectoAI account.',
+    'Use the email and password of your Methodos account.',
     'New accounts need email confirmation before the first sign-in.',
     'Public discovery remains available without an account.',
   ],

@@ -49,7 +49,7 @@ test('navigating announces the new view and updates the document title', () => {
     assert.equal(region.getAttribute('aria-live'), 'polite');
     assert.equal(region.className, 'visually-hidden');
     assert.equal(region.textContent, 'Now viewing Courses');
-    assert.equal(w.document.title, 'Courses — ProspectoAI');
+    assert.equal(w.document.title, 'Courses — Methodos');
   } finally {
     w.close();
   }

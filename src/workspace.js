@@ -81,6 +81,7 @@ let state = {},
   selectedProvider = '',
   selectedFormat = '',
   coursePage = 1,
+  focusFinderQuery = false,
   selectedPlan = '',
   planFilter = 'All',
   orderUndo = null;
@@ -1129,6 +1130,7 @@ function opportunities() {
     country: o.location,
     format: o.formats?.join(' / '),
     funding: o.cost,
+    status: o.openVerified && o.applicationUrl ? 'Open' : o.status,
     verification: o.archived
       ? 'Past cycle'
       : o.deadlineConfirmed
@@ -1136,7 +1138,7 @@ function opportunities() {
         : 'Next deadline not confirmed',
     closed: o.archived,
     recordId: 'opportunity-' + o.id,
-    url: o.sources[0][1],
+    url: o.applicationUrl || o.sources[0][1],
     note: o.caution,
     educationLevels: [],
     fieldIds: D.majors
@@ -1318,7 +1320,7 @@ function privacy() {
       'Privacy & account controls.',
       'Review, export and delete your information. Only you can read your private workspace through the app.',
     ) +
-    `<section class="work-card"><h2>AI profile sharing</h2><form id="work-privacy" class="work-form"><label class="work-check"><input name="allow_profile_ai" type="checkbox" ${p.allow_profile_ai ? 'checked' : ''}>Allow saved preferences, skills, course progress, activities and plans in AI requests. Individually permitted profile records are included; other records, raw document text, files and signed URLs are excluded.</label><p>Your chat message and filters you type into the assistant are sent when you ask it a question. Chats are kept in this tab only. Your text may be processed under the AI provider’s terms; ProspectoAI does not use it to train a model. No document contents are sent to analytics.</p><h3>In-app reminders</h3><label class="work-check"><input name="in_app_reminders" type="checkbox" ${p.in_app_reminders ? 'checked' : ''}>Show dated tasks in my dashboard</label>${choose(
+    `<section class="work-card"><h2>AI profile sharing</h2><form id="work-privacy" class="work-form"><label class="work-check"><input name="allow_profile_ai" type="checkbox" ${p.allow_profile_ai ? 'checked' : ''}>Allow saved preferences, skills, course progress, activities and plans in AI requests. Individually permitted profile records are included; other records, raw document text, files and signed URLs are excluded.</label><p>Your chat message and filters you type into the assistant are sent when you ask it a question. Chats are kept in this tab only. Your text may be processed under the AI provider’s terms; Methodos does not use it to train a model. No document contents are sent to analytics.</p><h3>In-app reminders</h3><label class="work-check"><input name="in_app_reminders" type="checkbox" ${p.in_app_reminders ? 'checked' : ''}>Show dated tasks in my dashboard</label>${choose(
       'Reminder window',
       'reminder_days',
       [
@@ -1333,6 +1335,7 @@ function privacy() {
 }
 async function render(next) {
   view = next;
+  if (next !== 'finder') focusFinderQuery = false;
   const panel = document.querySelector('#platform-panel');
   if (
     !uid &&
@@ -1369,6 +1372,10 @@ async function render(next) {
     panel.innerHTML =
       `<p id="work-status" class="work-status" role="status"></p>` +
       renderers[next]();
+    if (next === 'finder' && focusFinderQuery) {
+      focusFinderQuery = false;
+      panel.querySelector('#work-search-q')?.focus();
+    }
     const calendarScroll = panel.querySelector('.learning-scroll');
     if (calendarScroll) {
       const selected = calendarScroll.querySelector('[aria-pressed="true"]');
@@ -1401,6 +1408,15 @@ window.ProspectoWorkspace = {
   modal,
   openOpportunitySearch: (query) => {
     search = { q: query.trim().slice(0, 150) };
+    window.ProspectoNavigation?.navigate('finder');
+  },
+  focusOpportunitySearch: () => {
+    const input = document.querySelector('#work-search-q');
+    if (document.body.dataset.currentView === 'finder' && input) {
+      input.focus();
+      return;
+    }
+    focusFinderQuery = true;
     window.ProspectoNavigation?.navigate('finder');
   },
   openTask: (title) =>
@@ -1646,7 +1662,7 @@ async function action(name, id, element) {
     const item = state.plan_items.find((x) => x.id === id);
     if (!item) return;
     const ics = buildCalendar({
-      prodId: '-//ProspectoAI//Personal plan//EN',
+      prodId: '-//Methodos//Personal plan//EN',
       events: [
         {
           uid: 'task-' + item.id,
@@ -1752,7 +1768,7 @@ async function action(name, id, element) {
     download(
       JSON.stringify(
         {
-          product: 'ProspectoAI',
+          product: 'Methodos',
           exportedAt: new Date().toISOString(),
           ...state,
           ...(learningActivity === null

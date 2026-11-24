@@ -17,7 +17,7 @@ import accountHandler from '../api/account.js';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(projectRoot, 'dist');
 export function ensureDevBuild(directory = projectRoot) {
-  console.log('Building current ProspectoAI sources…');
+  console.log('Building current Methodos sources…');
   for (const script of ['build-catalog.cjs', 'build-platform.js'])
     execFileSync(process.execPath, [resolve(directory, 'scripts', script)], {
       cwd: directory,
@@ -153,6 +153,6 @@ if (
   const port = Number(process.env.PORT || 4173);
   const server = createPreviewServer();
   server.listen(port, '127.0.0.1', () =>
-    console.log('ProspectoAI: http://127.0.0.1:' + server.address().port),
+    console.log('Methodos: http://127.0.0.1:' + server.address().port),
   );
 }

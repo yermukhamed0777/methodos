@@ -86,7 +86,7 @@ const link = (url, name) => {
 const sources = (r) =>
   `<div class="resource-links">${(r.sources || []).map(([label, url]) => link(url, label)).join('')}</div><p class="resource-note">Reviewed ${E(r.checkedOn)} · ${E(r.verification || 'Source-backed; conditions can change')}</p>`;
 const title = (name, text) =>
-  `<header class="platform-heading"><span class="eyebrow">PROSPECTOAI · CONNECT YOUR NEXT STEP</span><h1>${E(name)}</h1><p>${E(text)}</p></header>`;
+  `<header class="platform-heading"><span class="eyebrow">METHODOS · CONNECT YOUR NEXT STEP</span><h1>${E(name)}</h1><p>${E(text)}</p></header>`;
 const empty = (text) =>
   `<div class="work-empty"><img src="/assets/white-lion.svg" width="96" height="96" alt=""><p>${E(text)}</p></div>`;
 const actions = (r) =>
@@ -194,7 +194,7 @@ async function refresh() {
   await updateNoticeBadge();
 }
 function personCard(r) {
-  return `<article class="intel-case"><div class="intel-case-label">${tag(r.contentType || 'Public professional profile')}<h2>${E(r.name)}</h2><p>${E(r.role || 'Publicly documented work')}<br>${E(r.organization || '')}</p>${btn('compare', 'Compare my stage-appropriate evidence', r.id)}</div><div><h3>Verified public facts</h3><ul>${(r.facts || []).map((f) => `<li>${E(typeof f === 'string' ? f : f.text)} ${typeof f === 'object' && f.source ? link(f.source, 'Source') : ''}</li>`).join('')}</ul><p><strong>Education:</strong> ${E(r.education || 'Not established in the cited source; no qualification is inferred.')}</p><p><strong>Previous roles:</strong> ${E(r.previousRoles || 'Not established in this source summary.')}</p><details><summary>ProspectoAI analysis · interpretation, not verified causation</summary><p>${E(r.analysis)}</p><dl>${Object.entries(
+  return `<article class="intel-case"><div class="intel-case-label">${tag(r.contentType || 'Public professional profile')}<h2>${E(r.name)}</h2><p>${E(r.role || 'Publicly documented work')}<br>${E(r.organization || '')}</p>${btn('compare', 'Compare my stage-appropriate evidence', r.id)}</div><div><h3>Verified public facts</h3><ul>${(r.facts || []).map((f) => `<li>${E(typeof f === 'string' ? f : f.text)} ${typeof f === 'object' && f.source ? link(f.source, 'Source') : ''}</li>`).join('')}</ul><p><strong>Education:</strong> ${E(r.education || 'Not established in the cited source; no qualification is inferred.')}</p><p><strong>Previous roles:</strong> ${E(r.previousRoles || 'Not established in this source summary.')}</p><details><summary>Methodos analysis · interpretation, not verified causation</summary><p>${E(r.analysis)}</p><dl>${Object.entries(
     r.analysisDetails || {},
   )
     .map(([k, v]) => `<dt>${E(k)}</dt><dd>${E(v)}</dd>`)
@@ -1491,7 +1491,7 @@ if (toolbar) {
 }
 function command() {
   B.modal(
-    'Search ProspectoAI',
+    'Search Methodos',
     `<label>Find a workspace or researched record<input id="intel-command-input" type="search" autofocus maxlength="120"></label><div id="intel-command-results"></div><p>Ctrl / ⌘ K: search · Escape: close · ?: shortcut help. Use Tab and Enter to choose results.</p>${undo ? btn('undo', 'Undo last reversible change') : ''}`,
     '',
     null,

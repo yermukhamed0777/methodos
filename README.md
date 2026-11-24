@@ -1,6 +1,6 @@
-# ProspectoAI
+# Methodos
 
-ProspectoAI connects opportunity discovery, career skills, public professional pathways, university research and private development planning. The current release is version 5. See [release evidence and limits](docs/release-status.md) and [authentication/domain configuration](docs/auth-routing-and-domains.md).
+Methodos connects opportunity discovery, career skills, public professional pathways, university research and private development planning. The current release is version 5. See [release evidence and limits](docs/release-status.md) and [authentication/domain configuration](docs/auth-routing-and-domains.md).
 
 The expansion adds a white-lion assistant identity, grounded source retrieval, 281 official learning resources, 100 editorial projects, research ideas, evidence comparisons, private admissions folders, notifications, and administrator review/history. Content examples are labelled and uncertain external records remain staged.
 
@@ -8,26 +8,16 @@ A place to explore education and career possibilities, build useful skills and k
 
 [Open the website](https://opportunity-explorer-ruddy.vercel.app/)
 
-![ProspectoAI university discovery preview](docs/preview.png)
+![Methodos university discovery preview](docs/preview.png)
 
 ## Explore
 
 - Research programmes, scholarships, hackathons and olympiads, with filters, comparisons and deadline reminders.
 - **Search for Universities**: laboratories, undergraduate research, prototyping and distinctive degree partnerships. No score thresholds or admission predictions.
-- GitHub integration test 1: README edit (2026-11-19)
-- GitHub integration test 2: CSS improvements
-- GitHub integration test 3: Security audit
-- GitHub integration test 4: Modern UI elements
-- GitHub integration test 5: Responsive design
-- GitHub integration test 6: Performance optimization
-- GitHub integration test 7: Accessibility updates
-- GitHub integration test 8: Dark mode implementation
-- GitHub integration test 9: Animation system
-- GitHub integration test 10: Visual hierarchy
 - **Skills for Your Major or Career**: 33 field maps with evidence-based progress, tools, projects and official course links.
 - **Internships and Jobs**: official career sources and individual postings. A source directory is clearly distinguished from a vacancy; missing deadlines are not guessed.
 - A private account workspace with a saved application tracker, profile and private activities. Activities support notes, dates, categories, priority, progress, filtering and sorting.
-- Public catalog search, with a source-grounded assistant and private development plans available after confirmed sign-in.
+- Public catalog search and BARYS, the built-in navigation guide. ProspectoAI is the separate source-grounded AI assistant available after confirmed sign-in.
 
 The initial expanded collection contains 33 programme records, 12 university profiles, 33 field maps, 28 courses, 10 illustrative career pathways and 9 career sources/postings. Some records are directories or closed-cycle preparation watchlists. Each retains its source and review date. Prices, openings, facilities access and programme conditions can change.
 
@@ -63,7 +53,7 @@ Set deployment environment variables in Vercel and local values in `.env.local`.
 | `dist/index.html`, `dist/app.js`, `dist/styles.css` | Existing explorer and tracker                                        |
 | `src/platform.js`, `dist/platform.css`              | Accounts, skills, universities, careers, activities and assistant UI |
 | `data/opportunities.json`, `data/resources.json`    | Researched source catalogs                                           |
-| `dist/assets/`                                      | ProspectoAI SVG mark and dark/light wordmarks                        |
+| `dist/assets/`                                      | Methodos SVG mark and dark/light wordmarks                           |
 | `api/`                                              | Configuration, chat, feeds, review report and scheduled refresh      |
 | `lib/`                                              | Retrieval, source auditing, feed parsing, storage and caching        |
 | `supabase/migrations/`                              | Reproducible schema and ownership policies                           |

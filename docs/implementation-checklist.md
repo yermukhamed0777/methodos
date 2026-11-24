@@ -48,7 +48,7 @@ Baseline: GitHub main `d3ad28053becf1f0138c60ef2c8ed67e8dad1eea`, deployed Produ
 - [x] Save migrations and apply to the connected project; verify advisors and grants.
 - [ ] Save reviewed source to GitHub, pass CI, deploy exact source commit and smoke-test Production.
 - [ ] Check safe clean Vercel alias; preserve working original URL.
-- [x] Prepare www.prospectoai.com DNS instructions; do not purchase or attach an unowned domain.
+- [x] Prepare www.methodos.com DNS instructions; do not purchase or attach an unowned domain.
 - [ ] Report exact implementation counts, evidence, deployment identifiers and genuine owner actions.
 
 Live owner inbox, password change, real signed-in AI and Storage network checks remain pending. Automated DOM tests use an in-memory adapter and are not a substitute for those checks. Account deletion requires a server-only owner key.
