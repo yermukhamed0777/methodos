@@ -13,7 +13,13 @@ export function createCoachHandler({
     res.setHeader('Cache-Control', 'no-store');
     if (req.method !== 'POST')
       return res.status(405).json({ error: 'Method not allowed' });
-    let body, requestId;
+    // Authenticate before inspecting the payload so signed-out callers never
+    // learn whether their JSON or field values were valid.
+    const auth = await authenticate(req, res);
+    if (!auth) return;
+    const requestId = randomUUID();
+    res.setHeader('X-Prospecto-Request-Id', requestId);
+    let body;
     try {
       body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     } catch {
@@ -21,10 +27,6 @@ export function createCoachHandler({
     }
     const parsed = validateCoachInput(body);
     if (parsed.error) return res.status(400).json({ error: parsed.error });
-    const auth = await authenticate(req, res);
-    if (!auth) return;
-    requestId = randomUUID();
-    res.setHeader('X-Prospecto-Request-Id', requestId);
     const { target, notes, recordId, section } = parsed.value;
     try {
       const { data: rows, error: catalogError } = await auth.db

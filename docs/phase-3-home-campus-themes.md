@@ -1,7 +1,7 @@
 # Phase 3: verified theme and loading-screen scope
 
 Verification date: 16 November 2026. The theme foundation was merged in
-[PR #13](https://github.com/yermukhamed0777/opportunity-explorer/pull/13) at
+[PR #13](https://github.com/yermukhamed0777/methodos/pull/13) at
 `32b68bf0ade825086243b96000a66618056b3e37`. The subsequent discovery release is on
 `codex/phase-3-home-campus-barys`; publication and deployment evidence belong in
 its PR and release handoff.
