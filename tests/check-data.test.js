@@ -180,14 +180,11 @@ test('ids shared between the two opportunity files are rejected', () => {
 test('the shipped data files pass with no errors', () => {
   const read = (path) =>
     JSON.parse(readFileSync(new URL('../' + path, import.meta.url), 'utf8'));
-  const problems = validateData(
-    {
-      catalog: read('data/opportunities.json'),
-      resources: read('data/resources.json'),
-      development: read('data/development.json'),
-    },
-    { today: TODAY },
-  );
+  const problems = validateData({
+    catalog: read('data/opportunities.json'),
+    resources: read('data/resources.json'),
+    development: read('data/development.json'),
+  });
   assert.deepEqual(
     problems.filter((p) => p.severity === 'error'),
     [],

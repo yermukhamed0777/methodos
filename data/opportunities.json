@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-06T13:11:10Z",
+  "updatedAt": "2026-11-24T13:40:00Z",
   "refresh": {
     "enabled": true,
-    "cadence": "weekly",
+    "cadence": "daily",
     "timezone": "Asia/Shanghai",
-    "description": "Monday mornings, Hong Kong time",
+    "description": "Each morning, Hong Kong time",
     "engine": "Vercel scheduled source feeds",
     "mode": "independent-source-discovery",
     "telegramChannels": [
@@ -193,10 +193,10 @@
       "aid": true,
       "cost": "Paid · request current quote",
       "costNote": "Tuition varies by track; a current fee was not verified. Separate need-based support exists through the Lumiere Foundation.",
-      "deadlineStart": "2026-11-22",
-      "deadlineEnd": "2026-11-22",
-      "deadline": "22 Nov 2026",
-      "deadlineDetail": "Regular winter deadline: 22 November. Priority deadline: 8 November. Organizer does not specify a cut-off time or timezone on the cohort table.",
+      "deadlineStart": "2026-11-29",
+      "deadlineEnd": "2026-11-29",
+      "deadline": "29 Nov 2026",
+      "deadlineDetail": "Regular winter deadline: 29 November. Priority deadline: 8 November. Organizer does not specify a cut-off time or timezone on the cohort table.",
       "dateStatus": "Confirmed deadline",
       "status": "confirmed",
       "schedule": "Winter cohort begins 7 Dec 2026; core Individual track lasts 12 weeks.",
@@ -212,6 +212,10 @@
           "https://www.lumiere-education.com/lumiere-programs"
         ],
         [
+          "Official application form",
+          "https://www.lumiere-education.com/students-application-form"
+        ],
+        [
           "Worldwide student eligibility",
           "https://www.lumiere-education.com/faqs"
         ],
@@ -221,9 +225,11 @@
         ]
       ],
       "deadlineConfirmed": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-24",
       "addedOn": "2026-11-06",
-      "finalDeadline": "2026-11-22",
+      "finalDeadline": "2026-11-29",
+      "applicationUrl": "https://www.lumiere-education.com/students-application-form",
+      "openVerified": true,
       "archived": false
     },
     {
@@ -589,7 +595,7 @@
       "deadlineStart": "2026-11-20",
       "deadlineEnd": "2026-11-20",
       "deadline": "20 Nov 2026",
-      "deadlineDetail": "School registration closes 12:00 noon Hong Kong (UTC+8). Preliminary application and work are due 18 Dec 2026 at noon.",
+      "deadlineDetail": "School registration closed at noon Hong Kong time (UTC+8) on 20 November. The 18 December noon deadline is for preliminary applications and submissions from registered teams.",
       "dateStatus": "Final date inconsistent",
       "status": "caution",
       "schedule": "Preliminary submission: 18 Dec 2026; finalists announced 15 Jan 2027. Final date requires correction by organizer.",
@@ -598,7 +604,7 @@
       "effort": "Research preparation across several months",
       "team": "2–5 students + Teacher Coordinator",
       "caution": "The organizer’s final-round table says 21 Feb 2026 within the 2027 cycle. No corrected final date is assumed here. University students are outside the stated eligibility.",
-      "next": "Ask your secondary school coordinator about nomination before 20 November.",
+      "next": "If your team is already registered, check preliminary submission instructions with your Teacher Coordinator. Otherwise, watch the organizer for a future cycle.",
       "sources": [
         [
           "2027 eligibility, registration & date table",
@@ -606,10 +612,10 @@
         ]
       ],
       "deadlineConfirmed": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-24",
       "addedOn": "2026-11-06",
       "finalDeadline": "2026-11-20",
-      "archived": false
+      "archived": true
     },
     {
       "type": "Scholarship",

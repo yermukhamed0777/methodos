@@ -17,7 +17,7 @@
         typeof value.progress !== 'object' ||
         Array.isArray(value.progress)
       )
-        throw new Error('Choose an ProspectoAI backup file.');
+        throw new Error('Choose an Methodos backup file.');
       const known = new Set(allowed),
         saved = [
           ...new Set(
@@ -97,7 +97,7 @@
         [
           'BEGIN:VCALENDAR',
           'VERSION:2.0',
-          'PRODID:-//ProspectoAI//Deadline reminder//EN',
+          'PRODID:-//Methodos//Deadline reminder//EN',
           'CALSCALE:GREGORIAN',
           'BEGIN:VEVENT',
           'UID:' + o.id + '-' + o.deadlineStart + '@prospectoai',
@@ -330,7 +330,7 @@
       $('#access').add(new Option(v, v));
   });
   $('#collection-date').textContent =
-    'Curated collection reviewed ' + dateLabel(window.CHECKED_ON);
+    'Curated collection updated ' + dateLabel(window.CHECKED_ON);
   const spotlight = Core.sort(
     data.filter(
       (o) =>
@@ -1074,6 +1074,15 @@
     $('#search').value = '';
     render();
     $('#search').focus();
+  });
+  $('#topbar-search')?.addEventListener('click', () => {
+    if (window.ProspectoWorkspace?.focusOpportunitySearch) {
+      window.ProspectoWorkspace.focusOpportunitySearch();
+      return;
+    }
+    if (window.ProspectoNavigation?.current() !== 'finder')
+      window.ProspectoNavigation?.navigate('finder');
+    $('#search')?.focus();
   });
   $('#active-filters').addEventListener('click', (event) => {
     const chip = event.target.closest('[data-clear-chip]');

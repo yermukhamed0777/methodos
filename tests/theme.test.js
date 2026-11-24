@@ -68,7 +68,7 @@ test('theme applies a stored preference immediately, before controls are ready',
   fixture(
     ({ w, resolved }) => {
       assert.equal(resolved(), 'dark');
-      assert.equal(w.document.querySelector('meta').content, '#0b1018');
+      assert.equal(w.document.querySelector('meta').content, '#0b0b0a');
     },
     { stored: 'dark' },
   ));

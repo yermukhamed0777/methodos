@@ -71,6 +71,7 @@ for (const file of [
   'dist/index.html',
   'dist/app.js',
   'dist/styles.css',
+  'dist/methodos-ui.css',
   'dist/auth.html',
   'dist/bootstrap.js',
   'dist/auth-page.js',

@@ -51,7 +51,7 @@ const AUTH = [
     'Reset your password',
     [
       'Open the secure password reset page.',
-      'Enter the email address you used for ProspectoAI.',
+      'Enter the email address you used for Methodos.',
       'Open the newest message and choose a new password of at least 10 characters.',
     ],
   ],
@@ -70,7 +70,7 @@ const AUTH = [
     /authoriz|sign[ -]?in|log[ -]?in|login|create (an )?account|register|access my account|private workspace/i,
     'Sign in or create an account',
     [
-      'Use the secure sign-in page for your ProspectoAI account.',
+      'Use the secure sign-in page for your Methodos account.',
       'Confirm your email first if this is a new account.',
       'After sign-in you return to the view you asked for; saved work stays private.',
     ],

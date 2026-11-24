@@ -174,6 +174,7 @@ function render(view) {
     };
     panel.innerHTML =
       heading(...headings[view]) +
+      '<div class="view-actions" role="group" aria-label="Quick actions"><button type="button" class="secondary" data-view="finder">Explore opportunities</button><button type="button" class="assistant-button" data-view="assistant">Ask ProspectoAI</button></div>' +
       (view === 'skills'
         ? '<div class="platform-notice">Course links were checked on 11 November 2026. Course and certificate prices vary. Check university or library access for LinkedIn Learning; no free certificate is promised.</div>'
         : '') +
@@ -202,7 +203,7 @@ function setView(v) {
 function accountUi(message = '') {
   const panel = $('#account-content');
   panel.innerHTML = user
-    ? `<h2 id="account-title">Your private workspace</h2><p>Signed in as <strong>${E(user.email)}</strong>.</p><p>Tracker and activities sync to your account. Guest notes stay separate until you import them. Chat text is sent to the model provider only when you use AI planning; it is not saved as chat history by ProspectoAI.</p><form id="profile-form"><h3>Your direction</h3><label>Name<input name="display_name" maxlength="80" value="${E(profile.display_name || '')}"></label><label>Education level<input name="education_level" maxlength="80" value="${E(profile.education_level || '')}"></label><label>Major / career<input name="major" maxlength="120" value="${E(profile.major || '')}"></label><label>Goals<textarea name="career_goal" maxlength="500">${E(profile.career_goal || '')}</textarea></label><label>Existing skills<textarea name="skills" maxlength="1000">${E(profile.skills || '')}</textarea></label><label>Preferred location<input name="preferred_location" maxlength="120" value="${E(profile.preferred_location || '')}"></label><label>Hours per week<input name="hours_per_week" type="number" min="1" max="80" value="${E(profile.hours_per_week || '')}"></label><label>Budget<input name="budget" maxlength="120" value="${E(profile.budget || '')}"></label><label>Work / study preference<select name="arrangement">${options(['Remote', 'Hybrid', 'On-site', 'Flexible'], profile.arrangement || '', 'Not specified')}</select></label><button class="secondary">Save profile</button></form><button id="import-guest" class="secondary">Import this browser’s guest tracker</button><button id="sign-out" class="primary">Sign out</button><p id="account-status" role="status">${E(message)}</p>`
+    ? `<h2 id="account-title">Your private workspace</h2><p>Signed in as <strong>${E(user.email)}</strong>.</p><p>Tracker and activities sync to your account. Guest notes stay separate until you import them. Chat text is sent to the model provider only when you use AI planning; it is not saved as chat history by Methodos.</p><form id="profile-form"><h3>Your direction</h3><label>Name<input name="display_name" maxlength="80" value="${E(profile.display_name || '')}"></label><label>Education level<input name="education_level" maxlength="80" value="${E(profile.education_level || '')}"></label><label>Major / career<input name="major" maxlength="120" value="${E(profile.major || '')}"></label><label>Goals<textarea name="career_goal" maxlength="500">${E(profile.career_goal || '')}</textarea></label><label>Existing skills<textarea name="skills" maxlength="1000">${E(profile.skills || '')}</textarea></label><label>Preferred location<input name="preferred_location" maxlength="120" value="${E(profile.preferred_location || '')}"></label><label>Hours per week<input name="hours_per_week" type="number" min="1" max="80" value="${E(profile.hours_per_week || '')}"></label><label>Budget<input name="budget" maxlength="120" value="${E(profile.budget || '')}"></label><label>Work / study preference<select name="arrangement">${options(['Remote', 'Hybrid', 'On-site', 'Flexible'], profile.arrangement || '', 'Not specified')}</select></label><button class="secondary">Save profile</button></form><button id="import-guest" class="secondary">Import this browser’s guest tracker</button><button id="sign-out" class="primary">Sign out</button><p id="account-status" role="status">${E(message)}</p>`
     : '<p>Redirecting to sign in…</p>';
 }
 $('#account-button').addEventListener('click', () => {
@@ -496,7 +497,7 @@ function renderMessages() {
       const routes = document.createElement('div');
       routes.className = 'chat-routes';
       const label = document.createElement('span');
-      label.textContent = 'Open in ProspectoAI:';
+      label.textContent = 'Open in Methodos:';
       routes.append(label);
       for (const route of m.routes) {
         const button = document.createElement('button');

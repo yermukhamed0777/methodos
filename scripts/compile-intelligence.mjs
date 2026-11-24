@@ -76,9 +76,13 @@ for (const o of old.opportunities)
     kind: o.type === 'Scholarship' ? 'scholarship' : 'opportunity',
     organization: o.org,
     url: o.sources[0][1],
-    applicationUrl: o.sources[0][1],
-    status: o.archived ? 'Previous cycle' : 'Deadline not announced',
-    openVerified: false,
+    applicationUrl: o.applicationUrl || o.sources[0][1],
+    status: o.archived
+      ? 'Previous cycle'
+      : o.openVerified && o.applicationUrl
+        ? 'Open'
+        : 'Deadline not announced',
+    openVerified: !o.archived && !!(o.openVerified && o.applicationUrl),
     deadlineVerified: !!o.deadlineConfirmed,
     summary: o.description,
     fieldIds: D.majors

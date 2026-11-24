@@ -4,7 +4,7 @@
 
 The current canonical origin is `https://opportunity-explorer-ruddy.vercel.app/`.
 
-In Supabase project **ProspectoAI**, open **Authentication → URL Configuration**. Keep Site URL set to that origin until a custom domain is owned, attached to Vercel and serving valid HTTPS. Production redirects are exact:
+In Supabase project **Methodos**, open **Authentication → URL Configuration**. Keep Site URL set to that origin until a custom domain is owned, attached to Vercel and serving valid HTTPS. Production redirects are exact:
 
 ```text
 https://opportunity-explorer-ruddy.vercel.app/
@@ -19,13 +19,13 @@ Legacy recovery and previously allowed preview URLs are retained for links alrea
 
 The password reset request uses the request origin plus `/reset-password`; confirmation uses `/auth/callback`. Dedicated routes manually consume implicit tokens or exchange a PKCE code before clearing URL credentials. The app is vanilla JavaScript with Node functions, not Next.js: Next.js middleware/SSR helpers would not apply. Bootstrap permits a reviewed public catalog preview without sign-in and validates the user before loading private workspace data or published database revisions. Personal actions show a sign-in prompt with a safe return path. Every private API separately validates the bearer session. Supabase RLS protects direct client queries and Storage.
 
-## Preferred custom domain: www.prospectoai.com
+## Preferred custom domain: www.methodos.com
 
 Ownership is not confirmed. No domain has been purchased or attached. A read-only Vercel lookup on 11 November 2026 found external GoDaddy nameservers and non-Vercel website addresses; this does not establish who owns the domain.
 
 After ownership is established:
 
-1. Open **Vercel → opportunity-explorer → Settings → Domains**. Add `www.prospectoai.com` to Production. Add `prospectoai.com` with a **308 redirect to www.prospectoai.com**.
+1. Open **Vercel → methodos → Settings → Domains**. Add `www.methodos.com` to Production. Add `methodos.com` with a **308 redirect to www.methodos.com**.
 2. At the authoritative DNS provider, replace conflicting website records with the project-specific recommendations below. Recheck Vercel after attachment in case its assigned targets change.
 
 | Type  | Host | Value                               | TTL                |
@@ -36,13 +36,13 @@ After ownership is established:
 
 3. Preserve MX and email-related TXT records. Remove only conflicting website A/AAAA/CNAME entries. Copy any ownership TXT challenge directly from Vercel; no challenge value is assumed.
 4. Wait for Vercel to show valid configuration and an HTTPS certificate. Test both hosts and the apex-to-www redirect.
-5. Set Supabase Site URL to `https://www.prospectoai.com/`. Add the following exact redirects:
+5. Set Supabase Site URL to `https://www.methodos.com/`. Add the following exact redirects:
 
 ```text
-https://www.prospectoai.com/
-https://www.prospectoai.com/auth/callback
-https://www.prospectoai.com/reset-password
-https://www.prospectoai.com/auth/update-password
+https://www.methodos.com/
+https://www.methodos.com/auth/callback
+https://www.methodos.com/reset-password
+https://www.methodos.com/auth/update-password
 ```
 
 6. Retain old production redirects during migration. Test signup, confirmation, login and recovery entirely on www. Only then redirect the old public origin while preserving path/query. There is no app API CORS allowlist to update: APIs are same-origin and never emit permissive CORS headers. Supabase Auth's redirect allowlist is distinct from CORS.

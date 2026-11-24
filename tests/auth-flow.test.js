@@ -9,7 +9,7 @@ import {
 import { requireUser, publicAuthConfig } from '../lib/auth.js';
 import { createPreviewServer } from '../scripts/dev-server.js';
 import { once } from 'node:events';
-const origin = 'https://opportunity-explorer-ruddy.vercel.app';
+const origin = 'https://methodos-ruddy.vercel.app';
 const response = () => ({
   statusCode: 200,
   setHeader() {},

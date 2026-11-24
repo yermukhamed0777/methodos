@@ -42,7 +42,7 @@ function show(form, title, intro) {
     .querySelectorAll('.auth-card form')
     .forEach((el) => (el.hidden = el.id !== form));
   $('#auth-title').textContent = title;
-  document.title = title + ' — ProspectoAI';
+  document.title = title + ' — Methodos';
   $('#auth-intro').textContent = intro;
 }
 async function verified() {
@@ -91,7 +91,7 @@ async function initialize() {
           status(
             hasCallback
               ? 'This link could not be verified. Request a fresh link.'
-              : 'Enter the email used for your ProspectoAI account.',
+              : 'Enter the email used for your Methodos account.',
           );
         }
         return;
@@ -122,7 +122,7 @@ async function initialize() {
   show(
     'login-form',
     'Sign in to explore.',
-    'Use your ProspectoAI email and password.',
+    'Use your Methodos email and password.',
   );
   status(
     url.searchParams.get('updated') === '1'

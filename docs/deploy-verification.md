@@ -1,11 +1,19 @@
-# Deployment handoff · 19 November 2026
+# Deployment handoff
+
+## 24 November 2026 · Methodos release candidate
+
+- Keep the existing Vercel project and working `https://opportunity-explorer-ruddy.vercel.app/` origin. The proposed `methodos-ruddy.vercel.app` alias returns `DEPLOYMENT_NOT_FOUND`; do not use it for auth or traffic.
+- GitHub's actual repository is `yermukhamed0777/opportunity-explorer`; `main` was `9722262` before the release candidate. The working production URL passes six legacy probes but lacks both Methodos release markers. The updated checker reports **6/8** before the release. Probes do not establish the source SHA.
+- Merge the reviewed candidate only after CI. In the existing Vercel project, verify the connected repository and `main` branch, deploy the exact green merge SHA if automation has not done so, and record the deployment ID, source SHA, alias and READY status. Then require `npm run check:live` **8/8** and exercise the public and owner journeys in [the pilot checklist](student-pilot.md).
+
+The 19 November notes below are historical. Do not deploy their old SHA or use their six-probe threshold for the Methodos release.
 
 ## Final source and deployment state (19 November 2026)
 
 - **Final tested `main`:** `dde9f074dbd62f8ce71fa458f8c6c6928e21215e` (merge of PR #34), clean checkout, no open PRs. GitHub Actions `check` **success** on `dde9f07`. `npm run check` → **206/206**, `npm run format:check` clean, `git diff --check` clean.
 - **Production:** the owner independently checked on 19 November that the alias `opportunity-explorer-ruddy.vercel.app` still resolves to deployment `dpl_2vNHzHmPHmANQmrFg5oAea4Z1h8w` at source `5c0e185`. I could not inspect Vercel directly to confirm that ID or its READY state. `npm run check:live` again reported **3/6** on this pass: `/glass.css` and `/404.html` are 404 and `/bootstrap.js` lacks the BARYS marker.
 - **Automatic deployment status: UNKNOWN.** No Vercel connector is installed, the catalog has no Vercel connector, and there is no Vercel CLI, `~/.vercel` auth, `VERCEL_*` variable, `.vercel/` project link, Actions secret or deploy hook. GitHub shows no deployment records, which establishes only that GitHub CI did not deploy these commits. Whether the Vercel project's Git integration is connected, paused, filtered or pointed elsewhere remains a hypothesis that only project settings can confirm.
-- **Smallest owner action:** in the **existing** `opportunity-explorer` Vercel project, confirm Settings → Git (repository, Production Branch, Ignored Build Step), then deploy `dde9f07` through that project or connect the repository and redeploy `main`. Do not create a new project or change environment variables/database. Record the deployment ID, source SHA, alias and READY state, then require `npm run check:live` **6/6** and source SHA equality with `git rev-parse origin/main`.
+- **Smallest owner action:** in the **existing** `methodos` Vercel project, confirm Settings → Git (repository, Production Branch, Ignored Build Step), then deploy `dde9f07` through that project or connect the repository and redeploy `main`. Do not create a new project or change environment variables/database. Record the deployment ID, source SHA, alias and READY state, then require `npm run check:live` **6/6** and source SHA equality with `git rev-parse origin/main`.
 
 ## Tested commit and earlier state
 
@@ -74,7 +82,7 @@ Deploy. Later merges then deploy automatically and write a GitHub commit status.
 git pull --ff-only
 git rev-parse HEAD     # deployment source SHA, must equal origin/main
 npm ci --ignore-scripts
-npx vercel link        # choose the EXISTING opportunity-explorer project
+npx vercel link        # choose the EXISTING methodos project
 npx vercel --prod
 ```
 

@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#f5f7fb" />
-    <title>ProspectoAI — Your Development Workspace</title>
+    <meta name="theme-color" content="#fffdf4" />
+    <title>Methodos — Your Development Workspace</title>
     <meta
       name="description"
       content="Find and compare scholarships, research programs, hackathons and olympiads. Clear eligibility, funding, deadlines and automatically collected source updates."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="ProspectoAI — Your next opportunity" />
+    <meta property="og:title" content="Methodos — Your next opportunity" />
     <meta
       property="og:description"
       content="Scholarships, research and competitions with clear requirements, source links and fresh announcements."
@@ -18,7 +18,7 @@
     <meta name="twitter:card" content="summary" />
     <link rel="icon" type="image/svg+xml" href="/assets/mark.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta property="og:site_name" content="ProspectoAI" />
+    <meta property="og:site_name" content="Methodos" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/platform.css" />
     <link rel="stylesheet" href="/workspace.css" />
@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="/loading.css" />
     <link rel="stylesheet" href="/discovery.css" />
     <link rel="stylesheet" href="/glass.css" />
+    <link rel="stylesheet" href="/methodos-ui.css" />
     <script src="/theme.js"></script>
     <script src="/bootstrap.js" defer=""></script>
   </head>
@@ -46,7 +47,7 @@
     </div>
     <noscript
       ><p>
-        JavaScript is needed. <a href="/login">Sign in to ProspectoAI</a>.
+        JavaScript is needed. <a href="/login">Sign in to Methodos</a>.
       </p></noscript
     >
     <button
@@ -60,31 +61,30 @@
       <button id="nav-close" class="nav-close" aria-label="Close navigation">
         ×
       </button>
-      <a
-        href="#home"
-        data-view="home"
-        class="brand"
-        aria-label="ProspectoAI home"
+      <a href="#home" data-view="home" class="brand" aria-label="Methodos home"
         ><img
           src="/assets/logo-light.svg"
           width="206"
           height="42"
-          alt="ProspectoAI"
+          alt="Methodos"
       /></a>
-      <div class="workspace-label">FIND YOUR NEXT STEP</div>
+      <div class="workspace-label">YOUR PATH, MADE CLEAR</div>
       <button data-view="home" data-home-link class="nav-item">
         ⌂ <span>Start here</span>
       </button>
       <nav class="main-nav" aria-label="Primary navigation">
+        <p class="nav-group-label">Discover</p>
         <button data-view="finder" data-hub="explore" class="nav-item active">
           <i data-icon="compass"></i><span>Explore</span>
         </button>
+        <p class="nav-group-label">Build</p>
         <button data-view="courses" data-hub="learn" class="nav-item">
           <i data-icon="spark"></i><span>Courses &amp; Skills</span>
         </button>
         <button data-view="professionals" data-hub="career" class="nav-item">
           <i data-icon="people"></i><span>Career Pathways</span>
         </button>
+        <p class="nav-group-label">Your space</p>
         <button data-view="dashboard" data-hub="workspace" class="nav-item">
           <i data-icon="bookmark"></i><span>My Workspace</span>
         </button>
@@ -98,6 +98,9 @@
         </p>
       </div>
       <div class="sidebar-bottom">
+        <button class="nav-item" data-view="assistant">
+          <i data-icon="spark"></i>Ask ProspectoAI
+        </button>
         <button class="nav-item" id="guide-btn">
           <i data-icon="info"></i>How this works
         </button>
@@ -122,9 +125,22 @@
           ☰ Menu
         </button>
         <div class="breadcrumb">
-          ProspectoAI <span>/</span
-          ><strong id="breadcrumb-title">Explore</strong>
+          Methodos <span>/</span><strong id="breadcrumb-title">Explore</strong>
         </div>
+        <button
+          id="topbar-search"
+          class="topbar-action optional-action"
+          type="button"
+        >
+          ⌕ Quick search
+        </button>
+        <button
+          data-view="assistant"
+          class="topbar-action assistant-action optional-action"
+          type="button"
+        >
+          ✦ Ask ProspectoAI
+        </button>
         <div class="account-wrap">
           <button
             id="account-button"
@@ -188,7 +204,7 @@
                 High school → Universities</button
               ><button data-view="skills">University → Build skills</button
               ><button data-view="careers">Early career → Jobs</button
-              ><button data-view="assistant">Create a plan →</button>
+              ><button data-view="assistant">Ask ProspectoAI →</button>
             </div>
             <div class="hero-stats">
               <span
@@ -214,7 +230,7 @@
           <div>
             <i data-icon="check"></i
             ><span id="collection-date"
-              >Curated collection reviewed 6 Nov 2026</span
+              >Curated collection · review dates on each listing</span
             >
           </div>
           <button data-view="latest">
@@ -521,8 +537,8 @@
       <p>
         The Latest updates page collects public announcements from StudyQA, No
         Borders Abroad, Scholars4Dev and Opportunity Desk. These sources are
-        checked automatically on Monday mornings in Hong Kong time. The updater
-        runs independently on the hosting service.
+        checked automatically each morning in Hong Kong time. The updater runs
+        independently on the hosting service.
       </p>
       <p>
         Incoming posts are discovery leads. Their eligibility, funding and
@@ -541,12 +557,11 @@
       <p>
         Known final deadlines hide closed opportunities from the main list. You
         can still see them through the filter and in your shortlist. Your
-        tracker, stages and notes are stored only in this browser. Export a
-        backup before clearing browser data, and restore it to move your tracker
-        to another device. Share links and calendar files exclude your notes.
-        Calendar exports are all-day date reminders, not exact cut-offs or
-        guaranteed alerts. This website does not submit applications or send
-        messages on your behalf.
+        tracker, stages and notes sync to your private account when signed in.
+        Older guest data stays in this browser unless you choose to import it.
+        Share links and calendar files exclude your notes. Calendar exports are
+        all-day date reminders, not exact cut-offs or guaranteed alerts. This
+        website does not submit applications or send messages on your behalf.
       </p>
     </dialog>
     <dialog id="account-dialog" aria-labelledby="account-title">

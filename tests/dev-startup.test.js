@@ -65,9 +65,7 @@ test(
         });
         child.stdout.on('data', (chunk) => {
           output = (output + chunk).slice(-6000);
-          const match = output.match(
-            /ProspectoAI: (http:\/\/127\.0\.0\.1:\d+)/,
-          );
+          const match = output.match(/Methodos: (http:\/\/127\.0\.0\.1:\d+)/);
           if (match) {
             clearTimeout(timer);
             resolveReady(match[1]);

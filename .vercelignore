@@ -3,5 +3,7 @@
 tests
 node_modules
 coverage
+.workbuddy-ai
+inspect-output.mjs
 *.zip
 *.tar.gz

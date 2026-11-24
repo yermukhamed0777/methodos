@@ -1,6 +1,8 @@
-# ProspectoAI 5 release verification
+# Methodos 5 release verification
 
-The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit. No rollback to Opportunity Explorer is part of this release.
+The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit.
+
+For the 24 November Methodos release candidate and current production checks, see the [deployment handoff](deploy-verification.md). The dated reports below describe earlier builds.
 
 ## Final handoff · 19 November 2026
 

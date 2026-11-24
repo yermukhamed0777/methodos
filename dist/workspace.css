@@ -398,19 +398,19 @@ summary:focus-visible {
   flex-wrap: wrap;
 }
 .learning-calendar {
-  --learning-none: #dbe3ef;
-  --learning-low: #b3a1f4;
-  --learning-mid: #8a6bdc;
-  --learning-high: #6946bd;
-  --learning-peak: #46258d;
+  --learning-none: #f4f1e4;
+  --learning-low: #ffe9a8;
+  --learning-mid: #ffd23f;
+  --learning-high: #7fcb9a;
+  --learning-peak: #16794b;
   min-width: 0;
 }
 [data-theme='dark'] .learning-calendar {
-  --learning-none: #303b50;
-  --learning-low: #5c4996;
-  --learning-mid: #8065cb;
-  --learning-high: #a687ed;
-  --learning-peak: #d2bfff;
+  --learning-none: #23261f;
+  --learning-low: #5a4a10;
+  --learning-mid: #ffd23f;
+  --learning-high: #4ade80;
+  --learning-peak: #88f0b8;
 }
 .learning-actions {
   margin-block: 16px;
