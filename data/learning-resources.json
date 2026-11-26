@@ -10,7 +10,6 @@
       "Computer Science",
       "Programming Languages",
       "Engineering",
-      "Computer Science",
       "Software Design and Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -40,7 +39,6 @@
       "Earth Science",
       "Sustainability",
       "Science",
-      "Earth Science",
       "Environmental Science"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -94,13 +92,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["mechanical"],
     "level": "Undergraduate",
-    "skills": [
-      "Engineering",
-      "Mechanical Engineering",
-      "Engineering",
-      "Mechanical Engineering",
-      "Mechanical Design"
-    ],
+    "skills": ["Engineering", "Mechanical Engineering", "Mechanical Design"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -128,7 +120,6 @@
       "Engineering",
       "Mechanical Engineering",
       "Solid Mechanics",
-      "Engineering",
       "Materials Science and Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -157,7 +148,6 @@
     "skills": [
       "Engineering",
       "Materials Science and Engineering",
-      "Engineering",
       "Mechanical Engineering",
       "Solid Mechanics"
     ],
@@ -247,7 +237,6 @@
     "skills": [
       "Engineering",
       "Mechanical Engineering",
-      "Engineering",
       "Systems Engineering",
       "Computational Modeling and Simulation"
     ],
@@ -480,7 +469,6 @@
     "skills": [
       "Engineering",
       "Materials Science and Engineering",
-      "Engineering",
       "Systems Engineering",
       "Computational Modeling and Simulation"
     ],
@@ -541,7 +529,6 @@
       "Architecture",
       "Architectural Design",
       "Fine Arts",
-      "Architecture",
       "Architectural History and Criticism"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -643,7 +630,6 @@
       "Architecture",
       "Architectural Design",
       "Fine Arts",
-      "Architecture",
       "Architectural History and Criticism"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -669,13 +655,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["architecture", "design"],
     "level": "Undergraduate",
-    "skills": [
-      "Game Design",
-      "Fine Arts",
-      "Media Studies",
-      "Fine Arts",
-      "Visual Arts"
-    ],
+    "skills": ["Game Design", "Fine Arts", "Media Studies", "Visual Arts"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -703,7 +683,6 @@
       "Architecture",
       "Architectural Design",
       "Fine Arts",
-      "Architecture",
       "Environmental Design"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -756,7 +735,6 @@
     "skills": [
       "Science",
       "Chemistry",
-      "Science",
       "Physics",
       "Atomic, Molecular, Optical Physics"
     ],
@@ -837,13 +815,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["chemistry"],
     "level": "Undergraduate",
-    "skills": [
-      "Science",
-      "Biology",
-      "Structural Biology",
-      "Science",
-      "Chemistry"
-    ],
+    "skills": ["Science", "Biology", "Structural Biology", "Chemistry"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -925,7 +897,6 @@
       "Engineering",
       "Mathematics",
       "Probability and Statistics",
-      "Engineering",
       "Civil Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -951,7 +922,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["civil", "environment"],
     "level": "Undergraduate",
-    "skills": ["Science", "Biology", "Ecology", "Science", "Earth Science"],
+    "skills": ["Science", "Biology", "Ecology", "Earth Science"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1005,13 +976,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["civil", "environment"],
     "level": "Undergraduate",
-    "skills": [
-      "Engineering",
-      "Civil Engineering",
-      "Engineering",
-      "Civil Engineering",
-      "Construction Management"
-    ],
+    "skills": ["Engineering", "Civil Engineering", "Construction Management"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1039,7 +1004,6 @@
       "Computer Science",
       "Algorithms and Data Structures",
       "Engineering",
-      "Computer Science",
       "Programming Languages"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1124,13 +1088,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["cs", "electrical", "software", "ai"],
     "level": "Undergraduate",
-    "skills": [
-      "Engineering",
-      "Electrical Engineering",
-      "Engineering",
-      "Electrical Engineering",
-      "Electronics"
-    ],
+    "skills": ["Engineering", "Electrical Engineering", "Electronics"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1158,7 +1116,6 @@
       "Electrical Engineering",
       "Signal Processing",
       "Engineering",
-      "Electrical Engineering",
       "Digital Systems"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1187,9 +1144,7 @@
     "skills": [
       "Computer Science",
       "Computer Design and Engineering",
-      "Engineering",
-      "Computer Science",
-      "Computer Design and Engineering"
+      "Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
@@ -1218,7 +1173,6 @@
       "Computer Science",
       "Programming Languages",
       "Engineering",
-      "Computer Science",
       "Software Design and Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1244,13 +1198,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["biology", "biotechnology"],
     "level": "Undergraduate",
-    "skills": [
-      "Biology",
-      "Molecular Biology",
-      "Science",
-      "Biology",
-      "Virology"
-    ],
+    "skills": ["Biology", "Molecular Biology", "Science", "Virology"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1298,13 +1246,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["biology", "biotechnology"],
     "level": "Undergraduate",
-    "skills": [
-      "Biology",
-      "Genetics",
-      "Science",
-      "Biology",
-      "Molecular Biology"
-    ],
+    "skills": ["Biology", "Genetics", "Science", "Molecular Biology"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1376,13 +1318,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["biology", "biotechnology"],
     "level": "Undergraduate",
-    "skills": [
-      "Biology",
-      "Molecular Biology",
-      "Science",
-      "Biology",
-      "Virology"
-    ],
+    "skills": ["Biology", "Molecular Biology", "Science", "Virology"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1502,13 +1438,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["psychology", "biomedical"],
     "level": "Graduate",
-    "skills": [
-      "Science",
-      "Cognitive Science",
-      "Science",
-      "Biology",
-      "Neuroscience"
-    ],
+    "skills": ["Science", "Cognitive Science", "Biology", "Neuroscience"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1700,7 +1630,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["psychology", "biomedical"],
     "level": "Graduate",
-    "skills": ["Biology", "Neurobiology", "Science", "Biology", "Neuroscience"],
+    "skills": ["Biology", "Neurobiology", "Science", "Neuroscience"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -1788,7 +1718,6 @@
       "Transport Processes",
       "Engineering",
       "Biological Engineering",
-      "Engineering",
       "Chemical Engineering"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1848,7 +1777,6 @@
       "Architecture",
       "Architectural Design",
       "Fine Arts",
-      "Architecture",
       "Environmental Design"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1938,7 +1866,6 @@
       "Public Administration",
       "Science and Technology Policy",
       "Social Science",
-      "Public Administration",
       "Social Welfare"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1998,7 +1925,6 @@
       "International Development",
       "Society",
       "Global Poverty",
-      "Society",
       "The Developing World"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2028,7 +1954,6 @@
       "Social Science",
       "Public Administration",
       "Public Policy",
-      "Social Science",
       "Political Science"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2072,7 +1997,7 @@
     "verification": "Course title and metadata checked against the official course data endpoint. Original teaching year remains in the URL."
   },
   {
-    "name": "Principles of Microeconomics ",
+    "name": "Principles of Microeconomics",
     "url": "https://ocw.mit.edu/courses/14-01-principles-of-microeconomics-fall-2023/",
     "provider": "MIT OpenCourseWare",
     "institution": "Massachusetts Institute of Technology",
@@ -2210,13 +2135,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["economics", "finance"],
     "level": "Undergraduate",
-    "skills": [
-      "Social Science",
-      "Economics",
-      "Social Science",
-      "Economics",
-      "Financial Economics"
-    ],
+    "skills": ["Social Science", "Economics", "Financial Economics"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -2270,13 +2189,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["economics", "finance"],
     "level": "Graduate",
-    "skills": [
-      "Social Science",
-      "Economics",
-      "Microeconomics",
-      "Social Science",
-      "Game Theory"
-    ],
+    "skills": ["Social Science", "Economics", "Microeconomics", "Game Theory"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -2328,7 +2241,6 @@
       "Economics",
       "International Economics",
       "Social Science",
-      "Economics",
       "Industrial Organization"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2358,7 +2270,6 @@
       "Economics",
       "International Economics",
       "Social Science",
-      "Economics",
       "Macroeconomics"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2562,7 +2473,6 @@
       "Economics",
       "Industrial Organization",
       "Social Science",
-      "Economics",
       "Microeconomics"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2616,13 +2526,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["mechanical"],
     "level": "Undergraduate",
-    "skills": [
-      "Engineering",
-      "Aerospace Engineering",
-      "Engineering",
-      "Aerospace Engineering",
-      "Propulsion Systems"
-    ],
+    "skills": ["Engineering", "Aerospace Engineering", "Propulsion Systems"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -2763,7 +2667,6 @@
     "skills": [
       "Social Science",
       "Political Science",
-      "Social Science",
       "Economics",
       "Political Economy"
     ],
@@ -2794,7 +2697,6 @@
       "Social Science",
       "Economics",
       "International Economics",
-      "Social Science",
       "Political Science"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2854,7 +2756,6 @@
       "Social Science",
       "Economics",
       "International Economics",
-      "Social Science",
       "Political Science"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2880,13 +2781,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["politics", "international-relations"],
     "level": "Graduate",
-    "skills": [
-      "Social Science",
-      "Political Science",
-      "Social Science",
-      "Political Science",
-      "American Politics"
-    ],
+    "skills": ["Social Science", "Political Science", "American Politics"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -2944,7 +2839,6 @@
       "Differential Equations",
       "Mathematics",
       "Calculus",
-      "Mathematics",
       "Applied Mathematics"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3018,12 +2912,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["mathematics", "data-science"],
     "level": "Undergraduate",
-    "skills": [
-      "Mathematics",
-      "Calculus",
-      "Mathematics",
-      "Differential Equations"
-    ],
+    "skills": ["Mathematics", "Calculus", "Differential Equations"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3071,12 +2960,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["mathematics", "data-science"],
     "level": "Undergraduate",
-    "skills": [
-      "Mathematics",
-      "Calculus",
-      "Mathematics",
-      "Differential Equations"
-    ],
+    "skills": ["Mathematics", "Calculus", "Differential Equations"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3104,7 +2988,6 @@
       "Calculus",
       "Mathematics",
       "Differential Equations",
-      "Mathematics",
       "Linear Algebra"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3130,13 +3013,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["biomedical", "biotechnology"],
     "level": "Undergraduate",
-    "skills": [
-      "Engineering",
-      "Biological Engineering",
-      "Synthetic Biology",
-      "Engineering",
-      "Biological Engineering"
-    ],
+    "skills": ["Engineering", "Biological Engineering", "Synthetic Biology"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3164,7 +3041,6 @@
       "Calculus",
       "Mathematics",
       "Linear Algebra",
-      "Mathematics",
       "Differential Equations"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3370,13 +3246,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["psychology", "education"],
     "level": "Undergraduate",
-    "skills": [
-      "Humanities",
-      "Philosophy",
-      "Metaphysics",
-      "Humanities",
-      "Religion"
-    ],
+    "skills": ["Humanities", "Philosophy", "Metaphysics", "Religion"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3434,7 +3304,6 @@
       "Gender Studies",
       "Society",
       "Global Poverty",
-      "Society",
       "The Developing World"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3493,7 +3362,6 @@
     "skills": [
       "Social Science",
       "Political Science",
-      "Social Science",
       "Sociology",
       "Social Justice"
     ],
@@ -3584,7 +3452,6 @@
       "History",
       "Middle Eastern History",
       "Humanities",
-      "History",
       "Modern History"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3640,13 +3507,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["politics", "international-relations"],
     "level": "Undergraduate",
-    "skills": [
-      "History",
-      "Ancient History",
-      "Humanities",
-      "History",
-      "European History"
-    ],
+    "skills": ["History", "Ancient History", "Humanities", "European History"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3718,13 +3579,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["politics", "international-relations"],
     "level": "Undergraduate",
-    "skills": [
-      "History",
-      "American History",
-      "Humanities",
-      "History",
-      "Modern History"
-    ],
+    "skills": ["History", "American History", "Humanities", "Modern History"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3838,13 +3693,7 @@
     "institution": "Massachusetts Institute of Technology",
     "fieldIds": ["media"],
     "level": "Undergraduate",
-    "skills": [
-      "Literature",
-      "Periodic Literature",
-      "Humanities",
-      "Literature",
-      "Rhetoric"
-    ],
+    "skills": ["Literature", "Periodic Literature", "Humanities", "Rhetoric"],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
     "duration": null,
     "format": "Self-paced archived teaching materials",
@@ -3962,7 +3811,6 @@
       "Literature",
       "Academic Writing",
       "Humanities",
-      "Literature",
       "Nonfiction Prose"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3992,7 +3840,6 @@
       "Literature",
       "Academic Writing",
       "Humanities",
-      "Literature",
       "Technical Writing"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4022,7 +3869,6 @@
       "Literature",
       "Periodic Literature",
       "Humanities",
-      "Literature",
       "Technical Writing"
     ],
     "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",

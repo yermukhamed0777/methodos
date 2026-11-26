@@ -182,3 +182,118 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
   commit SHA are appended to `progress.md`. Verified at commit `959b75c`,
   deployment `dpl_AxQMA7QyNZQ3XMcTTEWUS4gaMCMn` (Ready, Production, Current),
   `GET /api/events` → 401 and `check:live` → 8/8.
+
+## Final reliability sprint — 26 November 2026
+
+### MTH-015 — Regenerated derived catalog from reviewed sources
+
+- **Status:** Done
+- **Refs:** `scripts/compile-intelligence.mjs`, `data/intelligence.json`,
+  `data/learning-resources.json`.
+- **Evidence:** shipped `opportunity-rsi` had `status: "Deadline not announced"`
+  while `deadlineVerified: true`; the compile mapping already emitted `Upcoming`.
+  Regeneration exposed one source record with trailing whitespace in `name`.
+- **Fix:** removed the whitespace in `data/learning-resources.json` and reran
+  `node scripts/compile-intelligence.mjs`; the archived UBC cycle and all
+  confirmed-deadline statuses now match their sources.
+- **Done when:** `npm run check` passes on the regenerated projection. Verified.
+
+### MTH-016 — Confirmed future deadlines mislabelled as unannounced
+
+- **Status:** Done
+- **Refs:** `lib/intelligence-core.js`, `tests/deadline-labels.test.js`,
+  `tests/public-discovery.test.js`.
+- **Fix:** `cycleStatus` treats a confirmed future deadline as `Upcoming`, never
+  as an open application; `deadlineInfo` accepts `deadlineConfirmed` as well as
+  `deadlineVerified`. Badge is `Expected Cycle`, not `Awaiting Review` or
+  `Verified Open`.
+- **Done when:** 3 new tests pass and the full suite is green. Verified.
+
+### MTH-017 — Data gate did not cover the expanded catalog
+
+- **Status:** Done
+- **Refs:** `scripts/check-data.js`, `tests/check-data.test.js`.
+- **Fix:** `validateData` now checks `data/intelligence.json` ids, names, sources,
+  dates, open claims and review queue; `check:data` loads the file. Also warns on
+  confirmed-verification records with tentative notes.
+- **Done when:** `npm run check:data` passes with the expanded catalog included.
+  Verified.
+
+### MTH-021 — Generated answers were not checked against their evidence
+
+- **Status:** Done
+- **Refs:** `lib/grounding.js`, `api/chat.js`, `tests/ai-grounding.test.js`,
+  `tests/chat-grounding.test.js`.
+- **Fix:** answers with no reviewed match never reach a model; completions that
+  are empty, oversized, contain invented links/guarantees, or name no reviewed
+  record are replaced by a labelled catalog fallback (HTTP 503) and the request
+  ID is retained. Contradicting source dates are surfaced as notes.
+- **Done when:** stub-generation tests pass; no live claim is made. Verified.
+
+### MTH-023 — Coach/plan provider failure left an unusable error
+
+- **Status:** Done
+- **Refs:** `api/coach.js`, `tests/coach.test.js`.
+- **Fix:** provider failure returns a labelled, skeletons-first response instead
+  of a bare error, with private provider text withheld.
+- **Done when:** coach failure test passes. Verified.
+
+### MTH-032 — Static ownership-policy audit
+
+- **Status:** Done (static). Live cross-account attempt remains MTH-012/MTH-013.
+- **Refs:** `scripts/audit-ownership.js`, `tests/ownership-audit.test.js`,
+  `package.json` (`audit:ownership` in `check`).
+- **Fix:** automated review of all migrations: 18 private tables have owner
+  policies and no anon grants; private Storage folder predicate, four private
+  document policies and admin gates are present. No live identity was created.
+- **Done when:** `npm run audit:ownership` prints PASS and the test is green.
+  Verified.
+
+### MTH-034 — Auth flow type contradicted PKCE confirmation links
+
+- **Status:** Done
+- **Refs:** `src/auth-client.js`, `src/auth-flow.js`, `tests/public-config.test.js`,
+  `tests/auth-flow.test.js`.
+- **Fix:** client uses `flowType: 'pkce'`; callbacks exchange `?code=` only and
+  reject implicit bearer-token fragments with `flow_state_not_found`.
+- **Done when:** both tests pass. Verified. Note: the real email link form
+  remains an owner observation (MTH-012).
+
+### MTH-036 — Public projection removed a legitimate disclaimer
+
+- **Status:** Done
+- **Refs:** `lib/public-catalog.js`, `tests/public-discovery.test.js`.
+- **Fix:** the sensitive-key filter keeps `credentials`, which on reviewed skill
+  records is a published certificate/access disclaimer, not a secret value.
+- **Done when:** a test asserts the disclaimer is present in anonymous catalog
+  output. Verified.
+
+### MTH-037 — Coursera records carried a LinkedIn Learning cost claim
+
+- **Status:** Done
+- **Refs:** `data/resources.json`, `data/intelligence.json`.
+- **Fix:** the seven Coursera course cost notes now describe provider/institutional
+  access generically; no free certificate is promised. LinkedIn Learning records
+  keep their own provider-specific wording.
+- **Done when:** regenerated data and `npm run check` pass. Verified.
+
+### MTH-038 — Keyboard reachability across all hubs was untested
+
+- **Status:** Done (automated portion)
+- **Refs:** `tests/workspace-keyboard.test.js`, `src/view-registry.js`,
+  `src/navigation.js`.
+- **Fix:** regression tests enumerate every hub item, assert labels/safe hashes,
+  private-gate registration, and announcer/focus/title updates on every public
+  workspace.
+- **Done when:** tests pass. Verified. Manual screen-reader/zoom remains MTH-012.
+
+### MTH-039 — Constrained-mobile loading was unmeasured
+
+- **Status:** Done (measurement only, not a performance gate)
+- **Refs:** `scripts/perf-check.js`, `package.json` (`perf:mobile`).
+- **Fix:** deterministic CDP-throttled 375 px slow-4G/4x-CPU probe of the local
+  preview or public origin; reports FCP, load, resource counts, blocking head
+  assets and per-bundle bytes.
+- **Done when:** `npm run perf:mobile` reports measured values. Verified.
+  Measured guest payload still includes 81 KiB `workspace.js` and 54 KiB
+  `intelligence.js`; deferral is proposed, not implemented.

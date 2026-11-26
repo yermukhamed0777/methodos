@@ -1,4 +1,4 @@
-import { readFileSync, rmSync } from 'node:fs';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
 const r = JSON.parse(readFileSync('data/resources.json', 'utf8'));
 const ids = new Set();
@@ -80,6 +80,27 @@ for (const file of [
   if (readFileSync(file).length < 100)
     throw Error('Missing or empty release asset: ' + file);
 }
+// One stylesheet request instead of ten render-blocking files on a slow
+// mobile connection. Individual CSS files remain in dist for source review,
+// tests and the live marker checks; only the HTML references the bundle.
+const shellStyles = [
+  'styles.css',
+  'platform.css',
+  'workspace.css',
+  'intelligence.css',
+  'responsive.css',
+  'theme.css',
+  'loading.css',
+  'discovery.css',
+  'glass.css',
+  'methodos-ui.css',
+];
+writeFileSync(
+  'dist/bundle.css',
+  shellStyles
+    .map((name) => `/* ${name} */\n` + readFileSync('dist/' + name, 'utf8'))
+    .join('\n'),
+);
 console.log(
   'Platform assets validated: skills, courses, universities, careers and account client.',
 );

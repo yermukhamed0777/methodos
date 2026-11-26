@@ -48,3 +48,55 @@ outside a working tree` (deployment `dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv`, commit
 `git diff --quiet HEAD^ HEAD …` optimization cannot work there. Rationale: the
 optimization is not worth a broken release path; every push should build.
 D-04 is reversed, not silently rewritten.
+
+## D-06 — Final reliability sprint before the pilot (2026-11-26)
+
+The owner requested a last reliability and release-engineering pass on v5:
+catalog provenance and classification, independent BARYS / ProspectoAI failure
+testing, grounded-answer checks, account/RLS/private-document testing, Vercel and
+auth configuration reconciliation, constrained-mobile payload and accessibility
+review, then the full suite and `check:live` against the final deployment. This
+expands D-01's stopping point before the seven-day pilot; D-01 is not erased,
+the pilot remains the human boundary. Recruitment, consent, real accounts,
+SMTP, live AI generation and manual assistive-technology checks stay Human
+only. No catalog expansion or redesign is authorized unless a verified defect
+requires a minimal fix.
+
+## D-07 — Keep confirmation links PKCE-only (2026-11-26)
+
+The browser client uses `flowType: 'pkce'` and the callback accepts `?code=`
+exchanges only; implicit bearer-token fragments are rejected with
+`flow_state_not_found`. Rationale: fragments are attacker-controlled login-CSRF
+input and the documented email links are PKCE. The real link form still needs an
+owner observation; no email delivery is claimed.
+
+## D-08 — A confirmed future deadline is an expected cycle, never open (2026-11-26)
+
+`cycleStatus` maps `deadlineConfirmed`/`deadlineVerified` with a future
+`finalDeadline` to `Upcoming` and the badge to `Expected Cycle`; only
+`openVerified` plus a checked application URL can produce `Verified Open`.
+Rationale: a confirmed cut-off is evidence about a date, not about availability.
+This preserves the distinction between directories, archived cycles,
+illustrative pathways and confirmed open applications.
+
+## D-09 — Generated answers with no traceable reviewed record are rejected (2026-11-26)
+
+A completion that is empty, oversized, includes links/guarantees, or names no
+retrieved record is replaced by a labelled catalog fallback (503) with the
+request ID. Rationale: prompt instructions are not validation; a reference strip
+beside unsupported prose is not source grounding. Structural checks are not a
+semantic truth proof and no live model evaluation is claimed.
+
+## D-10 — Static policy audit is a gate; live cross-account access is human-only (2026-11-26)
+
+`npm run audit:ownership` inspects all reviewed migrations and is part of
+`npm run check`. Rationale: it catches missing owner predicates and anon grants
+without creating accounts. Actual cross-account attempts with isolated
+identities still require owner Supabase credentials and remain MTH-012/013.
+
+## D-11 — Constrained-mobile measurement is report-only (2026-11-26)
+
+`npm run perf:mobile` records FCP/load/resources/bundle bytes under CDP
+throttling; it has no pass/fail budget. Rationale: measured values must not be
+invented, and a timing threshold would be flaky in CI. The measured guest payload
+still carries private bundles; deferring them is proposed, not implemented.

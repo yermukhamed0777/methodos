@@ -27,7 +27,16 @@ const isHttps = (value) => {
 };
 
 export function validateData(
-  { catalog, resources, development },
+  {
+    catalog,
+    resources,
+    development,
+    intelligence,
+    curated,
+    learning,
+    feed,
+    blueprints,
+  },
   { today = new Date().toISOString().slice(0, 10) } = {},
 ) {
   const problems = [];
@@ -218,6 +227,25 @@ export function validateData(
         record.id,
         'finalDeadline must be an ISO date',
       );
+    if (
+      isDate(record.deadline) &&
+      isDate(record.startDate) &&
+      record.deadline > record.startDate
+    )
+      fail(
+        'data/development.json',
+        record.id,
+        'deadline is after the programme start date',
+      );
+    if (
+      /confirmed/i.test(record.verification || '') &&
+      /tentative|to verify|under construction/i.test(record.note || '')
+    )
+      warn(
+        'data/development.json',
+        record.id,
+        'verification says confirmed while the note is uncertain',
+      );
     for (const field of record.fieldIds || [])
       if (!majorIds.has(field))
         fail(
@@ -281,6 +309,98 @@ export function validateData(
       });
   }
 
+  // ---- Expanded intelligence catalogue ----------------------------------
+  // This is the largest published collection. It was previously invisible to
+  // the gate, so a duplicate id, non-HTTPS source or false open claim could be
+  // served to students while `check:data` still said "passed".
+  if (intelligence) {
+    const file = 'data/intelligence.json';
+    checkDate(file, intelligence, 'checkedOn', { required: true });
+    const seen = new Set();
+    for (const record of intelligence.records || []) {
+      if (!checkId(file, record, seen)) continue;
+      checkName(file, record);
+      checkSources(file, record);
+      checkDate(file, record, 'checkedOn', { required: true });
+      if (
+        isDate(intelligence.checkedOn) &&
+        isDate(record.checkedOn) &&
+        record.checkedOn > intelligence.checkedOn
+      )
+        fail(
+          file,
+          record.id,
+          'record reviewed after the collection header date',
+        );
+      for (const field of ['deadlineStart', 'deadlineEnd', 'finalDeadline']) {
+        if (record[field] && !isDate(record[field]))
+          fail(file, record.id, field + ' must be an ISO date');
+      }
+      if (record.openVerified === true) {
+        if (!isHttps(record.applicationUrl))
+          fail(
+            file,
+            record.id,
+            'openVerified requires an HTTPS applicationUrl',
+          );
+        if (typeof record.deadlineVerified !== 'boolean')
+          fail(
+            file,
+            record.id,
+            'openVerified requires a boolean deadlineVerified',
+          );
+      }
+      if (record.archived === true && record.status === 'Open')
+        fail(file, record.id, 'an archived record cannot be Open');
+    }
+    const queued = new Set();
+    for (const id of intelligence.reviewQueue || []) {
+      const value = typeof id === 'string' ? id : id?.id;
+      if (!ID.test(String(value || '')))
+        fail(file, value, 'reviewQueue entry needs a valid id');
+      if (queued.has(value)) fail(file, value, 'duplicate reviewQueue id');
+      queued.add(value);
+    }
+  }
+
+  // ---- Remaining reviewed seed files ------------------------------------
+  // Every published data file must at least parse and obey the same source
+  // and date rules. This closes the "3 of 8 files are gated" coverage gap.
+  const generic = (file, value) => {
+    if (value == null) return;
+    const walk = (node, path) => {
+      if (Array.isArray(node)) {
+        node.forEach((item, i) => walk(item, `${path}[${i}]`));
+        return;
+      }
+      if (!node || typeof node !== 'object') return;
+      if (Array.isArray(node.sources))
+        node.sources.forEach((source, i) => {
+          const url = Array.isArray(source) ? source[1] : source?.url;
+          if (!isHttps(url))
+            fail(
+              file,
+              `${path}.sources[${i}]`,
+              'source must have an https URL',
+            );
+        });
+      for (const field of ['checkedOn', 'addedOn']) {
+        if (node[field] == null) continue;
+        if (!isDate(node[field]))
+          fail(file, `${path}.${field}`, field + ' must be an ISO date');
+        else if (node[field] > today)
+          fail(file, `${path}.${field}`, field + ' is in the future');
+      }
+      for (const [key, item] of Object.entries(node))
+        if (key !== 'sources') walk(item, `${path}.${key}`);
+    };
+    walk(value, file);
+  };
+  generic('data/curated-intelligence.json', curated);
+  generic('data/learning-resources.json', learning);
+  generic('data/feed-snapshot.json', feed);
+  generic('data/project-blueprints.json', blueprints);
+
   return problems;
 }
 
@@ -290,6 +410,11 @@ function load() {
     catalog: read('data/opportunities.json'),
     resources: read('data/resources.json'),
     development: read('data/development.json'),
+    intelligence: read('data/intelligence.json'),
+    curated: read('data/curated-intelligence.json'),
+    learning: read('data/learning-resources.json'),
+    feed: read('data/feed-snapshot.json'),
+    blueprints: read('data/project-blueprints.json'),
   };
 }
 

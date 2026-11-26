@@ -12,7 +12,7 @@ import {
   compareUniversities,
   validatePlanDraft,
 } from '../lib/workspace-model.js';
-import { parseDocument } from '../lib/document-parser.js';
+import { parseDocument, safeDocumentMessage } from '../lib/document-parser.js';
 import { processFile } from '../api/document.js';
 import { developmentContext } from '../lib/development-context.js';
 import { createPreviewServer } from '../scripts/dev-server.js';
@@ -166,6 +166,22 @@ const docx = () =>
       '<?xml version="1.0"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Education</w:t></w:r></w:p><w:p><w:r><w:t>Materials degree project</w:t></w:r></w:p></w:body></w:document>',
     ),
   });
+test('parser errors are allowlisted before being stored or returned', () => {
+  assert.equal(
+    safeDocumentMessage(
+      'This PDF exceeds 50 pages. Upload a shorter document.',
+    ),
+    'This PDF exceeds 50 pages. Upload a shorter document.',
+  );
+  assert.equal(
+    safeDocumentMessage('unpdf: /private/CV/secret name.docx failed'),
+    'Document processing failed. Export a fresh PDF or DOCX.',
+  );
+  assert.equal(
+    safeDocumentMessage(undefined),
+    'Document processing failed. Export a fresh PDF or DOCX.',
+  );
+});
 test('DOCX extraction returns real text and tentative, unconsented review records', async () => {
   const result = await parseDocument(docx(), 'cv.docx');
   assert.match(result.text, /Materials degree project/);

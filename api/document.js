@@ -1,6 +1,7 @@
 import { Worker } from 'node:worker_threads';
 import '../lib/document-parser.js'; // Include the worker's parser dependencies in the serverless trace.
 import { requireUser } from '../lib/auth.js';
+import { safeDocumentMessage } from '../lib/document-parser.js';
 export function processFile(bytes, name) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
@@ -86,7 +87,7 @@ export default async function handler(req, res) {
       throw Error('The extracted text could not be saved. Please retry.');
     return res.status(200).json({ state: 'Needs review', pages: result.pages });
   } catch (error) {
-    const message = String(error.message || 'Processing failed.').slice(0, 500);
+    const message = safeDocumentMessage(error.message);
     if (id)
       await db
         .from('documents')

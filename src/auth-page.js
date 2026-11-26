@@ -53,10 +53,18 @@ async function verified() {
 }
 async function initialize() {
   ({ client } = await authClient());
+  // A fragment token on a login page is never a session. Scrub it before any
+  // further request so it cannot linger in the address bar or history.
+  if (/access_token=|refresh_token=/.test(url.hash)) {
+    history.replaceState(null, '', url.pathname + url.search);
+    url.hash = '';
+  }
   const kind = callbackKind(url);
   if (kind) {
     const hasCallback =
-      url.searchParams.has('code') || /access_token=|error=/.test(url.hash);
+      url.searchParams.has('code') ||
+      url.searchParams.has('error') ||
+      /error=/.test(url.hash);
     try {
       if (hasCallback) await consumeCallback(client, url);
       // Clear code and token fragments before the page makes any further requests.

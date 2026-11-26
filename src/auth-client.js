@@ -25,7 +25,10 @@ export async function authClient({
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: false,
-      flowType: 'implicit',
+      // Confirmation and recovery links are PKCE (`?code=`); the callback
+      // exchanges the code with a verifier stored in this browser. Fragment
+      // bearer tokens are rejected by consumeCallback().
+      flowType: 'pkce',
     },
   });
   return { client, config };

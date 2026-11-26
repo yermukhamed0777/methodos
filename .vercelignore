@@ -7,3 +7,6 @@ coverage
 inspect-output.mjs
 *.zip
 *.tar.gz
+.env
+.env.*
+.vercel

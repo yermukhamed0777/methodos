@@ -1,6 +1,36 @@
 import { removePrivateDocuments } from '../lib/account-cleanup.js';
 import { createClient } from '@supabase/supabase-js';
 import { publicAuthConfig, requireUser } from '../lib/auth.js';
+
+// Deletion is ordered so a failed step never removes private files while
+// leaving the account alive. The authenticated user is disabled and deleted
+// first; storage cleanup is best-effort afterwards and its outcome is reported.
+export async function completeDeletion({
+  auth,
+  secret,
+  adminFactory = createClient,
+  removeDocuments = removePrivateDocuments,
+}) {
+  // Never accept a user ID or path from the request.
+  const admin = adminFactory(publicAuthConfig().supabaseUrl, secret, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const signOut = await admin.auth.admin.signOut(auth.token, 'global');
+  if (signOut.error) throw signOut.error;
+  const removed = await admin.auth.admin.deleteUser(auth.user.id);
+  if (removed.error) throw removed.error;
+  let storageCleanup = 'done';
+  try {
+    await removeDocuments(
+      admin.storage.from('profile-documents'),
+      auth.user.id,
+    );
+  } catch {
+    storageCleanup = 'failed';
+  }
+  return { deleted: true, storageCleanup };
+}
+
 export default async function handler(req, res) {
   if (!['GET', 'DELETE'].includes(req.method))
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,23 +61,8 @@ export default async function handler(req, res) {
       code: 'reauth_required',
     });
   try {
-    // Never accept a user ID or path from the request.
-    const admin = createClient(publicAuthConfig().supabaseUrl, secret, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const bucket = admin.storage.from('profile-documents');
-    await removePrivateDocuments(bucket, auth.user.id);
-    const token = req.headers.authorization.match(/^Bearer (\S+)$/)[1];
-    const { error: signOutError } = await admin.auth.admin.signOut(
-      token,
-      'global',
-    );
-    if (signOutError) throw signOutError;
-    const { error: deleteError } = await admin.auth.admin.deleteUser(
-      auth.user.id,
-    );
-    if (deleteError) throw deleteError;
-    return res.status(200).json({ deleted: true });
+    const result = await completeDeletion({ auth, secret });
+    return res.status(200).json(result);
   } catch {
     return res.status(503).json({
       error:

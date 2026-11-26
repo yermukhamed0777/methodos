@@ -17,7 +17,7 @@ export const CHECKS = [
     expect: (r) =>
       r.status === 200 &&
       /<title>Methodos\b/.test(r.body) &&
-      r.body.includes('href="/methodos-ui.css"'),
+      r.body.includes('href="/bundle.css"'),
     detail: 'Methodos release shell',
   },
   {

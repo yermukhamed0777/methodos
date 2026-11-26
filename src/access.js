@@ -47,8 +47,10 @@ export function installAccess(w = window) {
     },
     true,
   );
-  d.querySelector('#signin-dialog')?.addEventListener('close', () =>
-    returnFocus?.focus(),
-  );
+  d.querySelector('#signin-dialog')?.addEventListener('close', () => {
+    // The opener may have been re-rendered while the dialog was open.
+    if (returnFocus?.isConnected) returnFocus.focus();
+    else d.getElementById('main-content')?.focus();
+  });
   return { promptSignIn, gateHTML };
 }

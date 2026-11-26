@@ -39,6 +39,10 @@ test('source labels describe the destination without claiming an application', (
     'View directory ↗',
   );
   assert.equal(
+    sourceLinkLabel({ verification: 'Employer directory' }),
+    'View directory ↗',
+  );
+  assert.equal(
     sourceLinkLabel({ sourceLabel: 'Admissions page' }),
     'View admissions ↗',
   );

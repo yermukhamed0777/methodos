@@ -19,7 +19,7 @@ A place to explore education and career possibilities, build useful skills and k
 - A private account workspace with a saved application tracker, profile and private activities. Activities support notes, dates, categories, priority, progress, filtering and sorting.
 - Public catalog search and BARYS, the built-in navigation guide. ProspectoAI is the separate source-grounded AI assistant available after confirmed sign-in.
 
-The initial expanded collection contains 33 programme records, 12 university profiles, 33 field maps, 28 courses, 10 illustrative career pathways and 9 career sources/postings. Some records are directories or closed-cycle preparation watchlists. Each retains its source and review date. Prices, openings, facilities access and programme conditions can change.
+The legacy seed served by the public preview contains 33 programme records, 12 university profiles, 33 field maps, 28 courses, 10 illustrative career pathways and 9 career sources/postings. The larger reviewed intelligence collection (281 courses, 22 university profiles and more) is served separately with its own source and review dates. Some records are directories or closed-cycle preparation watchlists. Each retains its source and review date. Prices, openings, facilities access and programme conditions can change.
 
 See [development workspace architecture and verification](docs/development-workspace.md) for onboarding, profiles, private CV/portfolio documents, reviewed extraction, learning progress, editable time-bounded plans, comparisons and privacy controls.
 

@@ -3,7 +3,7 @@
   "refreshedAt": "2026-11-06T09:38:53.906Z",
   "lastSuccessfulRefresh": "2026-11-06T09:38:53.906Z",
   "engine": "vercel-scheduled-feeds",
-  "schedule": "Monday mornings, Hong Kong time",
+  "schedule": "Daily at 01:00 UTC (09:00 Hong Kong time)",
   "notice": "Automatically collected source announcements. Eligibility, funding and deadlines are not independently verified.",
   "sources": [
     {

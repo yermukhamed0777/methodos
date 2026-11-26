@@ -19,20 +19,14 @@ export function safeNext(value, origin) {
   }
 }
 export function callbackKind(url) {
-  const hash = new URLSearchParams(url.hash.slice(1));
+  // Only the two dedicated auth routes are callbacks. A fragment carrying
+  // tokens on any other URL is attacker-controlled input, not a session.
   if (
     url.pathname === RECOVERY_PATH ||
-    url.pathname === '/auth/update-password' ||
-    hash.get('type') === 'recovery' ||
-    url.hash === '#recovery'
+    url.pathname === '/auth/update-password'
   )
     return 'recovery';
-  if (
-    url.pathname === CALLBACK_PATH ||
-    hash.has('access_token') ||
-    url.searchParams.has('code')
-  )
-    return 'confirmation';
+  if (url.pathname === CALLBACK_PATH) return 'confirmation';
   return null;
 }
 export function authMessage(error) {
@@ -55,9 +49,13 @@ export function authMessage(error) {
       );
   }
 }
-// URL tokens remain in memory only until Supabase stores the session. Never log them.
+// PKCE only: a code is exchanged with the verifier stored in this browser.
+// URL fragments containing bearer tokens are rejected, never installed as a
+// session (a login-CSRF vector). Never log token values.
 export async function consumeCallback(client, url) {
   const hash = new URLSearchParams(url.hash.slice(1));
+  if (hash.has('access_token') || hash.has('refresh_token'))
+    throw { code: 'flow_state_not_found' };
   if (hash.has('error') || url.searchParams.has('error'))
     throw {
       code:
@@ -66,22 +64,8 @@ export async function consumeCallback(client, url) {
         'otp_expired',
     };
   const code = url.searchParams.get('code');
-  if (code) {
-    const result = await client.auth.exchangeCodeForSession(code);
-    if (result.error) throw result.error;
-    return result.data.session;
-  }
-  const access_token = hash.get('access_token'),
-    refresh_token = hash.get('refresh_token');
-  if (access_token && refresh_token) {
-    const result = await client.auth.setSession({
-      access_token,
-      refresh_token,
-    });
-    if (result.error) throw result.error;
-    return result.data.session;
-  }
-  const result = await client.auth.getSession();
+  if (!code) throw { code: 'flow_state_not_found' };
+  const result = await client.auth.exchangeCodeForSession(code);
   if (result.error) throw result.error;
   return result.data.session;
 }

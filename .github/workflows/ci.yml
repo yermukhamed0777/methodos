@@ -21,7 +21,9 @@ jobs:
       # check = data, build, lint (warnings denied), typecheck, tests,
       # content-free event verification, walkthrough fixture and formatting.
       - run: npm run check
-      - run: git diff --exit-code -- dist/data.js
+      # The generated catalog is intentionally not a tracked file. Assert that
+      # the build did not leave one behind instead of diffing an absent path.
+      - run: "test ! -e dist/data.js && echo 'PASS: no generated catalog file in dist'"
       - run: npm audit --audit-level=low
       # Merging a red revision is blocked by GitHub branch protection.
       # Blocking a Vercel deployment on this check is a project setting and

@@ -139,6 +139,9 @@ test('auth client initializes valid config and suppresses unexpected server erro
       assert.equal(url, valid.SUPABASE_URL);
       assert.equal(key, valid.SUPABASE_PUBLISHABLE_KEY);
       assert.equal(options.auth.detectSessionInUrl, false);
+      // PKCE links must be exchangeable: the verifier is stored by the client
+      // at signUp, so the callback can exchange `?code=`.
+      assert.equal(options.auth.flowType, 'pkce');
       return sentinel;
     },
   });

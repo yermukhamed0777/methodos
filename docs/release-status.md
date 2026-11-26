@@ -2,6 +2,21 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit.
 
+## Final reliability pass — 26 November 2026 (integrated tree, unpushed)
+
+Reviewed baseline `32ef0ba` was clean and green (CI `45756474470`, Vercel status
+success at `2026-11-26T04:38:48Z`, `check:live` 8/8, four served asset hashes
+identical to local). The integrated working tree after the reliability pass runs
+`npm run check` green with **263/263** tests, the static ownership audit (18
+private tables) and both deterministic hashes; `npm run check:live` is **8/8**.
+Fixes are recorded as MTH-015…MTH-039 in `docs/plan/backlog.md`; exact commands
+and results are in `docs/plan/progress.md`. The measured guest payload still
+loads private bundles (81 KiB `workspace.js`, 54 KiB `intelligence.js`) on slow
+4G — deferral is proposed, not implemented. Live cross-account access, email
+delivery, live AI generation, private Storage and manual AT checks remain
+human-only; the seven-day pilot has not started. No push or new deployment was
+authorized in this pass.
+
 ## Final deployment · 25 November 2026
 
 PR #40 merged to `main` at `415fcb9a81b6af1acac7e37b3e053480a2c09a82` after green CI and a passing Vercel preview check. It was promoted to production, then a documentation-only commit `288d1e91e5cdcbb98b4d18d8a77548b5c68b7ed3` became the current production deployment `dpl_BfEYM2q1YncigdGgPZ4MSo7VuyTL` at `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes, the corrected catalog dates are live, and signed-out coach requests return `401` before payload validation. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).
@@ -110,7 +125,7 @@ The complete dependency audit also found a development-only minimatch advisory. 
 
 The initial expanded seed contains 560 records: 280 official courses/open learning resources, 22 universities, 25 public-work/leadership profiles, 23 funding records, 24 other programmes, 100 editorial portfolio-project ideas, 33 editorial research ideas, 33 illustrative pathways, 13 fictional CV formats and seven location planning guides. The 33 field maps contain 516 editorial skills.
 
-Only two funding records have reviewed current-open application evidence. Five programme records describe upcoming cycles, 39 programme/funding records have unannounced or expected cycles, and one is closed. These are not 47 open vacancies. Ten normalized geographic regions are represented; worldwide listings are not counted as another geographic region.
+Only two funding records have reviewed current-open application evidence. Five programme records describe upcoming cycles, 34 programme/funding records have unannounced or expected cycles (33 not announced, 1 expected to reopen), and one is closed. Eleven of those 34 carry a provider-verified deadline but not a verified open cycle. These are not 47 open vacancies. Ten normalized geographic regions are represented; worldwide listings are not counted as another geographic region.
 
 Eighteen uncertain records remain staged. Mature targets of 75 universities, 250 opportunities and 50 funding records have not been reached; the specification permits the strongest verified subset with an update pipeline. No numerical filler has been added. Twenty-one public-work profiles are limited to award/work/affiliation facts; their education or full career histories are explicitly unestablished. Four leadership profiles include broader public career context. Editorial examples never imply a real person's endorsement, completed user work or proven research novelty.
 

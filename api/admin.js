@@ -86,7 +86,9 @@ export default async function handler(req, res) {
             process.env.VERCEL_GIT_PROVIDER_COMMIT_SHA ||
             'See Vercel deployment metadata',
         },
-        approvedSources: sourceRegistry().length,
+        // A mechanical count of distinct source URLs, not an approval decision:
+        // no record in this repository carries an approver or rights field.
+        sourceUrls: sourceRegistry().length,
       });
     }
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

@@ -26,8 +26,9 @@ npm run check:live            # after a deployment, against the live origin
 `npm run check` is the complete local gate: data validation, build, ESLint with
 warnings denied, strict type checking of the shared calendar module, all Node
 tests, the content-free event assertion, the walkthrough fixture check and
-Prettier. CI runs the same command plus `git diff --exit-code -- dist/data.js`
-and `npm audit --audit-level=low`. A red check must not be merged.
+Prettier. CI runs the same command plus an assertion that the build left no
+untracked `dist/data.js`, and `npm audit --audit-level=low`. A red check must not
+be merged.
 
 ## Working on a defect
 

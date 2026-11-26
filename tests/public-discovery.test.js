@@ -89,6 +89,22 @@ test('preview projection omits private fields, audit revisions and unpublished c
   assert.match(text, /Public award/);
 });
 
+test('public preview keeps the reviewed credentials disclaimer on skills', async () => {
+  const res = response();
+  await catalogHandler({ method: 'GET', headers: {} }, res);
+  assert.equal(res.statusCode, 200);
+  const skills = res.body.resources.skills || [];
+  assert.ok(skills.length > 0);
+  const withDisclaimer = skills.filter(
+    (s) => typeof s.credentials === 'string' && s.credentials.length > 0,
+  );
+  assert.ok(
+    withDisclaimer.length > 0,
+    'public skills must keep their certificate disclaimer',
+  );
+  assert.match(withDisclaimer[0].credentials, /certificate|access/i);
+});
+
 test('verification badges distinguish open, expected, directory, unreviewed and expired records', () => {
   const now = new Date('2026-11-13T10:00:00Z');
   const open = {
@@ -129,12 +145,14 @@ test('verification badges distinguish open, expected, directory, unreviewed and 
     verificationStatus({ closed: true, type: 'Job board' }, now).label,
     'Closed',
   );
+  // A confirmed future deadline is an expected cycle, never an open
+  // application and never "deadline not announced" (MTH-015).
   assert.equal(
     verificationStatus(
       { deadlineConfirmed: true, finalDeadline: '2026-12-01' },
       now,
     ).label,
-    'Awaiting Review',
+    'Expected Cycle',
   );
 });
 

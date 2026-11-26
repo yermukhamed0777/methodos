@@ -19,6 +19,7 @@ supabase/.temp/
 
 dist/bootstrap.js
 dist/auth-page.js
+dist/bundle.css
 
 dist/workspace.js
 

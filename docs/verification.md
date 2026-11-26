@@ -59,10 +59,12 @@ statement of repository configuration, not a claim about a Vercel feature.
 
 `.github/workflows/ci.yml` runs `npm ci --ignore-scripts --no-fund --no-audit`,
 `npm run check` (which now includes the content-free assertion, walkthrough
-check and formatting), `git diff --exit-code -- dist/data.js` and
-`npm audit --audit-level=low` on every push and pull request. A red check fails
-the job. Whether Vercel blocks deployment on that red job is a project setting
-outside this repository and remains MTH-010 (human only).
+check and formatting), `test ! -e dist/data.js` and
+`npm audit --audit-level=low` on every push and pull request. The former diff
+step was vacuous because `dist/data.js` is untracked and absent by design; the
+replacement asserts that the build did not leave a generated catalog file.
+A red check fails the job. Whether Vercel blocks deployment on that red job is a
+project setting outside this repository and remains MTH-010 (human only).
 
 ## Delivery result
 

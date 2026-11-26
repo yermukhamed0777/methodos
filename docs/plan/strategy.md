@@ -79,3 +79,28 @@ number was measured.
   generated assets; recorded in decisions D-04.
 - What counts as "content-free"? Resolved in MTH-005 as an automated assertion
   over the exact emitted JSON payload, not a documentation promise.
+
+## Correction — 2026-11-26 (supersedes the `ignoreCommand` answer above)
+
+The older open-question answer above says the `ignoreCommand` was kept (D-04).
+That is no longer true. D-05 reversed D-04 after production deployment
+`dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv` failed at `errorStep: ignoreStep` with exit
+129 (`warning: Not a git repository`). `ignoreCommand` was removed in `959b75c`.
+Verified again on 2026-11-26: `git grep -n -i ignoreCommand -- vercel.json`
+returns no match, and `vercel.json` contains only `buildCommand`,
+`installCommand`, `outputDirectory`, functions, crons, rewrites and headers.
+Do not reintroduce a Git-dependent ignore step.
+
+## Final reliability state — 2026-11-26
+
+Measured on the integrated tree: `npm run check` exit 0 with 263/263 tests,
+data check, static ownership audit (18 private tables), build, lint, strict
+typecheck, content-free assertion and deterministic walkthrough; `npm run
+check:live` 8/8. Constrained-mobile measurement is report-only: 375 px slow 4G
+and 4× CPU gave FCP 1,324 ms, load 2,709 ms, 489 KiB JS and 144 KiB CSS, with
+81 KiB `workspace.js` and 54 KiB `intelligence.js` still loaded for guests.
+Catalog status defects, PKCE alignment, grounded-answer fallbacks, public
+credentials disclaimer and keyboard hub coverage were fixed (MTH-015…MTH-039).
+Live cross-account access, real email/SMTP, live AI generation, private Storage
+and manual assistive-technology checks remain human-only. No usage, user or
+revenue outcome was measured. The seven-day pilot is still the boundary.

@@ -6,6 +6,7 @@ import {
   consumeCallback,
   authMessage,
 } from '../src/auth-flow.js';
+import { authClient } from '../src/auth-client.js';
 import { requireUser, publicAuthConfig } from '../lib/auth.js';
 import { createPreviewServer } from '../scripts/dev-server.js';
 import { once } from 'node:events';
@@ -40,10 +41,10 @@ test('return paths cannot redirect to external sites, auth pages or token fragme
     '/?opportunity=research-science-institute#explore',
   );
 });
-test('recovery and confirmation links route independently of transient auth events', async () => {
+test('PKCE callbacks are browser-bound; fragment tokens are never accepted', async () => {
   assert.equal(
     callbackKind(new URL(origin + '/#access_token=example&type=recovery')),
-    'recovery',
+    null,
   );
   assert.equal(
     callbackKind(new URL(origin + '/reset-password?code=example')),
@@ -66,24 +67,24 @@ test('recovery and confirmation links route independently of transient auth even
       },
     },
   };
-  assert.equal(
-    (
-      await consumeCallback(
+  await assert.rejects(
+    () =>
+      consumeCallback(
         client,
         new URL(
           origin +
             '/reset-password#access_token=a&refresh_token=b&type=recovery',
         ),
-      )
-    ).user.id,
-    'one',
+      ),
+    (error) => error.code === 'flow_state_not_found',
   );
+  assert.equal(calls.length, 0);
   assert.equal(
     (await consumeCallback(client, new URL(origin + '/reset-password?code=c')))
       .user.id,
     'two',
   );
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 1);
   await assert.rejects(
     () =>
       consumeCallback(
@@ -100,6 +101,27 @@ test('recovery and confirmation links route independently of transient auth even
   );
   assert.match(authMessage({ code: 'invalid_credentials' }), /incorrect/);
 });
+test('auth client uses PKCE and never auto-detects tokens from the URL', async () => {
+  let options;
+  const client = await authClient({
+    fetcher: async () => ({
+      ok: true,
+      json: async () => ({
+        supabaseUrl: 'https://example.supabase.co',
+        supabaseKey: 'sb_publishable_test',
+      }),
+    }),
+    clientFactory: (_url, _key, config) => {
+      options = config;
+      return { auth: {} };
+    },
+  });
+  assert.ok(client.client);
+  assert.equal(options.auth.flowType, 'pkce');
+  assert.equal(options.auth.detectSessionInUrl, false);
+  assert.equal(options.auth.persistSession, true);
+});
+
 test('API gate rejects missing, invalid, anonymous and unconfirmed sessions', async () => {
   let res = response();
   let called = false;

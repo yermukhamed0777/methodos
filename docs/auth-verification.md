@@ -111,3 +111,23 @@ a confirmed account. That message comes from Supabase returning an empty
 - Email confirmation was not disabled or relaxed.
 - No Supabase authentication policy, schema or provider setting was changed.
 - No credentials, tokens or personal addresses are recorded in this file.
+
+## Correction — 26 November 2026 (supersedes the stale status above)
+
+The earlier statement "206 tests pass" (line 42 above) and "production still
+serves the pre-#15 build" (line 66 above) were true at the time but are no longer
+current. Verified on 2026-11-26 from the repository root:
+
+- `npm.cmd run check` → exit 0, **232 tests, 232 pass, 0 fail**.
+- `npm.cmd run check:live` → **8/8** for
+  `https://opportunity-explorer-ruddy.vercel.app`, including the BARYS marker and
+  the branded 404 page that the old note said were missing.
+- `gh api repos/yermukhamed0777/methodos/commits/32ef0ba/statuses` → Vercel
+  `success` for the reviewed `main` commit.
+
+No email, inbox, SMTP, recovery round trip or live account was tested by an
+agent. One documentation/code nuance remains open: the browser client sets
+`flowType: 'implicit'` (`src/auth-client.js:28`) while this file describes PKCE
+links; `consumeCallback()` accepts both token forms, so the owner should record
+which form actually arrives in the confirmation email. Filed as a future
+backlog item, not as a verified defect.

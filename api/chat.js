@@ -9,6 +9,7 @@ import {
   fallbackAnswer,
   navigationFor,
 } from '../lib/assistant.js';
+import { conflictNotes, groundingViolation } from '../lib/grounding.js';
 export function createChatHandler({
   authenticate = requireUser,
   getContext = developmentContext,
@@ -128,27 +129,39 @@ export function createChatHandler({
           notice:
             'A personal plan needs context. You can still browse the collection without a profile.',
         });
-      const references = results.map((o) => ({
-        id: o.id,
-        kind: o.kind,
-        name: o.name,
-        url: o.url,
-        checkedOn: o.checkedOn,
-      }));
+      // A one-word incidental overlap is not evidence for a generated answer.
+      const grounded = results.filter((o) => o.score >= 3);
+      const conflicts = conflictNotes(grounded);
+      const references = grounded
+        .filter((o, i, all) => all.findIndex((x) => x.id === o.id) === i)
+        .map((o) => ({
+          id: o.id,
+          kind: o.kind,
+          name: o.name,
+          // Only real provider URLs are sources; in-app routes are navigation.
+          ...(/^https:\/\//.test(o.url || '') ? { url: o.url } : {}),
+          ...(o.checkedOn ? { checkedOn: o.checkedOn } : {}),
+        }));
       const fallback = (notice, status = 200, extra = {}) => {
         if (extra.retryAfter != null)
           res.setHeader('Retry-After', String(extra.retryAfter));
         const { retryAfter, ...body } = extra;
         return res.status(status).json({
           mode: 'catalog',
-          text: fallbackAnswer(results),
+          text: fallbackAnswer(grounded),
           references,
-          routes: navigationFor(results),
-          notice,
+          routes: navigationFor(grounded),
+          notice: notice + (conflicts.length ? ` ${conflicts.join(' ')}` : ''),
           ...body,
           requestId,
         });
       };
+      // A question with no reviewed match must not reach a model: otherwise
+      // general-knowledge prose can look like sourced Methodos evidence.
+      if (!grounded.length)
+        return fallback(
+          'I could not find a match in the researched collection. Try a broader subject or location. This is catalog search, not a search of the whole internet.',
+        );
       if (!isGatewayConfigured(env))
         return fallback(
           'AI generation is not configured. Showing catalog search.',
@@ -177,18 +190,41 @@ export function createChatHandler({
               profile,
               permittedContext,
               today: new Date().toISOString().slice(0, 10),
-              catalog: results,
+              catalog: grounded,
               conversation: history,
             }),
             maxOutputTokens: 1200,
           },
           { requestId },
         );
+        // Prompt instructions are not validation. An empty, non-string or
+        // oversized completion must not be presented as a grounded answer.
+        if (typeof text !== 'string' || !text.trim() || text.length > 8000)
+          return fallback(
+            'The model returned an unusable answer. Showing catalog search instead.',
+            503,
+          );
+        // Structural grounding checks: an answer that cannot name a retrieved
+        // record, includes unsupported claim shapes, or pretends to have
+        // browsed live is replaced by the labelled catalog fallback. This does
+        // not prove semantic truth; it prevents the clearest false evidence.
+        const violation = groundingViolation(text);
+        const citesEvidence = grounded.some(
+          (o) =>
+            typeof o.name === 'string' &&
+            o.name.length > 2 &&
+            text.toLowerCase().includes(o.name.toLowerCase()),
+        );
+        if (violation || !citesEvidence)
+          return fallback(
+            `The generated answer could not be checked against the reviewed catalog${violation ? `: ${violation}` : ' because it did not name a reviewed catalog entry. It did not name a reviewed record from the researched collection'}. Showing catalog search instead.`,
+            503,
+          );
         return res.status(200).json({
           mode: 'ai',
           text,
           references,
-          routes: navigationFor(results),
+          routes: navigationFor(grounded),
           requestId,
           model: aiModel,
           usedFallback,
@@ -196,7 +232,8 @@ export function createChatHandler({
             (usedFallback
               ? 'A permitted backup model answered this request. '
               : '') +
-            'AI suggestions use the researched catalog, not a live web search. Check every provider source. Up to 10 requests per account per day, subject to a site-wide allowance.',
+            'AI suggestions use the researched catalog, not a live web search. Check every provider source. Up to 10 requests per account per day, subject to a site-wide allowance.' +
+            (conflicts.length ? ` ${conflicts.join(' ')}` : ''),
         });
       } catch (error) {
         const diagnostic = gatewayDiagnostic(error, {
@@ -204,7 +241,7 @@ export function createChatHandler({
           requestId,
         });
         return fallback(
-          `AI generation is unavailable (${diagnostic.errorCode}). Showing catalog search instead. Request reference: ${requestId}.`,
+          `AI generation is unavailable (${diagnostic.errorCode}). Showing catalog search instead. Request reference: ${requestId}. This attempt counted toward your daily allowance.`,
           503,
         );
       }

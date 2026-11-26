@@ -3,6 +3,8 @@
 The full handoff — consent wording, schedule, collection fields, failure
 intake, go/no-go criteria and the human-only list — is in
 [pilot-handoff.md](pilot-handoff.md). This file is the pre-flight checklist.
+A blank, copy-ready [record sheet](pilot-record-sheet.md) is provided; it is
+prepared only and contains no participant data.
 
 ## Before inviting students
 

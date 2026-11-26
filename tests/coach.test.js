@@ -155,6 +155,63 @@ test('coach produces a cleaned AI draft with references and no saved side effect
   assert.match(res.body.notice, /Nothing has been saved or submitted/);
 });
 
+test('an explicit recordId cannot make a pathway or directory an application target', async () => {
+  const pathway = {
+    id: 'pathway-materials',
+    kind: 'pathway',
+    status: 'Published',
+    payload: {
+      id: 'pathway-materials',
+      name: 'Illustrative pathway',
+      checkedOn: '2026-11-01',
+    },
+  };
+  const opportunity = {
+    id: 'opportunity-open',
+    kind: 'opportunity',
+    status: 'Published',
+    payload: {
+      id: 'opportunity-open',
+      name: 'Open opportunity',
+      status: 'Open',
+      openVerified: true,
+      applicationUrl: 'https://example.org/apply',
+      checkedOn: '2026-11-20',
+    },
+  };
+  const setup = deps({ rows: [pathway, opportunity] });
+  const res = response();
+  await createCoachHandler(setup.options)(
+    {
+      method: 'POST',
+      body: {
+        target: 'materials',
+        notes: 'I studied materials.',
+        recordId: 'pathway-materials',
+      },
+    },
+    res,
+  );
+  assert.equal(res.statusCode, 200);
+  assert(!res.body.references.some((r) => r.id === 'pathway-materials'));
+
+  const valid = response();
+  await createCoachHandler(deps({ rows: [pathway, opportunity] }).options)(
+    {
+      method: 'POST',
+      body: {
+        target: 'materials',
+        notes: 'I studied materials.',
+        recordId: 'opportunity-open',
+      },
+    },
+    valid,
+  );
+  const cited = valid.body.references.find((r) => r.id === 'opportunity-open');
+  assert(cited, 'a real application target is cited');
+  assert.equal(cited.verification, 'Verified Open');
+});
+
 test('draft helpers keep text bounded and never invent facts', () => {
   assert.equal(
     cleanDraft('<b>Hello</b> [world](https://example.org)'),

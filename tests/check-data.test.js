@@ -96,12 +96,46 @@ const base = () => ({
   },
 });
 
+const intelligence = () => ({
+  checkedOn: '2026-11-01',
+  records: [
+    {
+      id: 'intel-one',
+      name: 'Intelligence record one',
+      checkedOn: '2026-11-01',
+      sources: [['Official', 'https://example.org/one']],
+      status: 'Open',
+      openVerified: true,
+      applicationUrl: 'https://example.org/apply',
+      deadlineVerified: true,
+      finalDeadline: '2026-12-01',
+    },
+  ],
+  reviewQueue: [],
+});
+
 const run = (data) => validateData(data, { today: TODAY });
 const errors = (data) => run(data).filter((p) => p.severity === 'error');
 const warnings = (data) => run(data).filter((p) => p.severity === 'warn');
 
 test('a clean dataset has no problems', () => {
   assert.deepEqual(run(base()), []);
+});
+
+test('a clean expanded intelligence catalogue passes the same gate', () => {
+  assert.deepEqual(errors({ ...base(), intelligence: intelligence() }), []);
+});
+
+test('a false open claim in the expanded catalogue is rejected', () => {
+  const data = { ...base(), intelligence: intelligence() };
+  data.intelligence.records[0].applicationUrl = 'http://example.org/apply';
+  assert.match(errors(data)[0].message, /HTTPS applicationUrl/);
+});
+
+test('a duplicate id in the expanded catalogue is rejected', () => {
+  const data = { ...base(), intelligence: intelligence() };
+  data.intelligence.records.push({ ...data.intelligence.records[0] });
+  assert.ok(errors(data).some((p) => /duplicate id/.test(p.message)));
 });
 
 test('duplicate ids are rejected', () => {

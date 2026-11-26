@@ -17,8 +17,9 @@ test('glass tokens cover both themes and respect transparency preferences', () =
   assert.match(css, /prefers-reduced-motion: no-preference/);
   const index = readFileSync('dist/index.html', 'utf8');
   const auth = readFileSync('dist/auth.html', 'utf8');
-  assert.match(index, /href="\/glass\.css"/);
-  assert.match(auth, /href="\/glass\.css"/);
+  // Both shells load the build-generated stylesheet, which contains glass.css.
+  assert.match(index, /href="\/bundle\.css"/);
+  assert.match(auth, /href="\/bundle\.css"/);
   assert.match(auth, /class="auth-card glass-panel"/);
 });
 

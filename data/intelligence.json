@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedOn": "2026-11-12",
+  "checkedOn": "2026-11-24",
   "records": [
     {
       "id": "materials",
@@ -9,7 +9,7 @@
       "url": "https://www.coursera.org/learn/materials-science",
       "skills": ["Structure–property relationships", "Materials selection"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["mse"],
@@ -26,7 +26,7 @@
       "url": "https://www.coursera.org/specializations/python",
       "skills": ["Python", "Data processing"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": [
@@ -54,7 +54,7 @@
       "url": "https://www.coursera.org/specializations/machine-learning-introduction",
       "skills": ["Machine learning", "Model evaluation"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["ai"],
@@ -74,7 +74,7 @@
       "url": "https://www.coursera.org/learn/mechanics-1",
       "skills": ["Stress and strain", "Mechanical analysis"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["mse", "mechanical", "civil", "architecture"],
@@ -91,7 +91,7 @@
       "url": "https://www.coursera.org/learn/intro-chemistry",
       "skills": ["Stoichiometry", "Chemical reactions"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["chemical-engineering", "pharmacy", "chemistry"],
@@ -108,7 +108,7 @@
       "url": "https://www.coursera.org/learn/wharton-accounting",
       "skills": ["Financial statements", "Accounting"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["business", "finance"],
@@ -125,7 +125,7 @@
       "url": "https://www.coursera.org/learn/financial-markets-global",
       "skills": ["Risk", "Financial markets"],
       "checkedOn": "2026-11-11",
-      "cost": "Provider pricing applies. University/library access may cover LinkedIn Learning. Preview, audit and certificate access vary; no free certificate is promised.",
+      "cost": "Provider pricing applies; institutional access and audit options vary by provider. Preview and certificate conditions must be checked on the provider page. No free certificate is promised.",
       "costType": "Paid / access options vary",
       "kind": "course",
       "fieldIds": ["finance"],
@@ -736,7 +736,6 @@
         "Computer Science",
         "Programming Languages",
         "Engineering",
-        "Computer Science",
         "Software Design and Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -768,7 +767,6 @@
         "Earth Science",
         "Sustainability",
         "Science",
-        "Earth Science",
         "Environmental Science"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -826,13 +824,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["mechanical"],
       "level": "Undergraduate",
-      "skills": [
-        "Engineering",
-        "Mechanical Engineering",
-        "Engineering",
-        "Mechanical Engineering",
-        "Mechanical Design"
-      ],
+      "skills": ["Engineering", "Mechanical Engineering", "Mechanical Design"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -862,7 +854,6 @@
         "Engineering",
         "Mechanical Engineering",
         "Solid Mechanics",
-        "Engineering",
         "Materials Science and Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -893,7 +884,6 @@
       "skills": [
         "Engineering",
         "Materials Science and Engineering",
-        "Engineering",
         "Mechanical Engineering",
         "Solid Mechanics"
       ],
@@ -989,7 +979,6 @@
       "skills": [
         "Engineering",
         "Mechanical Engineering",
-        "Engineering",
         "Systems Engineering",
         "Computational Modeling and Simulation"
       ],
@@ -1238,7 +1227,6 @@
       "skills": [
         "Engineering",
         "Materials Science and Engineering",
-        "Engineering",
         "Systems Engineering",
         "Computational Modeling and Simulation"
       ],
@@ -1303,7 +1291,6 @@
         "Architecture",
         "Architectural Design",
         "Fine Arts",
-        "Architecture",
         "Architectural History and Criticism"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1413,7 +1400,6 @@
         "Architecture",
         "Architectural Design",
         "Fine Arts",
-        "Architecture",
         "Architectural History and Criticism"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1441,13 +1427,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["architecture", "design"],
       "level": "Undergraduate",
-      "skills": [
-        "Game Design",
-        "Fine Arts",
-        "Media Studies",
-        "Fine Arts",
-        "Visual Arts"
-      ],
+      "skills": ["Game Design", "Fine Arts", "Media Studies", "Visual Arts"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -1477,7 +1457,6 @@
         "Architecture",
         "Architectural Design",
         "Fine Arts",
-        "Architecture",
         "Environmental Design"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1534,7 +1513,6 @@
       "skills": [
         "Science",
         "Chemistry",
-        "Science",
         "Physics",
         "Atomic, Molecular, Optical Physics"
       ],
@@ -1621,13 +1599,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["chemistry"],
       "level": "Undergraduate",
-      "skills": [
-        "Science",
-        "Biology",
-        "Structural Biology",
-        "Science",
-        "Chemistry"
-      ],
+      "skills": ["Science", "Biology", "Structural Biology", "Chemistry"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -1715,7 +1687,6 @@
         "Engineering",
         "Mathematics",
         "Probability and Statistics",
-        "Engineering",
         "Civil Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1743,7 +1714,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["civil", "environment"],
       "level": "Undergraduate",
-      "skills": ["Science", "Biology", "Ecology", "Science", "Earth Science"],
+      "skills": ["Science", "Biology", "Ecology", "Earth Science"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -1801,13 +1772,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["civil", "environment"],
       "level": "Undergraduate",
-      "skills": [
-        "Engineering",
-        "Civil Engineering",
-        "Engineering",
-        "Civil Engineering",
-        "Construction Management"
-      ],
+      "skills": ["Engineering", "Civil Engineering", "Construction Management"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -1837,7 +1802,6 @@
         "Computer Science",
         "Algorithms and Data Structures",
         "Engineering",
-        "Computer Science",
         "Programming Languages"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1932,7 +1896,6 @@
         "Electrical Engineering",
         "Signal Processing",
         "Engineering",
-        "Electrical Engineering",
         "Digital Systems"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -1963,9 +1926,7 @@
       "skills": [
         "Computer Science",
         "Computer Design and Engineering",
-        "Engineering",
-        "Computer Science",
-        "Computer Design and Engineering"
+        "Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
@@ -1996,7 +1957,6 @@
         "Computer Science",
         "Programming Languages",
         "Engineering",
-        "Computer Science",
         "Software Design and Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2024,13 +1984,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["biology", "biotechnology"],
       "level": "Undergraduate",
-      "skills": [
-        "Biology",
-        "Molecular Biology",
-        "Science",
-        "Biology",
-        "Virology"
-      ],
+      "skills": ["Biology", "Molecular Biology", "Science", "Virology"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -2056,13 +2010,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["biology", "biotechnology"],
       "level": "Undergraduate",
-      "skills": [
-        "Biology",
-        "Genetics",
-        "Science",
-        "Biology",
-        "Molecular Biology"
-      ],
+      "skills": ["Biology", "Genetics", "Science", "Molecular Biology"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -2140,13 +2088,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["biology", "biotechnology"],
       "level": "Undergraduate",
-      "skills": [
-        "Biology",
-        "Molecular Biology",
-        "Science",
-        "Biology",
-        "Virology"
-      ],
+      "skills": ["Biology", "Molecular Biology", "Science", "Virology"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -2281,13 +2223,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["psychology", "biomedical"],
       "level": "Graduate",
-      "skills": [
-        "Science",
-        "Cognitive Science",
-        "Science",
-        "Biology",
-        "Neuroscience"
-      ],
+      "skills": ["Science", "Cognitive Science", "Biology", "Neuroscience"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -2493,13 +2429,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["psychology", "biomedical"],
       "level": "Graduate",
-      "skills": [
-        "Biology",
-        "Neurobiology",
-        "Science",
-        "Biology",
-        "Neuroscience"
-      ],
+      "skills": ["Biology", "Neurobiology", "Science", "Neuroscience"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -2593,7 +2523,6 @@
         "Transport Processes",
         "Engineering",
         "Biological Engineering",
-        "Engineering",
         "Chemical Engineering"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2657,7 +2586,6 @@
         "Architecture",
         "Architectural Design",
         "Fine Arts",
-        "Architecture",
         "Environmental Design"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2753,7 +2681,6 @@
         "Public Administration",
         "Science and Technology Policy",
         "Social Science",
-        "Public Administration",
         "Social Welfare"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2817,7 +2744,6 @@
         "International Development",
         "Society",
         "Global Poverty",
-        "Society",
         "The Developing World"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2849,7 +2775,6 @@
         "Social Science",
         "Public Administration",
         "Public Policy",
-        "Social Science",
         "Political Science"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -2897,7 +2822,7 @@
       "kind": "course"
     },
     {
-      "name": "Principles of Microeconomics ",
+      "name": "Principles of Microeconomics",
       "url": "https://ocw.mit.edu/courses/14-01-principles-of-microeconomics-fall-2023/",
       "provider": "MIT OpenCourseWare",
       "institution": "Massachusetts Institute of Technology",
@@ -3019,13 +2944,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["economics", "finance"],
       "level": "Undergraduate",
-      "skills": [
-        "Social Science",
-        "Economics",
-        "Social Science",
-        "Economics",
-        "Financial Economics"
-      ],
+      "skills": ["Social Science", "Economics", "Financial Economics"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -3087,7 +3006,6 @@
         "Social Science",
         "Economics",
         "Microeconomics",
-        "Social Science",
         "Game Theory"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3145,7 +3063,6 @@
         "Economics",
         "International Economics",
         "Social Science",
-        "Economics",
         "Industrial Organization"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3177,7 +3094,6 @@
         "Economics",
         "International Economics",
         "Social Science",
-        "Economics",
         "Macroeconomics"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3395,7 +3311,6 @@
         "Economics",
         "Industrial Organization",
         "Social Science",
-        "Economics",
         "Microeconomics"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3453,13 +3368,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["mechanical"],
       "level": "Undergraduate",
-      "skills": [
-        "Engineering",
-        "Aerospace Engineering",
-        "Engineering",
-        "Aerospace Engineering",
-        "Propulsion Systems"
-      ],
+      "skills": ["Engineering", "Aerospace Engineering", "Propulsion Systems"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -3610,7 +3519,6 @@
       "skills": [
         "Social Science",
         "Political Science",
-        "Social Science",
         "Economics",
         "Political Economy"
       ],
@@ -3643,7 +3551,6 @@
         "Social Science",
         "Economics",
         "International Economics",
-        "Social Science",
         "Political Science"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3707,7 +3614,6 @@
         "Social Science",
         "Economics",
         "International Economics",
-        "Social Science",
         "Political Science"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3735,13 +3641,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["politics", "international-relations"],
       "level": "Graduate",
-      "skills": [
-        "Social Science",
-        "Political Science",
-        "Social Science",
-        "Political Science",
-        "American Politics"
-      ],
+      "skills": ["Social Science", "Political Science", "American Politics"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -3803,7 +3703,6 @@
         "Differential Equations",
         "Mathematics",
         "Calculus",
-        "Mathematics",
         "Applied Mathematics"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3883,12 +3782,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["mathematics", "data-science"],
       "level": "Undergraduate",
-      "skills": [
-        "Mathematics",
-        "Calculus",
-        "Mathematics",
-        "Differential Equations"
-      ],
+      "skills": ["Mathematics", "Calculus", "Differential Equations"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -3944,7 +3838,6 @@
         "Calculus",
         "Mathematics",
         "Differential Equations",
-        "Mathematics",
         "Linear Algebra"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -3972,13 +3865,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["biomedical", "biotechnology"],
       "level": "Undergraduate",
-      "skills": [
-        "Engineering",
-        "Biological Engineering",
-        "Synthetic Biology",
-        "Engineering",
-        "Biological Engineering"
-      ],
+      "skills": ["Engineering", "Biological Engineering", "Synthetic Biology"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -4008,7 +3895,6 @@
         "Calculus",
         "Mathematics",
         "Linear Algebra",
-        "Mathematics",
         "Differential Equations"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4228,13 +4114,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["psychology", "education"],
       "level": "Undergraduate",
-      "skills": [
-        "Humanities",
-        "Philosophy",
-        "Metaphysics",
-        "Humanities",
-        "Religion"
-      ],
+      "skills": ["Humanities", "Philosophy", "Metaphysics", "Religion"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -4296,7 +4176,6 @@
         "Gender Studies",
         "Society",
         "Global Poverty",
-        "Society",
         "The Developing World"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4359,7 +4238,6 @@
       "skills": [
         "Social Science",
         "Political Science",
-        "Social Science",
         "Sociology",
         "Social Justice"
       ],
@@ -4456,7 +4334,6 @@
         "History",
         "Middle Eastern History",
         "Humanities",
-        "History",
         "Modern History"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4520,7 +4397,6 @@
         "History",
         "Ancient History",
         "Humanities",
-        "History",
         "European History"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4600,13 +4476,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["politics", "international-relations"],
       "level": "Undergraduate",
-      "skills": [
-        "History",
-        "American History",
-        "Humanities",
-        "History",
-        "Modern History"
-      ],
+      "skills": ["History", "American History", "Humanities", "Modern History"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -4728,13 +4598,7 @@
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["media"],
       "level": "Undergraduate",
-      "skills": [
-        "Literature",
-        "Periodic Literature",
-        "Humanities",
-        "Literature",
-        "Rhetoric"
-      ],
+      "skills": ["Literature", "Periodic Literature", "Humanities", "Rhetoric"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
       "format": "Self-paced archived teaching materials",
@@ -4860,7 +4724,6 @@
         "Literature",
         "Academic Writing",
         "Humanities",
-        "Literature",
         "Nonfiction Prose"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4892,7 +4755,6 @@
         "Literature",
         "Academic Writing",
         "Humanities",
-        "Literature",
         "Technical Writing"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -4924,7 +4786,6 @@
         "Literature",
         "Periodic Literature",
         "Humanities",
-        "Literature",
         "Technical Writing"
       ],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
@@ -11222,7 +11083,7 @@
         ]
       ],
       "checkedOn": "2026-11-11",
-      "verification": "Confirmed future deadline",
+      "verification": "Tentative Fall schedule · deadline to verify",
       "note": "Spring 2027 applications closed on 15 October 2026. The listed Fall schedule is tentative; verify the portal’s 23:59 JST cut-off.",
       "closed": false,
       "funded": false,
@@ -11479,8 +11340,8 @@
       "eligibility": "Students from IMPA and other institutions; choose an appropriate course and verify prerequisites and language.",
       "funding": "Local scholarships exist with separate rules; funding is not guaranteed",
       "compensation": null,
-      "finalDeadline": "2027-01-18",
-      "deadline": "2027-01-18",
+      "finalDeadline": null,
+      "deadline": null,
       "startDate": "2027-01-04",
       "duration": "4 January–26 February 2027",
       "requiredSkills": [],
@@ -11507,7 +11368,7 @@
         "PhD or doctoral degree"
       ],
       "applicationUrl": "https://impa.br/programas/escola-de-verao/",
-      "status": "Upcoming",
+      "status": "Deadline not announced",
       "openVerified": false,
       "deadlineVerified": false
     },
@@ -11716,7 +11577,7 @@
       "deadline": "11 Dec 2026",
       "deadlineDetail": "11:59 pm US Eastern (12 Dec, 12:59 pm Hong Kong). This is the CEE deadline; international country deadlines may differ.",
       "dateStatus": "Confirmed deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "MIT: 20 Jun–31 Jul 2027; Stanford: 27 Jun–7 Aug 2027.",
       "description": "Six weeks of scientific coursework and mentored original research, ending in a written report and presentation.",
       "output": "A mentored research project, scientific report and oral presentation.",
@@ -12221,7 +12082,7 @@
       "deadline": "31 Dec 2026 · regular",
       "deadlineDetail": "Late enrollment closes 1 Feb 2027 at a higher fee. Universal cut-off timezone was not verified.",
       "dateStatus": "Confirmed deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "Competition: 18 Mar 2027. Verify your selected center’s session details.",
       "description": "An individual mathematical problem-solving competition for school students at participating centers.",
       "output": "An individual problem-solving result and ranking in the relevant level.",
@@ -12273,7 +12134,7 @@
       "deadline": "12 Mar 2027",
       "deadlineDetail": "23:59 CET (Geneva), equivalent to 13 Mar, 06:59 Hong Kong. Proposals open December 2026.",
       "dateStatus": "Eligibility conflict",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "Online information events from Nov 2026; winners conduct experiments in late Sep 2027.",
       "description": "Design a particle-beam experiment and compete for the chance to carry it out at a major physics laboratory.",
       "output": "A research proposal and experimental design; selected winners conduct the experiment.",
@@ -12496,7 +12357,7 @@
       "deadline": "14 Jan 2027",
       "deadlineDetail": "Regular application deadline: 18:00 KST (17:00 Hong Kong). The timeline lists 21 Jan for references, but also has a general note about all documents being due by the deadline; confirm reference timing.",
       "dateStatus": "Confirmed application deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "deadlineConfirmed": true,
       "finalDeadline": "2027-01-14",
       "schedule": "Regular applications: 10 Nov 2026–14 Jan 2027; fall enrollment starts late Aug 2027.",
@@ -12719,7 +12580,7 @@
       "deadline": "15 Jan 2027",
       "deadlineDetail": "Scholarship application deadline: 15 Jan 2027. The checked page does not establish a universal cut-off time or timezone; confirm before submitting.",
       "dateStatus": "Confirmed deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "deadlineConfirmed": true,
       "finalDeadline": "2027-01-15",
       "schedule": "Applications opened 15 Oct 2026 for the two-year 2027–2029 program.",
@@ -12795,7 +12656,7 @@
       "deadline": "30 Nov 2026 · 11:59 CET",
       "deadlineDetail": "The official 2027 master’s admissions page specifies 11:59 AM CET, equivalent to 18:59 Hong Kong, on 30 November. ESOP must be requested in this first application window.",
       "dateStatus": "Confirmed deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "Applications: 1–30 Nov 2026; autumn semester begins 20 Sep 2027.",
       "description": "Competitive funding for excellent master’s applicants, including living support, waived tuition and mentorship.",
       "output": "Scholarship support toward a regular ETH master’s degree, if selected.",
@@ -12883,7 +12744,7 @@
       "deadline": "15 Dec 2026 · external applicants",
       "deadlineDetail": "For 2027 entry, external applications must be paid for and validated by 15 December. References are due one week later, on the date stated in the validation email. The page does not specify a cut-off timezone. Some EPFL internal applicants have a 31 January route.",
       "dateStatus": "Confirmed application deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "For 2027 master’s entry; references follow the timing in the validated application email.",
       "description": "A limited number of fellowships recognizing academic excellence and wider achievements among incoming master’s students.",
       "output": "Financial support for master’s study, conditional on selection and renewal requirements.",
@@ -12942,7 +12803,7 @@
       "aid": true,
       "checkedOn": "2026-11-06",
       "addedOn": "2026-11-06",
-      "archived": false,
+      "archived": true,
       "deadlineConfirmed": true,
       "id": "opportunity-ubc-international-scholars-2027",
       "name": "UBC International Scholars Program",
@@ -12967,7 +12828,7 @@
       "deadline": "25 Nov 2026 · portal extension",
       "deadlineDetail": "The official 2027 award portal extends the deadline to 25 Nov at 12:00 PM Pacific Standard Time (26 Nov, 04:00 Hong Kong). The general information page still says 15 Nov; confirm reference and nomination timing.",
       "dateStatus": "Official pages differ",
-      "status": "Deadline not announced",
+      "status": "Previous cycle",
       "schedule": "For September 2027 entry; admission application must precede the award application.",
       "description": "Need-based undergraduate awards for international students with outstanding academic and community contributions.",
       "output": "Assessed financial support for an eligible first undergraduate degree, if selected.",
@@ -13037,7 +12898,7 @@
       "deadline": "26 Jan 2027 · 12:00 UK time",
       "deadlineDetail": "Official undergraduate funding information gives 12 noon UK time on 26 January 2027, equivalent to 20:00 Hong Kong. The application procedure is due to appear in January.",
       "dateStatus": "Confirmed deadline",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "Scholarship application opens January 2027 for eligible 2027 offer holders.",
       "description": "A small undergraduate scholarship scheme for students unable to study suitably in their own countries for financial, political or educational reasons.",
       "output": "Undergraduate funding if an eligible Oxford offer holder is selected.",
@@ -13183,7 +13044,7 @@
       "deadline": "16 Dec 2026 · 13:00 CET",
       "deadlineDetail": "The department confirms 16 December 2026 at 13:00 CET, equivalent to 20:00 Hong Kong. Applications opened 1 November. Submit through the official SiROP link.",
       "dateStatus": "Program dates differ",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "Department application page: 2 July–27 August 2027. Linked SiROP listing: 1 July–31 August. Confirm required arrival and departure dates before booking.",
       "description": "Join a computer-science research group for a supervised summer project and an international cohort experience.",
       "output": "Hands-on research within an ETH laboratory; no publication or admission outcome is promised.",
@@ -13259,7 +13120,7 @@
       "deadline": "1 Apr 2027 · verify portal clock",
       "deadlineDetail": "The provider states 16:00 CET. Confirm the portal’s timezone because April normally uses daylight-saving time. Obtain admission first; allow processing time.",
       "dateStatus": "Confirmed day · check timezone",
-      "status": "Deadline not announced",
+      "status": "Upcoming",
       "schedule": "September 2027 intake.",
       "description": "Merit-based support for incoming international master’s students.",
       "output": "Partial financial support for an eligible MSc.",

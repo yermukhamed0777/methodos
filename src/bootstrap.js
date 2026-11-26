@@ -19,6 +19,12 @@ async function loadScript(src) {
   });
 }
 async function start() {
+  // Never forward or retain fragment bearer tokens; only PKCE codes on the
+  // dedicated auth routes are valid callbacks.
+  if (/access_token=|refresh_token=/.test(route.hash)) {
+    history.replaceState(null, '', route.pathname + route.search);
+    route.hash = '';
+  }
   const kind = callbackKind(route);
   if (kind) {
     location.replace(

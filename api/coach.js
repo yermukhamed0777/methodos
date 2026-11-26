@@ -3,6 +3,7 @@ import { isGatewayConfigured } from '../lib/ai-config.js';
 import { generateWithFallback, gatewayDiagnostic } from '../lib/ai-gateway.js';
 import { requireUser } from '../lib/auth.js';
 import { searchResources, navigationFor } from '../lib/assistant.js';
+import { verificationStatus } from '../lib/intelligence-core.js';
 import { validateCoachInput, cleanDraft, templateDraft } from '../lib/coach.js';
 export function createCoachHandler({
   authenticate = requireUser,
@@ -51,25 +52,52 @@ export function createCoachHandler({
         extra: published,
         kinds: ['opportunity', 'course', 'university'],
       }).slice(0, 6);
-      const exact = recordId ? published.find((r) => r.id === recordId) : null;
+      // A writing target must be something a person can actually apply to;
+      // a pathway or directory record must not become an application target.
+      const exact = recordId
+        ? published.find(
+            (r) =>
+              r.id === recordId &&
+              ['opportunity', 'scholarship'].includes(r.kind),
+          )
+        : null;
       const references = (exact ? [exact, ...results] : results)
+        .filter((r, i, all) => r && all.findIndex((x) => x.id === r.id) === i)
+        .slice(0, 6)
+        .map((r) => {
+          const url = r.url || r.sources?.[0]?.[1];
+          return {
+            id: r.id,
+            name: r.name,
+            status: r.status,
+            verification: verificationStatus(r).label,
+            ...(/^https:\/\//.test(url || '') ? { url } : {}),
+            ...(r.checkedOn ? { checkedOn: r.checkedOn } : {}),
+          };
+        });
+      // The prompt must contain the reviewed facts it tells the model to use,
+      // not just the names and dates shown to the student.
+      const evidence = (exact ? [exact, ...results] : results)
         .filter((r, i, all) => r && all.findIndex((x) => x.id === r.id) === i)
         .slice(0, 6)
         .map((r) => ({
           id: r.id,
           name: r.name,
-          url: r.url || r.sources?.[0]?.[1],
+          kind: r.kind,
+          summary: r.summary || r.description || r.question || '',
+          eligibility: r.eligibility || r.caution || '',
           checkedOn: r.checkedOn,
         }));
-      const template = () =>
+      const template = (
+        notice = 'This is a writing skeleton, not AI text. Fill it only with facts you can verify at the provider source.',
+      ) =>
         res.status(200).json({
           mode: 'template',
           text: templateDraft({ target, notes, section, references }),
           references,
           routes: navigationFor(results),
           requestId,
-          notice:
-            'This is a writing skeleton, not AI text. Fill it only with facts you can verify at the provider source.',
+          notice,
         });
       if (!isGatewayConfigured(env)) return template();
       const { data: allowed, error: quotaError } =
@@ -85,6 +113,7 @@ export function createCoachHandler({
               section,
               studentNotes: notes,
               references,
+              catalog: evidence,
               today: new Date().toISOString().slice(0, 10),
             }),
             maxOutputTokens: 900,
@@ -109,12 +138,9 @@ export function createCoachHandler({
           'Coach generation failed',
           gatewayDiagnostic(error, { model: env.AI_GATEWAY_MODEL, requestId }),
         );
-        return res.status(503).json({
-          error:
-            'AI drafting is unavailable. The writing skeleton remains available when you retry.',
-          code: 'coach_unavailable',
-          requestId,
-        });
+        return template(
+          `AI drafting is unavailable (request ${requestId}). Showing the writing skeleton instead; add only facts you can verify at the provider source.`,
+        );
       }
     } catch (error) {
       console.error(

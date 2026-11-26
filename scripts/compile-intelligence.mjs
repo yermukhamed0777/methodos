@@ -81,7 +81,10 @@ for (const o of old.opportunities)
       ? 'Previous cycle'
       : o.openVerified && o.applicationUrl
         ? 'Open'
-        : 'Deadline not announced',
+        : o.finalDeadline && o.deadlineConfirmed
+          ? 'Upcoming'
+          : 'Deadline not announced',
+    archived: !!o.archived,
     openVerified: !o.archived && !!(o.openVerified && o.applicationUrl),
     deadlineVerified: !!o.deadlineConfirmed,
     summary: o.description,

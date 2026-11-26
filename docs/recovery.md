@@ -1,5 +1,9 @@
 # Deployment recovery — 11 November 2026
 
+This document is about **deployment** recovery. For password reset and account
+recovery, see [auth-routing-and-domains.md](auth-routing-and-domains.md) and
+[auth-verification.md](auth-verification.md).
+
 The production Vercel deployment `dpl_D4iodcdRr6SXFKscibu7T4fgUVxw` was marked READY but its source tree contained no `dist/index.html`, `dist/app.js` or `dist/styles.css`. Its `out` tree contained only the two feed functions. The production root therefore returned Vercel's 404 page. A successful deployment status did not prove a usable frontend.
 
 The last complete deployment available for inspection was `dpl_6rkJknYeQtsWih1Y5YefUDJw6pz7`. Its HTML, JavaScript and CSS could be fetched. The latest GitHub revision was `b287a5382c5adf33c7b7a789c048492fb2ee41c3`; it included additional reliability fixes and tests. The original GitHub revision is preserved in `backup/pre-prospectoai-2026-11-11`.

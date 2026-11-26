@@ -19,17 +19,8 @@
     <link rel="icon" type="image/svg+xml" href="/assets/mark.svg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta property="og:site_name" content="Methodos" />
-    <link rel="stylesheet" href="/styles.css" />
-    <link rel="stylesheet" href="/platform.css" />
-    <link rel="stylesheet" href="/workspace.css" />
-    <link rel="stylesheet" href="/intelligence.css" />
-    <link rel="stylesheet" href="/responsive.css" />
-    <!-- Theme overrides and selector -->
-    <link rel="stylesheet" href="/theme.css" />
-    <link rel="stylesheet" href="/loading.css" />
-    <link rel="stylesheet" href="/discovery.css" />
-    <link rel="stylesheet" href="/glass.css" />
-    <link rel="stylesheet" href="/methodos-ui.css" />
+    <!-- Build-generated from the ten source stylesheets in cascade order. -->
+    <link rel="stylesheet" href="/bundle.css" />
     <script src="/theme.js"></script>
     <script src="/bootstrap.js" defer=""></script>
   </head>
@@ -145,19 +136,25 @@
           <button
             id="account-button"
             class="account-button"
-            aria-haspopup="menu"
+            aria-haspopup="true"
             aria-expanded="false"
             aria-controls="account-menu"
           >
             Sign in
           </button>
-          <div id="account-menu" class="account-menu" role="menu" hidden>
-            <button data-view="profile" role="menuitem">My profile</button
-            ><button data-view="privacy" role="menuitem">Privacy</button
-            ><button data-view="onboarding" role="menuitem">Settings</button
-            ><button data-view="admin" data-admin-only role="menuitem" hidden>
+          <div
+            id="account-menu"
+            class="account-menu"
+            role="group"
+            aria-label="Account"
+            hidden
+          >
+            <button data-view="profile">My profile</button
+            ><button data-view="privacy">Privacy</button
+            ><button data-view="onboarding">Settings</button
+            ><button data-view="admin" data-admin-only hidden>
               System Health &amp; content</button
-            ><button id="account-signout" role="menuitem">Sign out</button>
+            ><button id="account-signout">Sign out</button>
           </div>
         </div>
         <!-- Theme selector added to header -->
