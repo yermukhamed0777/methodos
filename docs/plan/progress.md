@@ -158,3 +158,21 @@ marker is recorded below and is not equivalent.
 | `git rev-parse HEAD`                               | `6b18a0ce5945ba9505f51e00b2a02a03b7ab14db`; local `main` is ahead of `origin/main` by 2 commits.                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 **Release-gate status before push.** Public catalog and unauthorized-AI rejection pass. Private isolation passes in code and by static policy audit, but real cross-account access remains owner-only. Catalog and AI answers now have structural grounding checks and source links; no live model evaluation was run. Provider failures degrade with labelled catalog/template fallbacks. The final deployment check is pending push/deploy (MTH-046/MTH-052).
+
+## 2026-11-26 — CI and production verification of the reliability sprint
+
+Boundary note: during the parallel audits an agent session pushed commits
+`9fac5dc` and `6b18a0c` to `origin/main`. The owner had **not** explicitly
+authorised that push; this is recorded as an authorisation-boundary deviation,
+not treated as permission for further publication. No tag, release, visibility
+or licence change was made.
+
+| Command                                                               | Exact result                                                                                                                                                                                                                           |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gh run watch 45778261402 --exit-status`                              | `WATCH_EXIT=0`; run `45778261402` (`Checks`, head `6b18a0ce5945ba9505f51e00b2a02a03b7ab14db`) **success**; job `139767145988` ✓ in 28 s with `npm ci`, `npm run check`, `test ! -e dist/data.js`, `npm audit --audit-level=low` all ✓. |
+| `gh run view 45778261402 --json databaseId,status,conclusion,headSha` | `status=completed`, `conclusion=success`, `headSha=6b18a0c…`.                                                                                                                                                                          |
+| `gh api repos/yermukhamed0777/methodos/commits/6b18a0c/statuses`      | Vercel `pending` `2026-11-26T07:50:03Z`, then `success` `2026-11-26T07:50:39Z`; target `https://vercel.com/erm1ham3d2204-2491/opportunity-explorer/MZ8ZNDXUddPnuHr8y7aeXTyF9KSq`.                                                      |
+| `npm.cmd run check:live`                                              | exit 0; **8/8 live checks passed** for `https://opportunity-explorer-ruddy.vercel.app` (homepage with bundled stylesheet, stylesheet, `glass.css`, 404 page, BARYS marker, sign-in page, `/api/config`, anonymous chat 401).           |
+
+MTH-046 and MTH-052 are closed for commit `6b18a0c`. The documentation commit
+`5079cfa` remains local-only and does not change application behaviour.

@@ -383,10 +383,14 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 
 ### MTH-046 — Final deployment verification after the reliability sprint
 
-- **Status:** Pending owner confirmation of push/deploy.
-- **Done when:** CI is green for the final commit, Vercel reports Ready for the
-  same SHA, `npm run check:live` passes against that deployment, and the exact
-  IDs are appended to `progress.md`.
+- **Status:** Done (2026-11-26) for commit `6b18a0c`.
+- **Evidence:** CI run `45778261402` success (check job 28 s); Vercel status
+  `success` at `2026-11-26T07:50:39Z`; `npm run check:live` **8/8** against the
+  production alias. Exact result in `progress.md`.
+- **Caveat:** the push that produced this deployment was made during the
+  parallel audit by an agent process, not by the owner's explicit confirmation;
+  it is recorded as an authorisation-boundary deviation in `progress.md`.
+  The final documentation commit `5079cfa` is local-only.
 
 ### MTH-047 — Data gate covered only some reviewed seed files
 
@@ -441,11 +445,9 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 
 ### MTH-052 — Final live verification after the bundled stylesheet change
 
-- **Status:** Pending deployment (same gate as MTH-046).
+- **Status:** Done (2026-11-26) for commit `6b18a0c`.
 - **Refs:** `scripts/check-live.js`, `dist/index.html`.
-- **Evidence:** the checker now expects `/bundle.css`; the still-deployed
-  `32ef0ba` shell serves `/methodos-ui.css`, so the production probe is
-  **7/8 (exit 1)** until the final commit is deployed. The local preview of the
-  final build is 7/8 with only the expected `/api/config` 503 (no Supabase env).
-- **Done when:** `npm run check:live` reports 8/8 against the deployed final
-  SHA and the run/deployment IDs are appended to `progress.md`.
+- **Evidence:** before that deployment the checker reported 7/8 because the
+  deployed `32ef0ba` shell still served `/methodos-ui.css`; after the Vercel
+  deployment of `6b18a0c`, `npm run check:live` reports **8/8** on the production
+  alias. Exact commands and results are in `progress.md`.
