@@ -38,3 +38,13 @@ API, `vercel.json`, `data/**`, `dist/**` or generated assets, so a code change
 still builds. Rationale: it reduces noise without weakening the release path.
 The separate question of whether Vercel blocks deployment on red CI is a
 project setting (MTH-010), not something this command can enforce.
+
+## D-05 — Remove the `ignoreCommand` (reverses D-04, 2026-11-26)
+
+The first production deployment after push failed at the `ignoreStep` with exit
+code 129: `warning: Not a git repository. Use --no-index to compare two paths
+outside a working tree` (deployment `dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv`, commit
+`1d75c48`). Vercel executes the command where `.git` is unavailable, so a
+`git diff --quiet HEAD^ HEAD …` optimization cannot work there. Rationale: the
+optimization is not worth a broken release path; every push should build.
+D-04 is reversed, not silently rewritten.

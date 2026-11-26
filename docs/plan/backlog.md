@@ -163,3 +163,20 @@ dist/data.js` and `npm audit --audit-level=low` in CI so CI and local run the
 - **Why human:** requires recruiting and consenting real participants. This is
   the boundary; work stops here.
 - **Done when:** owner records real outcomes and files failures as new IDs.
+
+## Defect found during delivery
+
+### MTH-014 — Vercel production deployment failed at the ignored build step
+
+- **Status:** In progress
+- **Refs:** `vercel.json` (`ignoreCommand`, now removed), `docs/plan/decisions.md`
+  D-04/D-05, deployment `dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv` at `1d75c48`.
+- **Evidence:** GitHub Vercel status `failure`: `Command failed with exit code
+129 … warning: Not a git repository. Use --no-index to compare two paths
+outside a working tree`, `errorStep: "ignoreStep"`. Production
+  `GET /api/events` returned 404, proving the new code was not deployed.
+- **Fix:** remove `ignoreCommand` so every push builds; record the reversal in
+  D-05. No source, data or CI behaviour changes.
+- **Done when:** a new production deployment succeeds, `GET /api/events` is no
+  longer 404, `npm run check:live` reports 8/8, and the exact deployment ID and
+  commit SHA are appended to `progress.md`.
