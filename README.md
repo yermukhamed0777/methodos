@@ -38,11 +38,20 @@ Open `http://127.0.0.1:4173`. `npm run dev` automatically loads `.env.local` wit
 Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from the same Supabase project. Use a publishable key (or legacy anonymous key), never a secret/service-role key. Restart the server after editing `.env.local`. The file is ignored by Git, is outside the served `dist/` directory, and is never copied into browser bundles. `npm run build` remains available for an explicit rebuild.
 
 ```bash
-npm run check
-npm run format:check
-npm audit
+npm run check          # data, build, lint (warnings denied), typecheck, tests,
+                       # content-free event check, walkthrough fixture, formatting
+npm run format:check   # included in check; kept separate for quick feedback
+npm audit --audit-level=low
 npm run seed:export
+npm run verify:events  # content-free counter assertion, no network
+npm run walkthrough    # verify the deterministic capture fixture
+npm run check:live     # read-only probes against the deployed origin
+npm run report:events -- --days=7 --json   # needs BLOB_READ_WRITE_TOKEN
 ```
+
+Every command above was run for this handoff. Exact commands and results are
+recorded in [progress.md](docs/plan/progress.md); the full verification matrix
+is in [verification.md](docs/verification.md).
 
 Set deployment environment variables in Vercel and local values in `.env.local`. The `dev` script loads this file; other plain Node commands need exported values or Node’s explicit `--env-file-if-exists=.env.local` option. Never commit credentials. The configuration endpoint exposes only validated public Supabase settings, a non-secret AI capability flag and, when running locally, setup diagnostics.
 
@@ -125,6 +134,43 @@ GitHub is the source of truth. Keep provider fact changes, schema changes and co
 Legacy guest tracker data remains in the browser for explicit import after login. Signed-in trackers, profiles and activities are private to the user. Guest data is imported only on request. Shared links and calendar exports omit private notes. A tracker backup contains notes and should be kept private.
 
 Supabase, Vercel functions, Blob storage, email delivery and AI have separate quotas and may incur charges. No paid tier or billing commitment is included in source configuration. AI request caps bound volume; monitor provider prices, account budgets and hosting usage before growing traffic. Expensive model changes require reviewing those limits.
+
+## Backup and restore
+
+- **Guest tracker:** in Application tracker, choose **Export backup** to download
+  `prospectoai-backup.json`. It contains saved opportunity IDs and progress only;
+  notes stay in the JSON and must be kept private. Choose **Import backup** with a
+  file smaller than 1 MB to merge saved items and progress. Unknown IDs are
+  rejected. If browser storage is unavailable, the import lasts for the current
+  session only — export again before leaving.
+- **Signed-in workspace:** in My Workspace → Privacy → **Export my data (.json)**
+  downloads the profile, records, document text and metadata, skills, courses,
+  plans, searches, recent views, activities and tracker. It excludes login
+  tokens and temporary file URLs. Original documents are not included in that
+  JSON: download them separately before deleting an account.
+- **Restore:** import a guest backup into Application tracker; for an account,
+  sign in first, then import a tracker backup and re-upload any original
+  documents you need. No automatic remote backup exists.
+
+## Anonymous usage counters
+
+Methodos records six content-free event names — `view`, `search`, `detail_open`,
+`save`, `next_step` and `source_open` — to understand which parts of the public
+flow are used during a pilot. Properties are enums or coarse result buckets.
+Search text, typed filters, notes, document names, file URLs, email addresses
+and account IDs are not part of the schema and are never stored. A random
+per-tab session ID links a search → detail → save → next-step funnel; it is not
+derived from an account or device. Do Not Track and Global Privacy Control
+disable collection. Daily private blobs under `methodos/events/` are deleted
+after 30 days by the `/api/events` cron (`30 1 * * *`), which requires
+`CRON_SECRET`.
+
+`POST /api/events` accepts batches of at most 20 validated events; invalid
+batches are acknowledged without a write. `GET /api/events` is cron-only and
+returns 405 unless `CRON_SECRET` is configured. Run `npm run verify:events` to
+assert that emitted, aggregated and reported JSON contain no journal or account
+content; it uses no network and no real data. `npm run report:events` prints
+totals and the funnel after `vercel env pull .env.local`.
 
 Created by **Yermukhamed Tuktibay**.
 

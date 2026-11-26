@@ -16,6 +16,13 @@
 - Extended the glass design system to Home, university and work cards, BARYS and state surfaces with one action hierarchy and solid fallbacks.
 - Made university names, location, research context and directory status unmistakable, and explained what is open to browse versus saved with an account.
 - Added real signed-in resume points on Home from existing workspace state without new network calls or invented records.
+- Added anonymous, content-free product counters: an allowlisted event schema, a per-tab random session ID, DNT/GPC opt-out, a 30-day private retention cron, and `npm run report:events`.
+- Added `npm run verify:events`, which asserts that emitted, aggregated and reported JSON contain no journal text, typed queries, notes, document names, file URLs or account content.
+- Added a deterministic six-step walkthrough fixture and `npm run walkthrough`, so a future video can be captured without re-running the app.
+- Fixed dynamically populated filter selects defaulting to a real value and silently showing zero opportunities.
+- Archived the passed UBC International Scholars 2027 cycle so the data gate reports no unarchived past deadlines.
+- Served `/api/events` from the local preview server and made ESLint fail on warnings.
+- Added an auditable plan layer, verification matrix, contributor guide, third-party notices and a seven-day pilot handoff.
 
 ## 5.0.0 · 12 November 2026
 

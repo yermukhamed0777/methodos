@@ -1,5 +1,9 @@
 # Methodos release and student pilot
 
+The full handoff — consent wording, schedule, collection fields, failure
+intake, go/no-go criteria and the human-only list — is in
+[pilot-handoff.md](pilot-handoff.md). This file is the pre-flight checklist.
+
 ## Before inviting students
 
 - [ ] Verify the live deployment SHA matches the reviewed merge and `npm run check:live` passes 8/8.
