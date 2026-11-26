@@ -89,6 +89,7 @@ export function installNavigation(w = window) {
     }
     w.ProspectoTracker?.setView(view);
     paint(view);
+    if (view !== previous) w.ProspectoEvents?.track('view', { view });
     if (focus) {
       w.scrollTo({ top: 0, behavior: 'instant' });
       const main = d.querySelector('main');

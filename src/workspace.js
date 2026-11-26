@@ -36,6 +36,7 @@ const D = window.PROSPECTO_DEVELOPMENT,
   A = window.ProspectoAuth,
   db = A.client,
   uid = A.user?.id;
+const track = (name, props) => window.ProspectoEvents?.track(name, props);
 const TABLES = [
   'preferences',
   'documents',
@@ -779,8 +780,8 @@ function courseForm(id) {
         ? button('delete-course', 'Delete this course progress', id)
         : ''),
     'Save learning',
-    async (fd) =>
-      save('course_progress', {
+    async (fd) => {
+      const rows = await save('course_progress', {
         course_id: id,
         state: fd.get('state'),
         notes: fd.get('notes'),
@@ -788,7 +789,10 @@ function courseForm(id) {
         project_id: fd.get('project_id') || null,
         evidence: fd.get('evidence'),
         updated_at: new Date().toISOString(),
-      }),
+      });
+      track('next_step', { action: 'progress' });
+      return rows;
+    },
   );
 }
 function documents() {
@@ -1330,7 +1334,7 @@ function privacy() {
         ['30', '30 days'],
       ],
       String(p.reminder_days),
-    )}<button class="primary">Save preferences</button></form></section><section class="work-card"><h2>Your data</h2><p>Export includes your profile, records, document text and metadata, skills, courses, plans, searches, recent views, activities and tracker. It excludes login tokens and temporary file URLs. Download original documents separately.</p><div class="work-actions">${button('export', 'Export my data (.json)')}${go('documents', 'Manage / delete documents')}${go('profile', 'Edit / delete profile records')}${button('clear-recent', 'Clear recent sources')}${go('assistant', 'Clear chat in assistant')}</div></section><section class="work-card"><h2>Delete account</h2><p>Deletion permanently removes your login, documents and private workspace. You must sign in again within five minutes and type the confirmation phrase. This cannot be undone.</p><div id="work-delete-capability">Checking deletion availability…</div></section>`
+    )}<button class="primary">Save preferences</button></form></section><section class="work-card"><h2>Your data</h2><p>Export includes your profile, records, document text and metadata, skills, courses, plans, searches, recent views, activities and tracker. It excludes login tokens and temporary file URLs. Download original documents separately.</p><p><strong>Anonymous usage counts.</strong> Methodos records which views, searches, saves and next steps are used, with a random per-tab ID that is not linked to your account, email or notes. Search text, filters you type, notes, document names or contents, file URLs and email addresses are never included. Do Not Track and Global Privacy Control disable these counts. Daily counters are deleted after 30 days.</p><div class="work-actions">${button('export', 'Export my data (.json)')}${go('documents', 'Manage / delete documents')}${go('profile', 'Edit / delete profile records')}${button('clear-recent', 'Clear recent sources')}${go('assistant', 'Clear chat in assistant')}</div></section><section class="work-card"><h2>Delete account</h2><p>Deletion permanently removes your login, documents and private workspace. You must sign in again within five minutes and type the confirmation phrase. This cannot be undone.</p><div id="work-delete-capability">Checking deletion availability…</div></section>`
   );
 }
 async function render(next) {
@@ -1602,7 +1606,10 @@ async function action(name, id, element) {
     return render(view);
   }
   if (name === 'review-doc') return reviewDoc(id);
-  if (name === 'new-plan') return planForm();
+  if (name === 'new-plan') {
+    track('next_step', { action: 'plan' });
+    return planForm();
+  }
   if (name === 'edit-plan') return planForm(id);
   if (name === 'delete-plan') {
     if (confirm('Delete this plan and all its tasks?')) {
@@ -1611,8 +1618,14 @@ async function action(name, id, element) {
     }
     return;
   }
-  if (name === 'new-item') return itemForm('', '', id);
-  if (name === 'quick-plan') return itemForm('', id);
+  if (name === 'new-item') {
+    track('next_step', { action: 'task' });
+    return itemForm('', '', id);
+  }
+  if (name === 'quick-plan') {
+    track('next_step', { action: 'quick_plan' });
+    return itemForm('', id);
+  }
   if (name === 'edit-item') return itemForm(id);
   if (name === 'delete-item') {
     if (confirm('Delete this task?')) {

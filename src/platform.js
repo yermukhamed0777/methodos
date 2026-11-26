@@ -3,6 +3,7 @@ import { verificationStatus } from '../lib/intelligence-core.js';
 import { authMessage, RECOVERY_PATH } from './auth-flow.js';
 import { glassBadge } from './ui-components.js';
 const R = window.PROSPECTO_RESOURCES;
+const track = (name, props) => window.ProspectoEvents?.track(name, props);
 const $ = (s) => document.querySelector(s);
 const E = (value) =>
   String(value ?? '').replace(
@@ -420,6 +421,7 @@ async function addActivity(
     return false;
   }
   activities.push(data);
+  track('next_step', { action: 'activity' });
   if (resourcesView === 'activities') renderActivities();
   else {
     const toast = $('#toast');
@@ -545,6 +547,12 @@ document.addEventListener('input', (e) => {
   }
 });
 document.addEventListener('change', (e) => {
+  if (e.target.id === 'resource-search') {
+    track('search', {
+      surface: 'workspace',
+      filters: activeField || activeRegion || activeKind ? 'some' : 'none',
+    });
+  }
   if (e.target.id === 'career-arrangement') {
     careerArrangement = e.target.value;
     resourceList(resourcesView);

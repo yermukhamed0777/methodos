@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-26T00:00:00.000Z",
+  "source": "scripts/walkthrough.js",
+  "steps": [
+    {
+      "n": 1,
+      "label": "Open Home",
+      "event": {
+        "name": "view",
+        "props": {
+          "view": "finder"
+        }
+      }
+    },
+    {
+      "n": 2,
+      "label": "Search the reviewed catalog",
+      "event": {
+        "name": "search",
+        "props": {
+          "surface": "catalog",
+          "results": "1-5",
+          "filters": "none"
+        }
+      }
+    },
+    {
+      "n": 3,
+      "label": "Open the first result",
+      "event": {
+        "name": "detail_open",
+        "props": {
+          "kind": "opportunity",
+          "surface": "catalog"
+        }
+      }
+    },
+    {
+      "n": 4,
+      "label": "Save it to the private tracker",
+      "event": {
+        "name": "save",
+        "props": {
+          "action": "add",
+          "kind": "opportunity"
+        }
+      }
+    },
+    {
+      "n": 5,
+      "label": "Add a next step to the plan",
+      "event": {
+        "name": "next_step",
+        "props": {
+          "action": "task"
+        }
+      }
+    },
+    {
+      "n": 6,
+      "label": "Open the official source",
+      "event": {
+        "name": "source_open",
+        "props": {
+          "surface": "detail"
+        }
+      }
+    }
+  ],
+  "counter": {
+    "events": 6,
+    "dimensions": 6,
+    "sha256": "dc55917dd0e2f9aa4c0e5fc22733433cee74a365914c274046d3958e6ed3703c"
+  }
+}

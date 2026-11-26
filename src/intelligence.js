@@ -19,6 +19,7 @@ const A = window.ProspectoAuth,
   B = window.ProspectoWorkspace;
 const records = window.PROSPECTO_INTELLIGENCE?.records || [],
   majors = window.PROSPECTO_DEVELOPMENT.majors;
+const track = (name, props) => window.ProspectoEvents?.track(name, props);
 const views = [
   'professionals',
   'projects',
@@ -1020,6 +1021,7 @@ B.render = (v) =>
 async function detail(id) {
   const r = records.find((x) => x.id === id);
   if (!r) throw Error('This record is no longer available.');
+  track('detail_open', { kind: 'resource', surface: 'library' });
   if (r.kind === 'university') {
     goto('universities');
     return;
@@ -1099,8 +1101,8 @@ async function action(name, id) {
       `<p>${E(r.name)}</p>` +
         area('Private notes', 'notes', old?.notes || '', 3999),
       'Save item',
-      async (fd) =>
-        result(
+      async (fd) => {
+        const rows = await result(
           db.from('saved_resources').upsert({
             user_id: uid,
             resource_id: id,
@@ -1108,7 +1110,10 @@ async function action(name, id) {
             title: r.name,
             notes: fd.get('notes'),
           }),
-        ),
+        );
+        track('save', { action: 'add', kind: 'resource' });
+        return rows;
+      },
     );
     return;
   }
@@ -1121,6 +1126,7 @@ async function action(name, id) {
         .eq('user_id', uid)
         .eq('resource_id', id),
     );
+    track('save', { action: 'remove', kind: 'resource' });
     undo = { kind: 'saved', old };
     await refresh();
     message(

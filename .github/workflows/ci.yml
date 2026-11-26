@@ -18,7 +18,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts --no-fund --no-audit
+      # check = data, build, lint (warnings denied), typecheck, tests,
+      # content-free event verification, walkthrough fixture and formatting.
       - run: npm run check
       - run: git diff --exit-code -- dist/data.js
-      - run: npm run format:check
       - run: npm audit --audit-level=low
+      # Merging a red revision is blocked by GitHub branch protection.
+      # Blocking a Vercel deployment on this check is a project setting and
+      # remains an explicit owner action (docs/plan/backlog.md MTH-010).

@@ -12,11 +12,14 @@
     "test": "node tests/check.cjs && node --test tests/*.test.js",
     "check:data": "node scripts/check-data.js",
     "check:live": "node scripts/check-live.js",
-    "check": "npm run check:data && npm run build && npm run lint && npm run typecheck && npm test",
+    "report:events": "node --env-file-if-exists=.env.local scripts/event-report.js",
+    "verify:events": "node scripts/verify-events.js",
+    "walkthrough": "node scripts/walkthrough.js",
+    "check": "npm run check:data && npm run build && npm run lint && npm run typecheck && npm test && npm run verify:events && npm run walkthrough && npm run format:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "seed:export": "node scripts/export-seed.js",
-    "lint": "eslint .",
+    "lint": "eslint --max-warnings 0 .",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
