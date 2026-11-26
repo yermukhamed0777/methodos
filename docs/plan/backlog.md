@@ -387,3 +387,65 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 - **Done when:** CI is green for the final commit, Vercel reports Ready for the
   same SHA, `npm run check:live` passes against that deployment, and the exact
   IDs are appended to `progress.md`.
+
+### MTH-047 — Data gate covered only some reviewed seed files
+
+- **Status:** Done
+- **Refs:** `scripts/check-data.js`, `tests/check-data.test.js`,
+  `data/intelligence.json`.
+- **Fix:** all eight reviewed JSON seed files are loaded; the expanded
+  intelligence catalogue is checked for ids, names, HTTPS sources, ISO dates,
+  open claims, archived/open contradictions and review-queue ids; every record
+  reviewed date must not postdate the collection header. Header date corrected
+  from `2026-11-12` to the actual maximum `2026-11-24`; one trailing-space name
+  fixed in source data. No record or fact was added.
+- **Done when:** `npm.cmd run check:data` passes and
+  `node --test tests/check-data.test.js` passes 18/18. Verified.
+
+### MTH-048 — Admin health mislabelled a URL count as approval
+
+- **Status:** Done
+- **Refs:** `api/admin.js`, `lib/intelligence-core.js`.
+- **Fix:** `approvedSources` renamed to `sourceUrls` in both the API response
+  and the summary. No record carries an approver or rights field, so the old
+  name claimed a review that does not exist.
+- **Done when:** `git grep -n approvedSources -- api lib tests` returns no match
+  and `npm run check` passes. Verified.
+
+### MTH-049 — Feed cadence metadata disagreed with the cron
+
+- **Status:** Done
+- **Refs:** `lib/feeds.js`, `data/feed-snapshot.json`.
+- **Fix:** the public schedule text now says daily at 01:00 UTC (09:00 Hong
+  Kong), matching `/api/refresh` in `vercel.json`.
+- **Done when:** `git grep -n 'Monday morning' -- lib data` returns no match.
+  Verified.
+
+### MTH-050 — Labelled workspace groups had no role
+
+- **Status:** Done
+- **Refs:** `src/workspace.js`.
+- **Fix:** onboarding progress, activity legend and active-filter chips now
+  have `role="group"` so their `aria-label` is exposed to assistive technology.
+- **Done when:** `npm run check` passes with the updated DOM tests. Verified.
+  Screen-reader confirmation remains MTH-012.
+
+### MTH-051 — A final/late deadline could hide the earlier regular deadline
+
+- **Status:** Done
+- **Refs:** `src/workspace.js`, `tests/deadline-labels.test.js`.
+- **Fix:** opportunity cards and detail views render both the regular deadline
+  and the final/late cut-off with explicit labels instead of choosing only
+  `finalDeadline`.
+- **Done when:** `npm.cmd test` passes with the deadline-label tests. Verified.
+
+### MTH-052 — Final live verification after the bundled stylesheet change
+
+- **Status:** Pending deployment (same gate as MTH-046).
+- **Refs:** `scripts/check-live.js`, `dist/index.html`.
+- **Evidence:** the checker now expects `/bundle.css`; the still-deployed
+  `32ef0ba` shell serves `/methodos-ui.css`, so the production probe is
+  **7/8 (exit 1)** until the final commit is deployed. The local preview of the
+  final build is 7/8 with only the expected `/api/config` 503 (no Supabase env).
+- **Done when:** `npm run check:live` reports 8/8 against the deployed final
+  SHA and the run/deployment IDs are appended to `progress.md`.

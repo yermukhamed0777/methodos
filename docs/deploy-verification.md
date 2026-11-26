@@ -1,6 +1,14 @@
 # Deployment handoff
 
-## Current release · 25 November 2026
+## Latest verified production deployment · 26 November 2026 (pre-reliability-sprint)
+
+Production still serves `32ef0ba` (`dpl_AxQMA7QyNZQ3XMcTTEWUS4gaMCMn`,
+Ready/Production/Current) with `npm run check:live` 8/8 at that time. The
+reliability-sprint commits are local-only; after the bundled stylesheet change
+the same checker reports 7/8 against this older deployment. See
+[release status](release-status.md) and [progress](plan/progress.md).
+
+## Historical release · 25 November 2026
 
 - **Source:** `main` `288d1e91e5cdcbb98b4d18d8a77548b5c68b7ed3` (documentation-only commit after the promoted application source `415fcb9a81b6af1acac7e37b3e053480a2c09a82`). PR #40 carried the repository rename and the retained security/date/AI fixes; its GitHub checks and Vercel preview passed. Earlier release sources were `415fcb9` and `f56e29a`.
 - **Deployment:** `dpl_BfEYM2q1YncigdGgPZ4MSo7VuyTL`, `https://opportunity-explorer-fzmjrbc7j-erm1ham3d2204-2491.vercel.app`, target `production`, `READY`, aliased to `https://opportunity-explorer-ruddy.vercel.app/`. The `methodos-ruddy.vercel.app` alias still returns `DEPLOYMENT_NOT_FOUND` and is not used.

@@ -8,8 +8,9 @@ It is not a conformance claim.
 
 - **Language and structure.** `<html lang="en">`, one `<h1>` per page, a single
   `<main id="main-content" tabindex="-1">`, and labelled `<nav>` landmarks.
-- **Skip link.** The first focusable element is “Skip to content”, visible on
-  keyboard focus and pointing at `#main-content`.
+- **Skip link.** On the main shell and the sign-in shell the first focusable
+  element is “Skip to content”, visible on keyboard focus and pointing at the
+  page's `main` (`#main-content` or `#auth-main`).
 - **Keyboard operation.** All navigation, tabs, dialogs and forms are native
   buttons, links and inputs. BARYS uses a native `<dialog>` and restores focus
   to the launcher when closed. The mobile sidebar moves focus to its close

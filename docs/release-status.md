@@ -2,6 +2,20 @@
 
 The expansion connects Explore, Build Your Profile, Professional Pathways, Admissions and Universities, and My Plan. GitHub remains the source of truth; a release must deploy the exact merged commit.
 
+## Final reliability sprint — 26 November 2026 (pre-deployment)
+
+The reviewed baseline was `32ef0ba` and its Vercel deployment was Ready with
+`npm run check:live` 8/8. A subsequent audit-and-repair pass changed the local
+tree; it is **committed locally but not pushed**, so production still serves
+`32ef0ba`. Local `npm run check` is green (263/263 tests, ownership audit PASS,
+content-free and walkthrough fixtures unchanged). Because the rebuilt shell now
+links one bundled stylesheet, `npm run check:live` reports **7/8** against the
+still-stale production origin; the same checker reports 7/8 locally with only
+the expected missing-Supabase `/api/config` 503. Exact commands, counts and the
+release-gate interpretation are in [progress](plan/progress.md) and the
+[audit record](final-reliability-audit.md). Do not treat this pass as deployed
+until the final SHA is pushed, Vercel is Ready and `check:live` reports 8/8.
+
 ## Final reliability pass — 26 November 2026 (integrated tree, unpushed)
 
 Reviewed baseline `32ef0ba` was clean and green (CI `45756474470`, Vercel status
