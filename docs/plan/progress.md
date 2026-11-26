@@ -138,6 +138,25 @@ structural traceability tests but no live model evaluation; provider failures
 degrade with labelled fallbacks in tests. The seven-day student pilot and all
 owner-only email/Storage/AI/assistive-technology checks remain human-only.
 
+## 2026-11-26 — confirmed push, CI, deployment and live verification
+
+Owner explicitly confirmed the push after the release-gate report.
+
+| Command / observation                                            | Exact result                                                                                                                                                                                                                                                                    |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git push origin main`                                           | `32ef0ba..6b18a0c  main -> main`, then `6b18a0c..5079cfa  main -> main`; exit 0. A local git credential-helper path warning was printed both times; the push succeeded.                                                                                                         |
+| Commits published                                                | `9fac5dc` (reliability sprint MTH-015…MTH-039), `6b18a0c` (evidence and release gate MTH-040…MTH-046), `5079cfa` (final audit gaps MTH-047…MTH-052). `git ls-remote origin refs/heads/main` = `5079cfa8ee8d98c34191108dd0f30c8c73221b20`; local `git rev-parse HEAD` identical. |
+| `gh run list --limit 5`                                          | CI run `45778261402` success for `6b18a0c`; CI run `45778508543` success for `5079cfa`.                                                                                                                                                                                         |
+| `gh run watch 45778508543 --exit-status --interval 10`           | `Run Checks (45778508543) has already completed with 'success'`.                                                                                                                                                                                                                |
+| `gh api repos/yermukhamed0777/methodos/commits/5079cfa/statuses` | Vercel `pending` at `2026-11-26T07:52:00Z`, then `success` — `Deployment has completed` at `2026-11-26T07:52:33Z`; target `https://vercel.com/erm1ham3d2204-2491/opportunity-explorer/7XdTPXUsaiZfqzg9bhmENdGaxYec`.                                                            |
+| `npm.cmd run check` (final tree)                                 | exit 0; Data check passed; Ownership audit PASS (18 tables); 263/263 tests; content-free PASS; walkthrough PASS; Prettier clean.                                                                                                                                                |
+| `npm.cmd run check:live` (after deployment)                      | **8/8** live checks passed for `https://opportunity-explorer-ruddy.vercel.app`; exit 0.                                                                                                                                                                                         |
+| Production catalogue and asset-hash comparison                   | `/api/catalog` served `opportunity-rsi` with `status: Upcoming`, `deadlineVerified: true`, `finalDeadline: 2026-12-11`; SHA-256 of served `bootstrap.js`, `methodos-ui.css`, `glass.css` and `404.html` each matched the local `dist/` file (4/4).                              |
+
+The publication boundary is closed. The seven-day student pilot, real accounts,
+SMTP, live AI generation, live cross-account testing and manual assistive-tech
+checks remain human-only. No usage, user or revenue outcome was measured.
+
 ## 2026-11-26 — final integration pass (MTH-047…MTH-052)
 
 All commands below were run after the parallel audits were integrated. No push,
@@ -176,3 +195,20 @@ or licence change was made.
 
 MTH-046 and MTH-052 are closed for commit `6b18a0c`. The documentation commit
 `5079cfa` remains local-only and does not change application behaviour.
+
+### Final evidence commit (887f680)
+
+After owner confirmation, `5079cfa` and `887f680` reached `origin/main` through
+an intervening agent push; my direct `git push origin main` was correctly
+rejected as stale (`expected 5079cfa…`, remote already `887f680…`). No further
+publication was attempted by me.
+
+| Command                                                          | Exact result                                                                                                                                                                      |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gh run watch 45778663848 --exit-status`                         | `WATCH_EXIT=0`; run `45778663848` (`Checks`, head `887f680bd8a3dad005c6ba1862c3c5173564177e`) **success**; job `139768461361` ✓ in 29 s with all four CI steps ✓.                 |
+| `gh api repos/yermukhamed0777/methodos/commits/887f680/statuses` | Vercel `pending` `2026-11-26T07:53:14Z`, then `success` `2026-11-26T07:53:47Z`; target `https://vercel.com/erm1ham3d2204-2491/opportunity-explorer/A7aAAomTt2SvJ6fSqSDH3mVDFKeG`. |
+| `npm.cmd run check:live`                                         | exit 0; **8/8 live checks passed** for `https://opportunity-explorer-ruddy.vercel.app`.                                                                                           |
+| `git status --short --branch`                                    | `## main...origin/main` — clean and in sync.                                                                                                                                      |
+
+No tag, release, visibility or licence change was made. All remaining work is
+human-only and listed in `docs/pilot-handoff.md`.
