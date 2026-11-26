@@ -63,3 +63,15 @@ check and formatting), `git diff --exit-code -- dist/data.js` and
 `npm audit --audit-level=low` on every push and pull request. A red check fails
 the job. Whether Vercel blocks deployment on that red job is a project setting
 outside this repository and remains MTH-010 (human only).
+
+## Delivery result
+
+After owner confirmation, CI run **45755378799** (`1d75c48`) was green in 26s,
+but Vercel deployment `dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv` failed at the ignored
+build step because `git diff` ran outside a git working tree (MTH-014, D-05).
+The `ignoreCommand` was removed. CI run **45755831406** (`959b75c`) was green in
+27s and Vercel deployment
+**`dpl_AxQMA7QyNZQ3XMcTTEWUS4gaMCMn`** reached **Ready / Production / Current**
+in 34s at `2026-11-26T04:32:49Z`. Post-deployment `GET /api/events` returned
+**401** (was 404) and `npm run check:live` reported **8/8**. Exact commands and
+results are in [docs/plan/progress.md](plan/progress.md).

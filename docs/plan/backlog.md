@@ -168,7 +168,7 @@ dist/data.js` and `npm audit --audit-level=low` in CI so CI and local run the
 
 ### MTH-014 — Vercel production deployment failed at the ignored build step
 
-- **Status:** In progress
+- **Status:** Done
 - **Refs:** `vercel.json` (`ignoreCommand`, now removed), `docs/plan/decisions.md`
   D-04/D-05, deployment `dpl_63NAKEZmBpjcMUTxhNMB8Th2bSiv` at `1d75c48`.
 - **Evidence:** GitHub Vercel status `failure`: `Command failed with exit code
@@ -179,4 +179,6 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
   D-05. No source, data or CI behaviour changes.
 - **Done when:** a new production deployment succeeds, `GET /api/events` is no
   longer 404, `npm run check:live` reports 8/8, and the exact deployment ID and
-  commit SHA are appended to `progress.md`.
+  commit SHA are appended to `progress.md`. Verified at commit `959b75c`,
+  deployment `dpl_AxQMA7QyNZQ3XMcTTEWUS4gaMCMn` (Ready, Production, Current),
+  `GET /api/events` → 401 and `check:live` → 8/8.
