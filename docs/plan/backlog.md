@@ -451,3 +451,21 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
   deployed `32ef0ba` shell still served `/methodos-ui.css`; after the Vercel
   deployment of `6b18a0c`, `npm run check:live` reports **8/8** on the production
   alias. Exact commands and results are in `progress.md`.
+
+### MTH-053 — Dead published course source link
+
+- **Status:** Done locally (2026-11-26); deploy pending owner confirmation.
+- **Refs:** `data/learning-resources.json`, `data/intelligence.json`,
+  `supabase/seed.sql`, `tests/catalog-consistency.test.js:60`.
+- **Evidence:** a bounded link sweep of 593 unique HTTPS URLs in `data/*.json`
+  found 25 first-pass anomalies; a GET recheck confirmed the published MIT OCW
+  course URL `14-05-intermediate-macroeconomics-spring-2013/` returns **404**
+  (also confirmed by read-only fetch). The other confirmed 404s are inside
+  `reviewQueue` entries that are excluded from publication.
+- **Fix:** repoint the record to the verified canonical Fall 2025 OCW page,
+  update its verification note, regenerate the derived catalog and seed, and
+  raise the collection header to the actual latest review date. No course was
+  added or removed and no fact was invented.
+- **Done when:** `node --test tests/catalog-consistency.test.js` reports 4/4 and
+  `npm run check` is green with 264/264 tests. Verified locally; production has
+  not been updated because no push was authorised in this step.

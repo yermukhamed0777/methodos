@@ -57,6 +57,23 @@ test('programme deadlines never follow their start date and claims match their n
   }
 });
 
+test('published course links use a live canonical source', () => {
+  const macro = intelligence.records.find(
+    (r) =>
+      r.name === 'Intermediate Macroeconomics' &&
+      r.provider === 'MIT OpenCourseWare',
+  );
+  assert.ok(macro, 'missing Intermediate Macroeconomics course');
+  assert.equal(
+    macro.url,
+    'https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-fall-2025/',
+  );
+  assert.ok(
+    macro.sources.some(([, url]) => url === macro.url),
+    'sources must cite the same live URL',
+  );
+});
+
 test('no published record claims a deadline is unannounced when one is confirmed', () => {
   const bad = intelligence.records.filter(
     (r) =>

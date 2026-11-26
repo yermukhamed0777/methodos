@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedOn": "2026-11-24",
+  "checkedOn": "2026-11-26",
   "records": [
     {
       "id": "materials",
@@ -2881,7 +2881,7 @@
     },
     {
       "name": "Intermediate Macroeconomics",
-      "url": "https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-spring-2013/",
+      "url": "https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-fall-2025/",
       "provider": "MIT OpenCourseWare",
       "institution": "Massachusetts Institute of Technology",
       "fieldIds": ["economics", "finance"],
@@ -2889,20 +2889,20 @@
       "skills": ["Social Science", "Economics", "Macroeconomics"],
       "prerequisites": "Consult the linked syllabus; prerequisites were not independently extracted.",
       "duration": null,
-      "format": "Self-paced archived teaching materials",
+      "format": "Self-paced course materials",
       "language": "English",
       "certificate": "No OCW certificate or degree credit.",
       "auditing": "Open course materials; textbooks and software may have separate costs.",
       "costType": "Free open materials",
-      "checkedOn": "2026-11-12",
+      "checkedOn": "2026-11-26",
       "sources": [
         [
           "Official course materials",
-          "https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-spring-2013/"
+          "https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-fall-2025/"
         ]
       ],
-      "verification": "Course title and metadata checked against the official course data endpoint. Original teaching year remains in the URL.",
-      "id": "learn-5c3c81e9e991df28f6de",
+      "verification": "The Spring 2013 URL returned 404 on 26 November 2026. Title, level and learning materials were checked against the official Fall 2025 OCW course page; no certificate or credit is claimed.",
+      "id": "learn-f28a1d77fdb9bd254441",
       "kind": "course"
     },
     {

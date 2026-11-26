@@ -132,3 +132,14 @@ identities still require owner Supabase credentials and remain MTH-012/013.
 throttling; it has no pass/fail budget. Rationale: measured values must not be
 invented, and a timing threshold would be flaky in CI. The measured guest payload
 still carries private bundles; deferring them is proposed, not implemented.
+
+## D-12 — Replace a dead course link with a verified canonical page (2026-11-26)
+
+The Spring 2013 MIT OCW URL returned 404. Replacements considered: a web archive
+link (rejected: not the provider's canonical page), removing the course
+(rejected: loses a valid learning resource), and the official Fall 2025 OCW page
+for the same 14.05 course (chosen after confirming HTTP 200 and checking its
+title, level and materials). The record's check date was updated to the day the
+replacement was actually checked, and the derived header was raised to the
+latest recorded review date. Facts already published were otherwise unchanged.
+Affects: MTH-053.
