@@ -62,6 +62,38 @@ SMTP, live AI generation and manual assistive-technology checks stay Human
 only. No catalog expansion or redesign is authorized unless a verified defect
 requires a minimal fix.
 
+## D-07 — Derived deadline labels follow the source, never a guess (2026-11-26)
+
+A confirmed future deadline is `Upcoming` (badge: Expected Cycle), not
+`Deadline not announced`. It is never promoted to `Open` without a verified
+application URL and fresh review. Archived cycles are `Previous cycle` in every
+projection. Rationale: the same opportunity must not show contradictory labels
+in the catalog and the expanded view. Reversible by editing the compiler and
+rerunning the normalizer; no source facts were changed.
+
+## D-08 — One build-generated stylesheet for both shells (2026-11-26)
+
+The ten source CSS files remain in `dist/` for review, tests and live markers,
+but the HTML loads a single `bundle.css` emitted in cascade order. Rationale: a
+constrained mobile connection pays one request instead of ten; no design token
+or component was changed. Reversible by restoring the individual links.
+
+## D-09 — Source grounding is guarded structurally, not claimed semantically (2026-11-26)
+
+An AI answer is never sent when no reviewed record matches; a completion that
+names no reviewed record, invents links or guarantees, or claims live browsing
+is replaced by a labelled catalog fallback. Rationale: prompt instructions are
+not validation. Real claim-by-claim semantic verification still needs an
+owner-controlled model evaluation and is not claimed. PKCE-only callbacks were
+chosen for the same reason: a fragment token on any page is not a session.
+
+## D-10 — Keep every push building; never restore a Git-dependent ignore step (2026-11-26)
+
+Reaffirms D-05 after the final audit. Vercel executes the ignore command where
+`.git` does not exist; any `git diff` optimization breaks the release path. The
+CI catalog check was replaced with a real assertion that no generated catalog
+file is left in `dist`. Rationale: release correctness beats build noise.
+
 ## D-07 — Keep confirmation links PKCE-only (2026-11-26)
 
 The browser client uses `flowType: 'pkce'` and the callback accepts `?code=`

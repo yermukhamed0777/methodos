@@ -67,6 +67,35 @@ Branch protection and Vercel's green-check gate were **not** verified by any
 command here; MTH-010 remains human only. No usage, user or revenue result was
 measured.
 
+## 2026-11-26 — final reliability and release-engineering sprint
+
+Reviewed baseline `32ef0ba` first: `npm run check` exit 0 (232 tests),
+`npm run check:live` **8/8**, Vercel status `success` for `32ef0ba`
+(`CJ1Q3j4scprwaosGr2YcyQQ6SJtc`), and `git grep -i ignoreCommand -- vercel.json`
+returned no match. No `ignoreCommand` was reintroduced.
+
+| Command / observation                              | Exact result                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm.cmd run check` (final)                        | exit **0**; `Data check passed.`; `Ownership audit: PASS · 18 private tables`; `Validated catalog: 23 opportunities.`; node tests **263 total, 263 pass, 0 fail**, 4604.402 ms; `Content-free: PASS · events 6 · dimensions 6 · sha256 dc55917dd0e2f9aa4c0e5fc22733433cee74a365914c274046d3958e6ed3703c`; `Walkthrough: PASS · steps 6 · sha256 d6e3945e4fd7e21663decae090440ffef9c9586dc3b053bd908bf3dd8b12b58c`; `All matched files use Prettier code style!` |
+| `npm.cmd run check:data`                           | `Data check passed.` with the new deadline/start and claim/contradiction rules.                                                                                                                                                                                                                                                                                                                                                                                 |
+| `node scripts/normalize-derived-status.js`         | `Normalized 10 derived opportunity status(es) from the reviewed catalog.`                                                                                                                                                                                                                                                                                                                                                                                       |
+| `node --test tests/catalog-consistency.test.js`    | **3 tests, 3 pass, 0 fail**; mirrors agree with sources, no deadline after start, no confirmed deadline mislabelled.                                                                                                                                                                                                                                                                                                                                            |
+| `npm.cmd run seed:export`                          | `Exported 131 public resource records.`; seed regenerated after the IMPA/OIST corrections.                                                                                                                                                                                                                                                                                                                                                                      |
+| `npm.cmd ci --ignore-scripts --no-fund --no-audit` | `added 187 packages in 7s`; one non-fatal `whatwg-encoding@3.1.1` deprecation notice.                                                                                                                                                                                                                                                                                                                                                                           |
+| `npm.cmd run perf:mobile`                          | local preview at 375×812, slow 4G, 4× CPU: FCP **1908 ms**, DOMContentLoaded **2554 ms**, load **2562 ms**, 13 resources, **6 JS / 489 KiB**, **1 CSS / 144 KiB**, no horizontal overflow. Measurement, not a release gate.                                                                                                                                                                                                                                     |
+| `node scripts/compile-intelligence.mjs`            | Tried and reverted: full regeneration produced an 8,615-line diff; a targeted normalizer was used instead.                                                                                                                                                                                                                                                                                                                                                      |
+| `git grep -n -i ignoreCommand -- vercel.json`      | no match; D-05 still in force.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+
+Audits covered all catalog categories, independent BARYS/ProspectoAI failure
+cases, guest/account flows, 25 owner tables and Storage policies, private
+document handling, Vercel/env/redirect reconciliation, constrained-mobile
+loading and keyboard/a11y across every hub. Findings are in
+[`docs/final-reliability-audit.md`](../final-reliability-audit.md); fixes are
+MTH-015…MTH-045. No participant, real account, credential or paid resource was
+used. Live AI generation, signup email/SMTP, recovery, Storage and account
+deletion with the server secret remain owner-controlled (MTH-012); the seven-day
+student pilot remains the human boundary (MTH-013).
+
 ## 2026-11-26 — final reliability sprint, baseline before edits
 
 Working tree `main` at `32ef0ba`, clean (`git status --short --branch` →

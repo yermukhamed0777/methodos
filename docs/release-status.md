@@ -17,6 +17,29 @@ delivery, live AI generation, private Storage and manual AT checks remain
 human-only; the seven-day pilot has not started. No push or new deployment was
 authorized in this pass.
 
+## Final reliability sprint · 26 November 2026
+
+Reviewed baseline `32ef0ba` (Vercel `CJ1Q3j4scprwaosGr2YcyQQ6SJtc` success,
+`check:live` 8/8). Independent audits of the catalog, AI grounding, accounts and
+RLS, private documents, deployment configuration, performance and keyboard
+accessibility are in [`final-reliability-audit.md`](final-reliability-audit.md).
+Verified defects were fixed as MTH-015…MTH-045: 10 confirmed deadlines are no
+longer labelled unannounced, the UBC derived mirror is archived, IMPA/OIST
+claims match their notes, source-grounded answers are guarded structurally,
+coach failure returns a labelled skeleton, the CI catalog check is real, local
+credentials are excluded from Vercel CLI deploys, both shells load one generated
+stylesheet, and keyboard focus has explicit fallbacks. No catalog expansion or
+redesign was undertaken. `npm run check` passes with **263 tests**;
+`npm run perf:mobile` reports FCP 1908 ms at 375 px on a throttled connection.
+The failed Git-dependent `ignoreCommand` is still absent. CI and the final
+production deployment are recorded in [`plan/progress.md`](plan/progress.md)
+after owner-confirmed push. Public discovery remains anonymous, private
+workspaces remain owner-scoped, unauthorized AI requests are rejected, and
+provider failures degrade to labelled catalog/skeleton responses. Live AI
+generation, email delivery, Storage, account deletion with the secret, manual
+assistive-technology checks and the seven-day student pilot remain human-only
+and are not claimed as done.
+
 ## Final deployment · 25 November 2026
 
 PR #40 merged to `main` at `415fcb9a81b6af1acac7e37b3e053480a2c09a82` after green CI and a passing Vercel preview check. It was promoted to production, then a documentation-only commit `288d1e91e5cdcbb98b4d18d8a77548b5c68b7ed3` became the current production deployment `dpl_BfEYM2q1YncigdGgPZ4MSo7VuyTL` at `https://opportunity-explorer-ruddy.vercel.app/`. `npm run check:live` reports **8/8**; served release assets match local SHA-256 hashes, the corrected catalog dates are live, and signed-out coach requests return `401` before payload validation. Owner signup email, recovery, private-workspace journeys, manual accessibility checks and the student pilot remain open. See [deployment handoff](deploy-verification.md) and [pilot checklist](student-pilot.md).

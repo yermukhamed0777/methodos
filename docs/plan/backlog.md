@@ -297,3 +297,93 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 - **Done when:** `npm run perf:mobile` reports measured values. Verified.
   Measured guest payload still includes 81 KiB `workspace.js` and 54 KiB
   `intelligence.js`; deferral is proposed, not implemented.
+
+### MTH-040 — Derived opportunity statuses disagreed with their reviewed sources
+
+- **Status:** Done
+- **Refs:** `scripts/normalize-derived-status.js`, `scripts/compile-intelligence.mjs`,
+  `data/intelligence.json`, `tests/catalog-consistency.test.js`.
+- **Evidence:** 10 confirmed future deadlines were published as
+  `Deadline not announced` in the expanded catalog while their source records
+  had `deadlineConfirmed: true`; the UBC 2027 cycle was archived in
+  `data/opportunities.json` but not in the derived mirror. A confirmed deadline
+  was not an open application — the bug was the label, not the cycle rule.
+- **Fix:** map confirmed future deadlines to `Upcoming` in the compiler, add a
+  reusable normalizer, and assert mirror agreement in tests. No catalog record
+  was added and no deadline was invented.
+- **Done when:** `node scripts/normalize-derived-status.js`, `npm run check:data`
+  and `node --test tests/catalog-consistency.test.js` pass. Verified.
+
+### MTH-041 — Programme dates and verification claims contradicted their notes
+
+- **Status:** Done
+- **Refs:** `data/development.json`, `data/intelligence.json`,
+  `supabase/seed.sql`, `scripts/check-data.js`.
+- **Evidence:** IMPA summer 2027 listed a registration date (18 Jan 2027) after
+  its programme start (4 Jan 2027) while its note says it is not a confirmed
+  scholarship deadline; OIST Fall 2027 said "Confirmed future deadline" while
+  its note calls the schedule tentative.
+- **Fix:** clear IMPA's unconfirmed deadline fields, relabel OIST's verification,
+  regenerate the seed, and make `check-data` reject deadline-after-start and
+  confirmed/tentative contradictions.
+- **Done when:** `npm run check:data`, `npm run seed:export` and the consistency
+  tests pass. Verified.
+
+### MTH-042 — Render-blocking stylesheets on a constrained mobile connection
+
+- **Status:** Done
+- **Refs:** `scripts/build-platform.js`, `dist/index.html`, `dist/auth.html`,
+  `.gitignore`, `tests/design-system.test.js`.
+- **Evidence:** the home shell linked ten synchronous stylesheets; local
+  measurement before the change showed 10 CSS requests. `npm run perf:mobile`
+  now reports 1 CSS request / 144 KiB and FCP 1908 ms at 375 px, slow 4G, 4x CPU.
+- **Fix:** the build emits one `dist/bundle.css` in cascade order and both shells
+  link it; individual CSS files remain for review, tests and live markers.
+- **Done when:** `npm run build`, `npm run check` and `npm run perf:mobile` pass.
+  Verified. The 2.36 MB catalog payload reduction remains a proposal.
+
+### MTH-043 — Keyboard and dialog focus gaps
+
+- **Status:** Done (automated portion)
+- **Refs:** `src/access.js`, `dist/index.html`, `dist/auth.html`,
+  `tests/workspace-keyboard.test.js`.
+- **Fix:** sign-in dialog focus restoration falls back to `#main-content` when
+  the opener is detached; the account menu is a labelled `group` instead of a
+  `menu` without arrow-key behaviour; the sign-in shell has a skip link and a
+  focusable `main`.
+- **Done when:** `npm run check` passes. Verified. Manual screen-reader and
+  200% zoom checks remain human-only.
+
+### MTH-044 — Release-path configuration checks were vacuous or unsafe
+
+- **Status:** Done
+- **Refs:** `.github/workflows/ci.yml`, `.vercelignore`, `CONTRIBUTING.md`,
+  `docs/verification.md`.
+- **Fix:** the CI step `git diff --exit-code -- dist/data.js` (an absent,
+  untracked file, so always green) now asserts the generated catalog is not in
+  `dist`; `.vercelignore` excludes `.env`, `.env.*` and `.vercel` so a CLI deploy
+  cannot ship local credentials. The failed Git-dependent `ignoreCommand`
+  remains absent (D-05).
+- **Done when:** `npm run check` and `git grep -n -i ignoreCommand -- vercel.json`
+  (no match) pass. Verified.
+
+### MTH-045 — Account deletion and document errors were not failure-safe
+
+- **Status:** Done
+- **Refs:** `api/account.js`, `tests/account-deletion.test.js`,
+  `api/document.js`, `lib/document-parser.js`, `lib/document-worker.js`.
+- **Evidence:** private files were removed before the account was deleted, so a
+  failed deletion could leave a live account without its documents; parser
+  errors could echo library text containing file names or fragments.
+- **Fix:** disable/delete the account first, then clean Storage with an honest
+  `storageCleanup` result; allowlist every document message that may leave the
+  parser. No user ID or path is accepted from the request.
+- **Done when:** the new tests and `npm run check` pass. Verified. Production
+  deletion with the server secret remains owner-only (MTH-012).
+
+### MTH-046 — Final deployment verification after the reliability sprint
+
+- **Status:** Pending owner confirmation of push/deploy.
+- **Done when:** CI is green for the final commit, Vercel reports Ready for the
+  same SHA, `npm run check:live` passes against that deployment, and the exact
+  IDs are appended to `progress.md`.

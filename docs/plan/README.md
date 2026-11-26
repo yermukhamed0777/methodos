@@ -33,3 +33,11 @@ ID**. Corrections are new entries that point at the earlier one.
 
 Baseline for this plan: working tree at `75cbdef` plus the pre-existing
 uncommitted anonymous-event-counter files, inspected 26 November 2026.
+
+**Current snapshot (final reliability sprint):** reviewed baseline `32ef0ba`;
+agent-doable work through MTH-045 complete with `npm run check` green at **263
+tests** and `npm run perf:mobile` measured. MTH-046 (final CI/deployment IDs),
+MTH-010, MTH-011, MTH-012 and MTH-013 are explicitly pending: deployment
+verification and all participant/owner-controlled steps. No usage, user or
+revenue result has been measured. The audit evidence is in
+[`../final-reliability-audit.md`](../final-reliability-audit.md).
