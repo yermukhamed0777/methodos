@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPreviewServer } from '../scripts/dev-server.js';
+import { createEventsHandler } from '../api/events.js';
 
 test('local preview serves public assets and rejects unsafe requests', async () => {
   const server = createPreviewServer();
@@ -24,6 +25,41 @@ test('local preview serves public assets and rejects unsafe requests', async () 
     assert.equal((await fetch(url + '/%2e%2e%2fpackage.json')).status, 403);
     assert.equal((await fetch(url + '/%00')).status, 400);
     assert.equal((await fetch(url + '/.env')).status, 404);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
+test('local preview routes anonymous event batches to the events handler', async () => {
+  const batches = [];
+  const events = createEventsHandler({
+    append: async (date, batch) => batches.push({ date, batch }),
+  });
+  const server = createPreviewServer({ events });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const url = 'http://127.0.0.1:' + server.address().port;
+  try {
+    const valid = await fetch(url + '/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session: 'abcdef0123456789',
+        events: [{ name: 'view', props: { view: 'finder' } }],
+      }),
+    });
+    assert.equal(valid.status, 204);
+    assert.equal(batches.length, 1);
+    assert.deepEqual(batches[0].batch, [
+      { name: 'view', props: { view: 'finder' } },
+    ]);
+    assert.equal(
+      (await fetch(url + '/api/events', { method: 'POST', body: '{}' })).status,
+      204,
+    );
+    assert.equal(
+      (await fetch(url + '/api/events', { method: 'DELETE' })).status,
+      405,
+    );
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

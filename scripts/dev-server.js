@@ -14,6 +14,7 @@ import adminHandler from '../api/admin.js';
 import documentHandler from '../api/document.js';
 import developmentHandler from '../api/development.js';
 import accountHandler from '../api/account.js';
+import eventsHandler from '../api/events.js';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const root = resolve(projectRoot, 'dist');
 export function ensureDevBuild(directory = projectRoot) {
@@ -34,7 +35,7 @@ const mime = {
   '.webmanifest': 'application/manifest+json',
 };
 
-export function createPreviewServer() {
+export function createPreviewServer({ events = eventsHandler } = {}) {
   return createServer(async (req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
     const handlers = {
@@ -48,6 +49,7 @@ export function createPreviewServer() {
       '/api/catalog': catalogHandler,
       '/api/discover': discoverHandler,
       '/api/renewal': renewalHandler,
+      '/api/events': events,
     };
     if (handlers[pathname]) {
       const response = {
@@ -59,6 +61,10 @@ export function createPreviewServer() {
         json(value) {
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(value));
+        },
+        end() {
+          res.end();
+          return this;
         },
       };
       if (['POST', 'DELETE'].includes(req.method)) {

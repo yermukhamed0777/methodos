@@ -34,6 +34,26 @@ const settle = async (w) => {
     await new Promise((resolve) => setImmediate(resolve));
 };
 
+test('dynamically added filter options keep the empty default', async () => {
+  const { w, completeFeed } = await finder();
+  try {
+    completeFeed({
+      ok: true,
+      json: async () => ({ items: [], sources: [] }),
+    });
+    await settle(w);
+    assert.equal(w.document.querySelector('#field').value, '');
+    assert.equal(w.document.querySelector('#location').value, '');
+    assert.match(
+      w.document.querySelector('#results-count').textContent,
+      /^[1-9]\d* opportunities$/,
+    );
+    assert.ok(w.document.querySelector('#card-grid [data-detail]'));
+  } finally {
+    await w.happyDOM.close();
+  }
+});
+
 test('search has a visible submit and clear action beside the largest field', async () => {
   const { w, completeFeed } = await finder();
   try {

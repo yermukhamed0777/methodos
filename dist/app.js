@@ -1,5 +1,8 @@
 (function () {
   'use strict';
+  // Anonymous, coarse counters only. The tracker drops anything outside its
+  // allowlist; see lib/product-events.js.
+  const track = (name, props) => window.ProspectoEvents?.track(name, props);
   const PROGRESS_STATES = [
     'Interested',
     'Preparing',
@@ -323,6 +326,10 @@
     [...new Set(data.flatMap((o) => o[key]))]
       .sort()
       .forEach((v) => $('#' + id).add(new Option(v, v)));
+    // Adding options must not change the "any" default. Some DOM
+    // implementations select the first added option, which would silently
+    // filter the entire catalog out before a student touches a control.
+    $('#' + id).value = '';
   }
   const extraRoutes = [...new Set(data.map((o) => o.access))];
   extraRoutes.forEach((v) => {
@@ -429,7 +436,7 @@
     return `<div class="fact"><div class="fact-label">${icon(i)}${label}</div><div class="fact-value">${esc(value)}</div>${note ? `<p class="fact-note">${esc(note)}</p>` : ''}</div>`;
   }
   function card(o) {
-    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" target="_blank" rel="noopener noreferrer">${esc(sourceLabel(o))}</a><button class="details-btn" data-detail="${o.id}">View details →</button></div></div></article>`;
+    return `<article class="opp-card ${o.type.toLowerCase().replaceAll(' ', '-')}" data-id="${o.id}"><header class="card-heading"><div class="org-icon" aria-hidden="true">${esc(o.short)}</div><div class="card-title"><span class="type-tag">${esc(o.type)} · ${esc(o.cycle)}</span><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="org-name">${esc(o.org)}</div></div><button class="bookmark ${saved.has(o.id) ? 'saved' : ''}" data-save="${o.id}" aria-label="${saved.has(o.id) ? 'Remove' : 'Save'} ${esc(o.name)}${saved.has(o.id) ? ' from shortlist' : ' to shortlist'}" aria-pressed="${saved.has(o.id)}">${icon('bookmark')}</button></header><p class="card-description">${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div>${deadlineBadge(o)}<div class="eligibility-block"><div class="fact-label">${icon('people')}Who can apply</div><p>${esc(o.eligibility)}</p></div><div class="card-facts">${fact('Next deadline', o.deadline, 'calendar', o.deadlineDetail)}${fact(o.type === 'Scholarship' ? 'Funding & costs' : 'Participation cost', o.cost, 'coin', o.costNote)}${fact('Location & format', o.location, 'pin', o.formats.join(' / '))}${fact('Time & team', o.effort, 'people', o.team)}</div><div class="card-caution"><strong>Worth checking</strong><p>${esc(o.caution)}</p></div>${view === 'saved' ? trackerPanel(o) : ''}<div class="checked-stamp">Reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}</div><div class="card-bottom"><label class="check-label compare-check"><input type="checkbox" data-compare="${o.id}" ${compare.has(o.id) ? 'checked' : ''} aria-label="Compare ${esc(o.name)}">Compare</label><div class="card-links"><a href="${esc(safeLink(o.sources[0][1]))}" data-source-open="card" target="_blank" rel="noopener noreferrer">${esc(sourceLabel(o))}</a><button class="details-btn" data-detail="${o.id}">View details →</button></div></div></article>`;
   }
   function deadlineItem(o) {
     return `<article class="deadline-item"><div class="deadline-date">${esc(o.deadline)}</div><div><h2><button class="title-button" data-detail="${o.id}">${esc(o.name)}</button></h2><div class="status-row">${verificationBadge(o)}${status(o)}</div><p>${esc(o.deadlineDetail)}</p></div><button class="details-btn" data-detail="${o.id}">Details →</button></article>`;
@@ -809,6 +816,7 @@
       );
       return;
     }
+    const adding = !saved.has(id);
     if (saved.has(id)) saved.delete(id);
     else saved.add(id);
     let stored = true;
@@ -821,6 +829,10 @@
     }
     render();
     if ($('#detail-dialog').open) openDetail(id, false);
+    track('save', {
+      action: adding ? 'add' : 'remove',
+      kind: 'opportunity',
+    });
     toast(
       stored
         ? saved.has(id)
@@ -842,7 +854,7 @@
     return 'View official source ↗';
   }
   function sourceList(o) {
-    return `<ul class="sources">${o.sources.map(([label, url]) => `<li><a href="${esc(safeLink(url))}" target="_blank" rel="noopener noreferrer">${esc(linkLabel(o, label, url))}</a></li>`).join('')}</ul><p class="source-date">Provider sources reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}. Pages can change after this date.</p>`;
+    return `<ul class="sources">${o.sources.map(([label, url]) => `<li><a href="${esc(safeLink(url))}" data-source-open="detail" target="_blank" rel="noopener noreferrer">${esc(linkLabel(o, label, url))}</a></li>`).join('')}</ul><p class="source-date">Provider sources reviewed ${esc(dateLabel(o.checkedOn || window.CHECKED_ON))}. Pages can change after this date.</p>`;
   }
   let detailOpener = null;
   function detailRail(selectedId) {
@@ -856,9 +868,10 @@
       )
       .join('')}`;
   }
-  function openDetail(id, show = true) {
+  function openDetail(id, show = true, surface = 'catalog') {
     const o = byId(id);
     if (!o) return;
+    if (show) track('detail_open', { kind: 'opportunity', surface });
     detailRail(id);
     $('#detail-content').innerHTML =
       `<button type="button" class="text-button detail-return" id="detail-return">← Back to results</button><div class="dialog-eyebrow">${esc(o.type)} · ${esc(o.cycle)}</div><h2 id="detail-title">${esc(o.name)}</h2><p class="detail-org">${esc(o.org)}</p><p>${esc(o.description)}</p><div class="status-row">${verificationBadge(o)}${status(o)}</div><div class="detail-grid"><div><h3>Who can apply</h3><p>${esc(o.eligibility)}</p><p><strong>Entry route:</strong> ${esc(o.access)}</p></div><div><h3>Next deadline</h3><p><strong>${esc(o.deadline)}</strong></p><p>${esc(o.deadlineDetail)}</p></div><div><h3>Funding & costs</h3><p><strong>${esc(o.cost)}</strong></p><p>${esc(o.costNote)}</p></div><div><h3>Where, when & how</h3><p>${esc(o.location)} · ${esc(o.formats.join(' / '))}</p><p>${esc(o.schedule)}</p><p>${esc(o.effort)} · ${esc(o.team)}</p></div></div><div class="attention"><strong>Before you commit</strong><p>${esc(o.caution)}</p></div><h3>What you could take away</h3><p>${esc(o.output)}</p><p class="editorial-label">Editorial assessment; admission, publication or an award is not guaranteed.</p><h3>A useful next step</h3><p>${esc(o.next)}</p><h3>Read the original sources</h3>${sourceList(o)}<div class="detail-actions"><button class="primary" data-save="${o.id}">${saved.has(o.id) ? 'Remove from shortlist' : 'Save to tracker'}</button>${o.deadlineConfirmed && o.deadlineStart === o.deadlineEnd ? `<button class="secondary" data-calendar="${o.id}">Export deadline reminder (.ics)</button>` : ''}<button class="secondary" data-share="${o.id}">Copy opportunity link</button></div><p class="calendar-note">Calendar exports are date reminders, not exact cut-offs. Check the deadline and timezone above. Notifications depend on your calendar settings.</p>`;
@@ -934,7 +947,11 @@
       tab = event.target.closest('[data-type]');
     if (detail) {
       detailOpener = detail;
-      openDetail(detail.dataset.detail);
+      openDetail(
+        detail.dataset.detail,
+        true,
+        detail.classList.contains('rail-item') ? 'rail' : 'catalog',
+      );
       return;
     }
     if (sv) {
@@ -952,6 +969,10 @@
       type = tab.dataset.type;
       render();
     }
+  });
+  document.addEventListener('click', (event) => {
+    const source = event.target.closest('[data-source-open]');
+    if (source) track('source_open', { surface: source.dataset.sourceOpen });
   });
   document.addEventListener('change', (event) => {
     if (event.target.matches('[data-compare]'))
@@ -988,6 +1009,7 @@
           Core.calendar(o),
           'text/calendar;charset=utf-8',
         );
+        track('next_step', { action: 'calendar' });
         toast('Date reminder exported. Check its timezone in the source.');
       } catch (error) {
         toast(error.message);
@@ -998,6 +1020,7 @@
       url.searchParams.set('opportunity', share.dataset.share);
       try {
         await navigator.clipboard.writeText(url.href);
+        track('next_step', { action: 'share' });
         toast('Opportunity link copied. Your notes are private.');
       } catch {
         toast('Copy this link: ' + url.href);
@@ -1061,12 +1084,47 @@
       event.target.value = '';
     }
   });
+  let searchTimer;
+  function trackSearch() {
+    if (!$('#search').value.trim()) return;
+    const f = filters(),
+      active =
+        [
+          f.type,
+          f.field,
+          f.stage,
+          f.location,
+          f.access,
+          f.cost,
+          f.from,
+          f.to,
+        ].filter(Boolean).length +
+        f.formats.length +
+        [f.unknown, f.includeClosed, f.confirmed].filter(Boolean).length;
+    let results = 0;
+    try {
+      results = Core.filter(data, f).length;
+    } catch {
+      results = 0;
+    }
+    track('search', {
+      surface: 'catalog',
+      results: window.ProspectoEvents?.resultsBucket(results) || '0',
+      filters: active ? 'some' : 'none',
+    });
+  }
   $$('.filters input,.filters select').forEach((el) =>
     el.addEventListener('change', render),
   );
-  $('#search').addEventListener('input', render);
+  $('#search').addEventListener('input', () => {
+    render();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(trackSearch, 900);
+  });
   $('#search-submit').addEventListener('click', () => {
     render();
+    clearTimeout(searchTimer);
+    trackSearch();
     $('#results').scrollIntoView({ block: 'start' });
     $('#results').focus();
   });
@@ -1206,5 +1264,5 @@
   render();
   loadFeed();
   const linked = new URLSearchParams(location.search).get('opportunity');
-  if (linked && byId(linked)) openDetail(linked);
+  if (linked && byId(linked)) openDetail(linked, true, 'link');
 })();

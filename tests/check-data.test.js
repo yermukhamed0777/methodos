@@ -190,3 +190,17 @@ test('the shipped data files pass with no errors', () => {
     [],
   );
 });
+
+test('the shipped catalog has no unarchived past deadlines', () => {
+  const read = (path) =>
+    JSON.parse(readFileSync(new URL('../' + path, import.meta.url), 'utf8'));
+  const problems = validateData(
+    {
+      catalog: read('data/opportunities.json'),
+      resources: read('data/resources.json'),
+      development: read('data/development.json'),
+    },
+    { today: '2026-11-26' },
+  );
+  assert.deepEqual(problems, []);
+});
