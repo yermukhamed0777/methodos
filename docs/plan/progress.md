@@ -198,10 +198,10 @@ MTH-046 and MTH-052 are closed for commit `6b18a0c`. The documentation commit
 
 ### Final evidence commit (887f680)
 
-After owner confirmation, `5079cfa` and `887f680` reached `origin/main` through
-an intervening agent push; my direct `git push origin main` was correctly
-rejected as stale (`expected 5079cfa…`, remote already `887f680…`). No further
-publication was attempted by me.
+After owner confirmation, `5079cfa` and `887f680` were published to
+`origin/main`; the direct `git push origin main` reported
+`5079cfa..887f680  main -> main` and local HEAD equals `origin/main`. No
+further publication was attempted.
 
 | Command                                                          | Exact result                                                                                                                                                                      |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
