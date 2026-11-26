@@ -254,3 +254,19 @@ This reconciliation entry was committed locally and was **not** pushed.
 
 The MTH-053 fix is local and is not on the production origin. No push was
 authorised in this step; the release gate on the published commit remains 8/8.
+
+## 2026-11-26 — publication of MTH-053 after owner confirmation
+
+| Command / observation                                            | Exact result                                                                                                                                                                                          |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git push origin main`                                           | `e27c27f..b81d690  main -> main`; exit 0. The local git credential-helper path warning is non-fatal.                                                                                                  |
+| `gh run list --limit 1`                                          | CI run **45783550659** for `b81d690`, `Checks`/`push`/`main`.                                                                                                                                         |
+| `gh run watch 45783550659 --exit-status --interval 5`            | exit 0; job `check` **success in 30s** (ID `139784599948`).                                                                                                                                           |
+| `gh api repos/yermukhamed0777/methodos/commits/b81d690/statuses` | Vercel `pending`, then `success` — `Deployment has completed`, target `https://vercel.com/erm1ham3d2204-2491/opportunity-explorer/2gHbAtNSMSwrTabhgrFcPScZT7Ut` (`dpl_2gHbAtNSMSwrTabhgrFcPScZT7Ut`). |
+| `npm.cmd run check:live` (after deployment)                      | **8/8 live checks passed** for `https://opportunity-explorer-ruddy.vercel.app`; exit 0.                                                                                                               |
+| `curl.exe -o NUL -w '%{http_code}' …/api/events`                 | **401** — cron-protected endpoint remains live.                                                                                                                                                       |
+| `git status --short --branch`                                    | `## main...origin/main` at `b81d690` before this evidence entry.                                                                                                                                      |
+
+MTH-053 is now published and verified. The Git-dependent `ignoreCommand` remains
+absent (D-05). All human-only items (MTH-010–013) stay pending; no usage, user
+or revenue result was measured.
