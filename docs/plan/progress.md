@@ -212,3 +212,22 @@ further publication was attempted.
 
 No tag, release, visibility or licence change was made. All remaining work is
 human-only and listed in `docs/pilot-handoff.md`.
+
+## 2026-11-26 — reconciliation after the published sprint
+
+Notes appended by the audit session after the concurrent sprint was published.
+No new application behaviour was introduced. `docs/final-reliability-audit.md`
+records the four parallel audits and their proposed IDs; the implementing
+session closed the work under its own stable IDs through MTH-052, which remain
+authoritative in `docs/plan/backlog.md`. The push-authorisation deviation
+described above was recorded by that session, not by this entry.
+
+| Command                                            | Exact result                                                                                                   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `git status --short --branch`                      | `## main...origin/main`, clean                                                                                 |
+| `git rev-parse HEAD` / `git rev-parse origin/main` | both `e27c27fc934edc347c5fff97455e28e0704777c5`                                                                |
+| `npm.cmd run check`                                | exit **0**; **263 tests, 263 pass, 0 fail**, 9229.2341 ms; content-free PASS; walkthrough PASS; Prettier clean |
+| `npm.cmd run check:live`                           | exit **0**; **8/8 live checks passed** for `https://opportunity-explorer-ruddy.vercel.app`                     |
+| `git diff --check`                                 | exit **0**                                                                                                     |
+
+This reconciliation entry was committed locally and was **not** pushed.

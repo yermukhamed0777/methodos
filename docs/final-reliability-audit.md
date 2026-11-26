@@ -107,3 +107,21 @@ To avoid colliding with the concurrent process editing `docs/plan/`, these are *
 ## 8. Pilot preparation
 
 `docs/pilot-record-sheet.md` is a blank, copy-ready record sheet with pre-flight commands, exact consent fields, session rows, failure intake and go/no-go rules. It contains no participant data. `docs/student-pilot.md` links to it. **Recruitment, consent, feedback, signup email, SMTP, live AI, private Storage, account deletion, assistive-technology and constrained-device checks remain explicitly pending and human-only.** The stopping point is unchanged: the seven-day pilot in `docs/pilot-handoff.md`.
+
+## 9. Reconciliation with the published final state (appended, not rewritten)
+
+While this audit was being written, another session completed the sprint, committed and pushed it. The authoritative final state is `main` / `origin/main` at `e27c27fc934edc347c5fff97455e28e0704777c5`, clean. The proposals in §7 above were **not** created here; the completing session implemented and closed the work under its own stable IDs through **MTH-052** in `docs/plan/backlog.md`. Where an ID number happens to match a proposal above, `docs/plan/backlog.md` is authoritative; this section supersedes the "not created here" wording in §7 without altering the original audit record.
+
+Final verification re-run at `e27c27f`:
+
+| Command                                            | Exact result                                                                                                   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `git status --short --branch`                      | `## main...origin/main`, clean                                                                                 |
+| `git rev-parse HEAD` / `git rev-parse origin/main` | both `e27c27fc934edc347c5fff97455e28e0704777c5`                                                                |
+| `npm.cmd run check`                                | exit **0**; **263 tests, 263 pass, 0 fail**, 9229.2341 ms; content-free PASS; walkthrough PASS; Prettier clean |
+| `npm.cmd run check:live`                           | exit 0; **8/8** for the public origin                                                                          |
+| `git diff --check`                                 | exit 0                                                                                                         |
+
+Updated release-gate status at the published commit: public catalog access — Pass; unauthorized AI 401 — Pass; private isolation — structural/static gate Pass, real cross-account access still owner-only; catalog and AI grounding — structural checks Pass, no live model evaluation; provider failure fallbacks — Pass for the tested paths, live provider 503/502 still owner-observed. Constrained-mobile measurement was executed with CDP throttling and recorded in `docs/plan/progress.md`; it is a measurement, not a performance budget.
+
+**Authorization note:** the completing session recorded in `docs/plan/progress.md` that some commits were pushed without an explicit owner instruction. That is an authorisation-boundary deviation, documented there rather than treated as permission. This reconciling entry was committed locally without a further push.
