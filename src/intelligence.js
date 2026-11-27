@@ -19,6 +19,16 @@ const A = window.ProspectoAuth,
   B = window.ProspectoWorkspace;
 const records = window.PROSPECTO_INTELLIGENCE?.records || [],
   majors = window.PROSPECTO_DEVELOPMENT.majors;
+const recordAliases = new Map();
+for (const r of records)
+  for (const id of r.formerIds || []) recordAliases.set(id, r.id);
+const resolveRecordId = (id) => recordAliases.get(String(id || '')) || id;
+const sameRecordId = (a, b) =>
+  resolveRecordId(String(a || '')) === resolveRecordId(String(b || ''));
+const recordById = (id) => {
+  const rid = resolveRecordId(String(id || ''));
+  return records.find((x) => x.id === rid);
+};
 const track = (name, props) => window.ProspectoEvents?.track(name, props);
 const views = [
   'professionals',
@@ -91,7 +101,7 @@ const title = (name, text) =>
 const empty = (text) =>
   `<div class="work-empty"><img src="/assets/white-lion.svg" width="96" height="96" alt=""><p>${E(text)}</p></div>`;
 const actions = (r) =>
-  `<div class="work-actions">${btn('save', state.saved_resources?.some((x) => x.resource_id === r.id) ? 'Saved · edit notes' : 'Save to my library', r.id)}${btn('task', 'Add to my plan', r.id)}${['project', 'research'].includes(r.kind) ? btn('evidence', 'Record my evidence', r.id) : ''}</div>`;
+  `<div class="work-actions">${btn('save', state.saved_resources?.some((x) => sameRecordId(x.resource_id, r.id)) ? 'Saved · edit notes' : 'Save to my library', r.id)}${btn('task', 'Add to my plan', r.id)}${['project', 'research'].includes(r.kind) ? btn('evidence', 'Record my evidence', r.id) : ''}</div>`;
 const filters = () =>
   `<div class="intel-filterbar"><label>Search<input id="intel-search" type="search" value="${E(search)}" maxlength="120" placeholder="Search this workspace"></label><label>Field<select id="intel-field">${options(
     majors.map((x) => [x.id, x.name]),
@@ -247,8 +257,8 @@ function compareView() {
           ]
             .filter(Boolean)
             .map((id) => {
-              const r = records.find((x) => x.id === id);
-              return r ? btn('detail', r.name, id) : '';
+              const r = recordById(id);
+              return r ? btn('detail', r.name, r.id) : '';
             })
             .join(
               '',
@@ -281,7 +291,7 @@ function projectCard(r) {
     .map(([k, v]) => `<dt>${E(k)}</dt><dd>${E(v)}</dd>`)
     .join('')}</dl><div class="resource-links">${(r.courseIds || [])
     .map((id) => {
-      const c = records.find((x) => x.id === id);
+      const c = recordById(id);
       return c ? link(c.url || c.sources[0][1], c.name) : '';
     })
     .join('')}</div></details>${sources(r)}${actions(r)}</article>`;
@@ -349,9 +359,7 @@ function universityView() {
       field,
       sort: universitySort,
     }),
-    selectedRecords = compareIds
-      .map((id) => records.find((r) => r.id === id))
-      .filter(Boolean);
+    selectedRecords = compareIds.map((id) => recordById(id)).filter(Boolean);
   return (
     title(
       'Universities & Admissions',
@@ -585,7 +593,7 @@ function saved() {
     (state.saved_resources.length
       ? state.saved_resources
           .map((s) => {
-            const r = records.find((r) => r.id === s.resource_id);
+            const r = recordById(s.resource_id);
             return `<article class="work-card">${tag(s.kind)}<h2>${E(s.title)}</h2><p class="work-pre">${E(s.notes)}</p>${r ? tag(cycleStatus(r)) : tag('Source no longer in current collection')}<div class="work-actions">${r ? btn('detail', 'Open record', r.id) : ''}${r ? btn('task', 'Add to plan', r.id) : ''}${btn('unsave', 'Remove saved item', s.resource_id)}</div></article>`;
           })
           .join('')
@@ -784,7 +792,7 @@ function notificationDrawer() {
       notices()
         .map(
           (n) =>
-            `<article class="work-card"><h3>${E(n.title)}</h3><p>${E(n.body)}</p><p>${E(n.next)}</p><small>${n.verified ? 'Provider date recorded; verify its current notice.' : 'Personal / informational notice, not a confirmed provider cut-off.'}</small>${n.recordId ? sources(records.find((r) => r.id === n.recordId)) : ''}<div class="work-actions">${n.recordId ? btn('detail', 'Open item', n.recordId) : btn('go', 'Open workspace', n.route)}${n.recordId ? btn('task', 'Add to plan', n.recordId) : ''}${btn('dismiss', 'Dismiss', n.id)}${btn('snooze', 'Snooze 24 hours', n.id)}</div></article>`,
+            `<article class="work-card"><h3>${E(n.title)}</h3><p>${E(n.body)}</p><p>${E(n.next)}</p><small>${n.verified ? 'Provider date recorded; verify its current notice.' : 'Personal / informational notice, not a confirmed provider cut-off.'}</small>${n.recordId ? sources(recordById(n.recordId)) : ''}<div class="work-actions">${n.recordId ? btn('detail', 'Open item', resolveRecordId(n.recordId)) : btn('go', 'Open workspace', n.route)}${n.recordId ? btn('task', 'Add to plan', resolveRecordId(n.recordId)) : ''}${btn('dismiss', 'Dismiss', n.id)}${btn('snooze', 'Snooze 24 hours', n.id)}</div></article>`,
         )
         .join('') ||
       empty('Nothing needs attention in your current notification settings.')
@@ -1019,7 +1027,7 @@ const originalRender = B.render;
 B.render = (v) =>
   views.includes(v) || v === 'universities' ? render(v) : originalRender(v);
 async function detail(id) {
-  const r = records.find((x) => x.id === id);
+  const r = recordById(id);
   if (!r) throw Error('This record is no longer available.');
   track('detail_open', { kind: 'resource', surface: 'library' });
   if (r.kind === 'university') {
@@ -1079,7 +1087,7 @@ async function action(name, id) {
   if (name === 'retry') return render(view);
   if (name === 'detail') return detail(id);
   if (name === 'task') {
-    const r = records.find((x) => x.id === id);
+    const r = recordById(id);
     document.querySelector('#work-dialog')?.close();
     B.openTask('Prepare: ' + r.name);
     return;
@@ -1094,8 +1102,8 @@ async function action(name, id) {
     return;
   }
   if (name === 'save') {
-    const r = records.find((x) => x.id === id),
-      old = state.saved_resources.find((x) => x.resource_id === id);
+    const r = recordById(id),
+      old = state.saved_resources.find((x) => sameRecordId(x.resource_id, id));
     B.modal(
       'Save to my library',
       `<p>${E(r.name)}</p>` +
@@ -1105,7 +1113,7 @@ async function action(name, id) {
         const rows = await result(
           db.from('saved_resources').upsert({
             user_id: uid,
-            resource_id: id,
+            resource_id: r.id,
             kind: r.kind,
             title: r.name,
             notes: fd.get('notes'),
@@ -1118,13 +1126,16 @@ async function action(name, id) {
     return;
   }
   if (name === 'unsave') {
-    const old = state.saved_resources.find((x) => x.resource_id === id);
+    const old = state.saved_resources.find((x) =>
+      sameRecordId(x.resource_id, id),
+    );
+    const rid = old?.resource_id || resolveRecordId(id);
     await result(
       db
         .from('saved_resources')
         .delete()
         .eq('user_id', uid)
-        .eq('resource_id', id),
+        .eq('resource_id', rid),
     );
     track('save', { action: 'remove', kind: 'resource' });
     undo = { kind: 'saved', old };
@@ -1153,7 +1164,7 @@ async function action(name, id) {
           'course_id',
           (base.course_progress || []).map((r) => [
             r.course_id,
-            records.find((x) => x.id === r.course_id)?.name || r.course_id,
+            recordById(r.course_id)?.name || r.course_id,
           ]),
         ) +
         select(
@@ -1191,7 +1202,7 @@ async function action(name, id) {
   }
 
   if (name === 'evidence') {
-    const r = records.find((x) => x.id === id);
+    const r = recordById(id);
     B.modal(
       'Record work I actually completed',
       `<p>This saves a profile record only after your review. An example is not evidence of work you have done.</p>` +
@@ -1234,8 +1245,10 @@ async function action(name, id) {
     return render(view);
   }
   if (name === 'folder') {
-    const r = records.find((x) => x.id === id);
-    let f = state.admissions_folders.find((x) => x.university_id === id);
+    const r = recordById(id);
+    let f = state.admissions_folders.find((x) =>
+      sameRecordId(x.university_id, id),
+    );
     if (!f) {
       const rows = await result(
         db
@@ -1313,7 +1326,7 @@ async function action(name, id) {
     return;
   }
   if (name === 'download-cv') {
-    const r = records.find((x) => x.id === id);
+    const r = recordById(id);
     download(
       '# ' +
         r.name +

@@ -74,6 +74,15 @@ test('published course links use a live canonical source', () => {
   );
 });
 
+test('former MIT OCW course ID resolves to the canonical record', () => {
+  const oldId = 'learn-5c3c81e9e991df28f6de';
+  const r = intelligence.records.find(
+    (x) => x.id === oldId || x.formerIds?.includes(oldId),
+  );
+  assert.ok(r, 'old saved reference should resolve');
+  assert.equal(r.id, 'learn-f28a1d77fdb9bd254441');
+});
+
 test('no published record claims a deadline is unannounced when one is confirmed', () => {
   const bad = intelligence.records.filter(
     (r) =>

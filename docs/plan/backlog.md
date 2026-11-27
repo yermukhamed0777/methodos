@@ -454,9 +454,9 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 
 ### MTH-053 — Dead published course source link
 
-- **Status:** Done locally (2026-11-26); deploy pending owner confirmation.
+- **Status:** Done (2026-11-26; deployed on origin/main `b81d690`, Vercel deployment `dpl_2gHbAtNSMSwrTabhgrFcPScZT7Ut`, post-deploy 8/8 live).
 - **Refs:** `data/learning-resources.json`, `data/intelligence.json`,
-  `supabase/seed.sql`, `tests/catalog-consistency.test.js:60`.
+  `supabase/seed.sql`, `tests/catalog-consistency.test.js`, `src/intelligence.js`.
 - **Evidence:** a bounded link sweep of 593 unique HTTPS URLs in `data/*.json`
   found 25 first-pass anomalies; a GET recheck confirmed the published MIT OCW
   course URL `14-05-intermediate-macroeconomics-spring-2013/` returns **404**
@@ -465,7 +465,12 @@ outside a working tree`, `errorStep: "ignoreStep"`. Production
 - **Fix:** repoint the record to the verified canonical Fall 2025 OCW page,
   update its verification note, regenerate the derived catalog and seed, and
   raise the collection header to the actual latest review date. No course was
-  added or removed and no fact was invented.
-- **Done when:** `node --test tests/catalog-consistency.test.js` reports 4/4 and
-  `npm run check` is green with 264/264 tests. Verified locally; production has
-  not been updated because no push was authorised in this step.
+  added or removed and no fact was invented. Because the canonical ID changed
+  with the URL, the record keeps `formerIds` containing
+  `learn-5c3c81e9e991df28f6de`, and the intelligence UI resolves former IDs to
+  the canonical record so previously saved references still open.
+- **Done when:** `node --test tests/catalog-consistency.test.js` passes with the
+  former-ID compatibility case, `npm run check` is green with 264/264 tests, CI
+  for `b81d690` is green, Vercel reports success for deployment
+  `dpl_2gHbAtNSMSwrTabhgrFcPScZT7Ut`, and `npm run check:live` reports 8/8.
+  Verified.

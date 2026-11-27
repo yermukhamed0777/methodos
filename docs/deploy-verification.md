@@ -1,12 +1,14 @@
 # Deployment handoff
 
-## Latest verified production deployment · 26 November 2026 (pre-reliability-sprint)
+## Latest verified production deployment · 26 November 2026
 
-Production still serves `32ef0ba` (`dpl_AxQMA7QyNZQ3XMcTTEWUS4gaMCMn`,
-Ready/Production/Current) with `npm run check:live` 8/8 at that time. The
-reliability-sprint commits are local-only; after the bundled stylesheet change
-the same checker reports 7/8 against this older deployment. See
-[release status](release-status.md) and [progress](plan/progress.md).
+- **Origin/main (GitHub):** `b81d690ca66a44b8c43f4d434052bdb89a049dc2` (`MTH-053: replace dead MIT OCW course link with verified canonical source`).
+- **CI:** GitHub Actions run `45783550659` for `b81d690` — `completed/success`, job `check` success in 30s.
+- **Vercel:** deployment `dpl_2gHbAtNSMSwrTabhgrFcPScZT7Ut` — `success` / `Deployment has completed` at `2026-11-26T08:29:51Z`, target `https://vercel.com/erm1ham3d2204-2491/opportunity-explorer/2gHbAtNSMSwrTabhgrFcPScZT7Ut`.
+- **Live checks:** `npm run check:live` reports **8/8 live checks passed** for `https://opportunity-explorer-ruddy.vercel.app`; `GET /api/events` returns **401** (cron-protected, live).
+- **Local checkout:** `main` is one documentation commit ahead of `origin/main` (`ee2a11e docs: record CI and deployment IDs for published MTH-053`, docs-only). The evidence-only commit is accurate for the deployed `b81d690` state; publishing it creates a new docs-only push and should be followed by its own CI/Vercel status check.
+
+See [release status](release-status.md) and [progress](plan/progress.md).
 
 ## Historical release · 25 November 2026
 

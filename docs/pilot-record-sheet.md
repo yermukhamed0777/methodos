@@ -10,7 +10,7 @@
 | CI                | `gh run list --limit 1`                                        | `completed success` for the reviewed SHA                                                    |                             |
 | Production status | `gh api repos/yermukhamed0777/methodos/commits/<SHA>/statuses` | Vercel `success` for the reviewed SHA                                                       |                             |
 | Live markers      | `npm run check:live`                                           | `8/8 live checks passed`                                                                    |                             |
-| Offline suite     | `npm run check`                                                | exit 0; data, build, lint, typecheck, 232 tests, content-free, walkthrough, format all pass |                             |
+| Offline suite     | `npm run check`                                                | exit 0; data, build, lint, typecheck, 264 tests, content-free, walkthrough, format all pass |                             |
 
 Replace `<SHA>` with the actual value from `git rev-parse HEAD`; do not paste a token or credential. If any row fails, stop and file a new `MTH-###` ID before inviting anyone. Do not treat a green automated check as a substitute for the signed-out desktop/375 px walkthrough in `student-pilot.md:10`.
 

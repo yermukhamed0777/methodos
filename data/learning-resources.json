@@ -2096,7 +2096,8 @@
         "https://ocw.mit.edu/courses/14-05-intermediate-macroeconomics-fall-2025/"
       ]
     ],
-    "verification": "The Spring 2013 URL returned 404 on 26 November 2026. Title, level and learning materials were checked against the official Fall 2025 OCW course page; no certificate or credit is claimed."
+    "verification": "The Spring 2013 URL returned 404 on 26 November 2026. Title, level and learning materials were checked against the official Fall 2025 OCW course page; no certificate or credit is claimed.",
+    "formerIds": ["learn-5c3c81e9e991df28f6de"]
   },
   {
     "name": "Intermediate Macroeconomic Theory",
